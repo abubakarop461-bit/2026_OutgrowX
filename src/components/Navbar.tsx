@@ -81,7 +81,7 @@ const Navbar: React.FC = () => {
           <Sun size={18} className="text-accent" />
         </div>
         <span className="font-bold text-primary" style={{ fontSize: '1.375rem', fontFamily: 'var(--font-display)' }}>
-          Sury<span className="text-accent">X</span>
+          Surya<span className="text-accent">Setu</span>
         </span>
       </NavLink>
 

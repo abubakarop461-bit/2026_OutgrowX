@@ -165,8 +165,8 @@ const Onboarding: React.FC = () => {
             >
               <Zap size={20} className="text-accent" />
             </div>
-            <span className="font-bold text-primary" style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem' }}>
-              Sury<span className="text-accent">X</span>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: '#F0FFF4' }}>
+              Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
             </span>
             <span className="badge badge--accent ml-auto">
               Step {currentStep} of 5

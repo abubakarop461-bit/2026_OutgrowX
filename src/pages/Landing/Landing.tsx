@@ -91,8 +91,8 @@ const Landing: React.FC = () => {
           >
             <Sun size={28} className="text-accent" />
           </div>
-          <h1 style={{ fontSize: '3.25rem', fontFamily: 'var(--font-display)', fontWeight: 900 }}>
-            Sury<span className="text-accent">X</span>
+          <h1 style={{ fontSize: '3.25rem', fontFamily: 'Outfit, sans-serif', fontWeight: 900, margin: 0, color: '#F0FFF4' }}>
+            Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
           </h1>
         </div>
         <h2 className="text-secondary font-normal" style={{ fontSize: '1.375rem' }}>

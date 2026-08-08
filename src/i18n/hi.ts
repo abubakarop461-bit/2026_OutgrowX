@@ -1,6 +1,6 @@
 export default {
   // Navigation
-  welcome: 'SuryX में आपका स्वागत है',
+  welcome: 'SuryaSetu में आपका स्वागत है',
   dashboard: 'डैशबोर्ड',
   solarAI: 'सौर एआई इंटेलिजेंस',
   propertyAssessment: 'संपत्ति मूल्यांकन',

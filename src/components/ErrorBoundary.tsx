@@ -19,7 +19,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('SuryX Error:', error, errorInfo);
+    console.error('SuryaSetu Error:', error, errorInfo);
   }
 
   private handleReset = () => {

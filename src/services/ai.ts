@@ -148,7 +148,7 @@ export async function* generateReport(
 
   const stream = chatStream(
     [{ role: 'user', content: prompt }],
-    "You are SuryX Solar Intelligence AI. Provide detailed, professional, and actionable solar reports for Indian consumers.",
+    "You are SuryaSetu Solar Intelligence AI. Provide detailed, professional, and actionable solar reports for Indian consumers.",
     () => {}
   );
 

@@ -48,7 +48,7 @@ export default function VendorMarketplace() {
     });
     return `Hello ${selectedVendor?.companyName || ''},
 
-I am interested in installing a solar system and would like a quote. Based on my SuryX AI assessment:
+I am interested in installing a solar system and would like a quote. Based on my SuryaSetu AI assessment:
 
 - Recommended Size: ${roi.systemSizeKW} kW
 - Roof Area: ${area} sq ft
@@ -273,7 +273,7 @@ ${name}`;
 
             <div className="glass-card p-6 rounded-2xl h-fit">
               <h3 className="font-semibold mb-4">Vendor Registration</h3>
-              <p className="text-sm text-gray-400 mb-6">Want to receive verified solar leads? Register your business on SuryX.</p>
+              <p className="text-sm text-gray-400 mb-6">Want to receive verified solar leads? Register your business on SuryaSetu.</p>
               <form className="flex-col gap-4" onSubmit={e => e.preventDefault()}>
                 <div className="form-group">
                   <label className="label">Company Name</label>

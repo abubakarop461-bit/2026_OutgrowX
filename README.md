@@ -1,7 +1,7 @@
-# 🌞 SuryX — Solar Intelligence Platform
+# 🌞 SuryaSetu — Solar Intelligence Platform
 > **Project 2026_OutgrowX** | India's AI-Powered Solar ROI & Decision Engine
 
-SuryX is an intelligent solar energy decision & marketplace platform designed for Indian homeowners, landowners, and solar installers. It pairs 20-year backdated state electricity board tariff data with multi-tier AI vision and reasoning models to deliver instant bill parsing, precise ROI forecasting, seasonal consumption modeling, and seamless vendor matching.
+SuryaSetu is an intelligent solar energy decision & marketplace platform designed for Indian homeowners, landowners, and solar installers. It pairs 20-year backdated state electricity board tariff data with multi-tier AI vision and reasoning models to deliver instant bill parsing, precise ROI forecasting, seasonal consumption modeling, and seamless vendor matching.
 
 ---
 

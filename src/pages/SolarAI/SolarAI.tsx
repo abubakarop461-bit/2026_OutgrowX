@@ -318,7 +318,7 @@ const ApplianceCalculator: React.FC = () => {
 const AIAdvisor: React.FC = () => {
   const { userProfile, language } = useApp();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am your SuryX Solar Pro Advisor backed by our Single Source of Truth Knowledge Base. How can I help you regarding PM Surya Ghar, subsidies, payback, or DISCOM policies today?' }
+    { role: 'assistant', content: 'Hello! I am your SuryaSetu Solar Pro Advisor backed by our Single Source of Truth Knowledge Base. How can I help you regarding PM Surya Ghar, subsidies, payback, or DISCOM policies today?' }
   ]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
