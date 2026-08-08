@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
 import { DISCOM_BY_STATE } from '../../data/stateElectricityRates';
-import { Sparkles, ArrowRight, ArrowLeft, Check, ShieldCheck, Zap, FileText, CheckCircle2 } from 'lucide-react';
+import {
+  House, Key, Buildings, Sparkle, ArrowRight, ArrowLeft,
+  Check, ShieldCheck, Lightning, CurrencyInr, CheckCircle
+} from '@phosphor-icons/react';
 
 const INDIAN_STATES = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
@@ -14,26 +17,28 @@ const INDIAN_STATES = [
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { userProfile, setProfile, completeOnboarding } = useApp();
+  const { setProfile, completeOnboarding } = useApp();
   const { t } = useTranslation();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  // ALWAYS initialize form inputs as clean/empty when starting onboarding
   const [formData, setFormData] = useState({
-    firstName: userProfile.firstName || '',
-    userType: userProfile.userType || 'Homeowner',
-    propertyType: userProfile.propertyType || 'Independent House',
-    roofArea: userProfile.roofArea || '',
-    state: userProfile.state || '',
-    billAmount: userProfile.billAmount || '',
-    discom: userProfile.discom || '',
-    hasSolar: userProfile.hasSolar ? String(userProfile.hasSolar) : 'No',
-    systemSize: userProfile.systemSize || '',
-    installYear: userProfile.installYear || '',
-    wantsBattery: userProfile.wantsBattery ? String(userProfile.wantsBattery) : 'Yes',
-    city: userProfile.city || '',
-    pincode: userProfile.pincode || ''
+    firstName: '',
+    userType: 'Homeowner',
+    propertyType: 'Independent House',
+    roofArea: '',
+    state: '',
+    billAmount: '',
+    discom: '',
+    hasSolar: 'No',
+    systemSize: '',
+    installYear: '',
+    wantsBattery: 'Yes',
+    city: '',
+    pincode: ''
   });
 
   const update = (field: string, val: string | number) => {
@@ -96,8 +101,8 @@ const Onboarding: React.FC = () => {
       propertyType: formData.propertyType,
       roofArea: Number(formData.roofArea) || 800,
       roofSqFt: Number(formData.roofArea) || 800,
-      state: formData.state,
-      discom: formData.discom,
+      state: formData.state || 'Maharashtra',
+      discom: formData.discom || 'MSEDCL',
       billAmount: Number(formData.billAmount) || 3200,
       avgBill: Number(formData.billAmount) || 3200,
       hasSolar: formData.hasSolar === 'Yes',
@@ -113,6 +118,7 @@ const Onboarding: React.FC = () => {
     navigate('/dashboard');
   };
 
+  // Check if user has entered an actual bill amount
   const hasBillData = Number(formData.billAmount) > 0;
   const monthlyBill = Number(formData.billAmount) || 0;
   const annualBill = monthlyBill * 12;
@@ -131,9 +137,7 @@ const Onboarding: React.FC = () => {
 
   return (
     <main className="page flex relative">
-      <a href="#onboarding-form" className="skip-link">
-        Skip to form
-      </a>
+      <a href="#onboarding-form" className="skip-link">Skip to form</a>
 
       {/* Background ambient glow */}
       <div
@@ -145,7 +149,7 @@ const Onboarding: React.FC = () => {
           left: '15%',
           width: '400px',
           height: '400px',
-          background: 'radial-gradient(circle, rgba(168,255,62,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(168,255,62,0.05) 0%, transparent 70%)',
           borderRadius: '50%'
         }}
       />
@@ -160,13 +164,13 @@ const Onboarding: React.FC = () => {
               style={{
                 width: '36px',
                 height: '36px',
-                background: 'rgba(168,255,62,0.12)',
-                border: '1px solid rgba(168,255,62,0.3)'
+                background: 'rgba(168,255,62,0.10)',
+                border: '1px solid rgba(168,255,62,0.22)'
               }}
             >
-              <Zap size={20} className="text-accent" />
+              <Lightning size={20} weight="duotone" color="#A8FF3E" />
             </div>
-            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: '#F0FFF4' }}>
+            <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: '#ECF2EE' }}>
               Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
             </span>
             <span className="badge badge--accent ml-auto">
@@ -187,7 +191,7 @@ const Onboarding: React.FC = () => {
                   aria-current={step === currentStep ? 'step' : undefined}
                   disabled={step > currentStep}
                 >
-                  {step < currentStep ? <Check size={16} /> : step}
+                  {step < currentStep ? <Check size={16} weight="bold" /> : step}
                 </button>
                 {step < 5 && (
                   <div className={`step-line ${step < currentStep ? 'step-line--done' : ''}`} />
@@ -198,16 +202,16 @@ const Onboarding: React.FC = () => {
 
           {/* Step Form Box */}
           <div className="glass-card glass-card--lg" style={{ boxShadow: 'var(--shadow-glow)' }}>
-            <h2 className="mb-1" style={{ fontSize: '1.75rem' }}>
+            <h2 className="mb-1" style={{ fontSize: '1.5rem', fontFamily: 'Outfit, sans-serif', color: '#ECF2EE' }}>
               {currentStep === 1 && "What's your name & role?"}
               {currentStep === 2 && 'Tell us about your property'}
               {currentStep === 3 && 'Average electricity bill'}
               {currentStep === 4 && 'Do you currently have solar?'}
               {currentStep === 5 && 'Confirm location & DISCOM'}
             </h2>
-            <p className="text-secondary mb-6" style={{ fontSize: '0.9375rem' }}>
+            <p className="text-secondary mb-6" style={{ fontSize: '0.875rem', color: '#7A9484' }}>
               {currentStep === 1 && 'Personalize your solar intelligence dashboard.'}
-              {currentStep === 2 && 'We use roof area to compute maximum KW capacity.'}
+              {currentStep === 2 && 'We use roof area to compute maximum kW capacity.'}
               {currentStep === 3 && 'Allows us to model 20-year grid tariff vs solar ROI.'}
               {currentStep === 4 && 'Help us tailor recommendations for storage or expansion.'}
               {currentStep === 5 && 'Calculates accurate DISCOM net-metering & state subsidies.'}
@@ -218,37 +222,38 @@ const Onboarding: React.FC = () => {
               {currentStep === 1 && (
                 <div className="flex-col gap-6">
                   <div className="form-group">
-                    <label className="label" htmlFor="firstName">{t('firstName') || 'First Name'}</label>
+                    <label className="label" htmlFor="firstName" style={{ fontSize: '0.75rem', color: '#7A9484' }}>{t('firstName') || 'First Name'}</label>
                     <input
                       type="text"
                       id="firstName"
                       className="input"
                       value={formData.firstName}
                       onChange={e => update('firstName', e.target.value)}
-                      placeholder="e.g. Rahul or Priya"
+                      placeholder="Enter your first name"
                       required
                       autoFocus
+                      style={{ fontSize: '0.875rem' }}
                     />
                     {errors.firstName && <p className="text-red text-xs">{errors.firstName}</p>}
                   </div>
 
                   <div className="form-group">
-                    <label className="label">I am a...</label>
+                    <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>I am a...</label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                       {[
-                        { label: 'Homeowner', icon: '🏠' },
-                        { label: 'Tenant', icon: '🔑' },
-                        { label: 'Business Owner', icon: '🏢' }
-                      ].map(item => (
+                        { label: 'Homeowner', Icon: House, color: '#A8FF3E' },
+                        { label: 'Tenant', Icon: Key, color: '#60A5FA' },
+                        { label: 'Business Owner', Icon: Buildings, color: '#F59E0B' }
+                      ].map(({ label, Icon, color }) => (
                         <button
-                          key={item.label}
+                          key={label}
                           type="button"
-                          className={`toggle-option ${formData.userType === item.label ? 'toggle-option--selected' : ''}`}
-                          onClick={() => update('userType', item.label)}
-                          style={{ padding: '1rem 0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}
+                          className={`toggle-option ${formData.userType === label ? 'toggle-option--selected' : ''}`}
+                          onClick={() => update('userType', label)}
+                          style={{ padding: '1.25rem 0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.625rem' }}
                         >
-                          <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
-                          <span className="text-sm">{item.label}</span>
+                          <Icon size={26} weight="duotone" color={formData.userType === label ? '#A8FF3E' : color} />
+                          <span className="text-sm" style={{ fontWeight: 600 }}>{label}</span>
                         </button>
                       ))}
                     </div>
@@ -260,12 +265,13 @@ const Onboarding: React.FC = () => {
               {currentStep === 2 && (
                 <div className="flex-col gap-6">
                   <div className="form-group">
-                    <label className="label" htmlFor="propertyType">{t('propertyType') || 'Property Type'}</label>
+                    <label className="label" htmlFor="propertyType" style={{ fontSize: '0.75rem', color: '#7A9484' }}>{t('propertyType') || 'Property Type'}</label>
                     <select
                       id="propertyType"
                       className="input select"
                       value={formData.propertyType}
                       onChange={e => update('propertyType', e.target.value)}
+                      style={{ fontSize: '0.875rem' }}
                     >
                       <option value="Independent House">Independent House / Row House</option>
                       <option value="Flat/Apartment">Flat / Apartment Complex</option>
@@ -276,7 +282,7 @@ const Onboarding: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="label" htmlFor="roofArea">{t('propertySize') || 'Approximate Roof / Usable Area (sq ft)'}</label>
+                    <label className="label" htmlFor="roofArea" style={{ fontSize: '0.75rem', color: '#7A9484' }}>{t('propertySize') || 'Approximate Roof / Usable Area (sq ft)'}</label>
                     <input
                       type="number"
                       id="roofArea"
@@ -285,21 +291,24 @@ const Onboarding: React.FC = () => {
                       onChange={e => update('roofArea', e.target.value)}
                       placeholder="e.g. 800"
                       min="1"
+                      style={{ fontSize: '0.875rem' }}
                     />
                     {errors.roofArea && <p className="text-red text-xs">{errors.roofArea}</p>}
-                    <p className="text-muted text-xs" style={{ marginTop: '4px' }}>
-                      Rule of thumb: ~100 sq ft shadow-free area holds 1 kW (~3-4 solar panels).
+                    <p style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>
+                      Rule of thumb: ~107 sq ft shadow-free area holds 1 kW (~3-4 solar panels).
                     </p>
                   </div>
 
                   <div className="form-group">
-                    <label className="label" htmlFor="state">{t('yourState') || 'State'}</label>
+                    <label className="label" htmlFor="state" style={{ fontSize: '0.75rem', color: '#7A9484' }}>{t('yourState') || 'State'}</label>
                     <select
                       id="state"
                       className="input select"
                       value={formData.state}
                       onChange={e => update('state', e.target.value)}
+                      style={{ fontSize: '0.875rem' }}
                     >
+                      <option value="">Select your state</option>
                       {INDIAN_STATES.map(st => (
                         <option key={st} value={st}>{st}</option>
                       ))}
@@ -312,18 +321,17 @@ const Onboarding: React.FC = () => {
               {currentStep === 3 && (
                 <div className="flex-col gap-6">
                   <div className="form-group">
-                    <label className="label" htmlFor="billAmount">{t('yourBill') || 'Average Monthly Electricity Bill (₹)'}</label>
-                    <div className="relative">
-                      <span className="absolute text-accent font-bold" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.1rem' }}>₹</span>
+                    <label className="label" htmlFor="billAmount" style={{ fontSize: '0.75rem', color: '#7A9484' }}>{t('yourBill') || 'Average Monthly Electricity Bill (₹)'}</label>
+                    <div style={{ position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#7A9484', fontWeight: 600 }}>₹</span>
                       <input
                         type="number"
                         id="billAmount"
                         className="input"
-                        style={{ paddingLeft: '36px', fontSize: '1.125rem', fontWeight: 600 }}
+                        style={{ paddingLeft: '32px', fontSize: '0.875rem' }}
                         value={formData.billAmount}
                         onChange={e => update('billAmount', e.target.value)}
-                        placeholder="3200"
-                        required
+                        placeholder="e.g. 3200"
                         min="1"
                       />
                     </div>
@@ -331,27 +339,16 @@ const Onboarding: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="label" htmlFor="discom">DISCOM (Electricity Distribution Company)</label>
-                    <select
+                    <label className="label" htmlFor="discom" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Electricity DISCOM / Provider</label>
+                    <input
+                      type="text"
                       id="discom"
-                      className="input select"
+                      className="input"
                       value={formData.discom}
                       onChange={e => update('discom', e.target.value)}
-                    >
-                      {(DISCOM_BY_STATE[formData.state] || [`${formData.state} State Electricity Board`]).map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="glass-card glass-card--sm" style={{ background: 'rgba(168,255,62,0.04)', borderColor: 'rgba(168,255,62,0.15)' }}>
-                    <div className="flex items-center gap-3">
-                      <FileText size={20} className="text-accent" />
-                      <div>
-                        <p className="text-primary font-semibold text-sm" style={{ margin: 0 }}>Have your physical bill handy?</p>
-                        <p className="text-secondary text-xs" style={{ margin: 0 }}>You can scan your bill later using Solar AI OCR Scanner.</p>
-                      </div>
-                    </div>
+                      placeholder="e.g. MSEDCL, BESCOM, TANGEDCO"
+                      style={{ fontSize: '0.875rem' }}
+                    />
                   </div>
                 </div>
               )}
@@ -360,7 +357,7 @@ const Onboarding: React.FC = () => {
               {currentStep === 4 && (
                 <div className="flex-col gap-6">
                   <div className="form-group">
-                    <label className="label">{t('existingSolar') || 'Do you currently have solar panels installed?'}</label>
+                    <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Do you currently have solar panels installed?</label>
                     <div className="toggle-group">
                       {['Yes', 'No'].map(opt => (
                         <button
@@ -368,8 +365,9 @@ const Onboarding: React.FC = () => {
                           type="button"
                           className={`toggle-option ${formData.hasSolar === opt ? 'toggle-option--selected' : ''}`}
                           onClick={() => update('hasSolar', opt)}
+                          style={{ fontSize: '0.875rem' }}
                         >
-                          {opt === 'Yes' ? '✓ Yes, I have solar' : '✗ No, not yet'}
+                          {opt}
                         </button>
                       ))}
                     </div>
@@ -378,34 +376,36 @@ const Onboarding: React.FC = () => {
                   {formData.hasSolar === 'Yes' && (
                     <div className="form-row">
                       <div className="form-group">
-                        <label className="label" htmlFor="systemSize">Current System Size (kW)</label>
+                        <label className="label" htmlFor="systemSize" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Existing System Size (kW)</label>
                         <input
                           type="number"
                           id="systemSize"
                           className="input"
                           value={formData.systemSize}
                           onChange={e => update('systemSize', e.target.value)}
-                          min="0.1"
-                          step="0.1"
+                          placeholder="e.g. 3"
+                          style={{ fontSize: '0.875rem' }}
                         />
                       </div>
                       <div className="form-group">
-                        <label className="label" htmlFor="installYear">Installation Year</label>
+                        <label className="label" htmlFor="installYear" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Installation Year</label>
                         <input
                           type="number"
                           id="installYear"
                           className="input"
                           value={formData.installYear}
                           onChange={e => update('installYear', e.target.value)}
+                          placeholder="2022"
                           min="2000"
                           max="2030"
+                          style={{ fontSize: '0.875rem' }}
                         />
                       </div>
                     </div>
                   )}
 
                   <div className="form-group">
-                    <label className="label">Are you interested in battery storage?</label>
+                    <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Are you interested in battery storage?</label>
                     <div className="toggle-group">
                       {['Yes', 'No'].map(opt => (
                         <button
@@ -413,6 +413,7 @@ const Onboarding: React.FC = () => {
                           type="button"
                           className={`toggle-option ${formData.wantsBattery === opt ? 'toggle-option--selected' : ''}`}
                           onClick={() => update('wantsBattery', opt)}
+                          style={{ fontSize: '0.875rem' }}
                         >
                           {opt === 'Yes' ? 'Yes, battery storage' : 'No, grid-tied only'}
                         </button>
@@ -427,7 +428,7 @@ const Onboarding: React.FC = () => {
                 <div className="flex-col gap-6">
                   <div className="form-row">
                     <div className="form-group">
-                      <label className="label" htmlFor="city">City</label>
+                      <label className="label" htmlFor="city" style={{ fontSize: '0.75rem', color: '#7A9484' }}>City</label>
                       <input
                         type="text"
                         id="city"
@@ -435,10 +436,11 @@ const Onboarding: React.FC = () => {
                         value={formData.city}
                         onChange={e => update('city', e.target.value)}
                         placeholder="e.g. Pune"
+                        style={{ fontSize: '0.875rem' }}
                       />
                     </div>
                     <div className="form-group">
-                      <label className="label" htmlFor="pincode">PIN Code</label>
+                      <label className="label" htmlFor="pincode" style={{ fontSize: '0.75rem', color: '#7A9484' }}>PIN Code</label>
                       <input
                         type="text"
                         id="pincode"
@@ -446,7 +448,8 @@ const Onboarding: React.FC = () => {
                         maxLength={6}
                         value={formData.pincode}
                         onChange={e => update('pincode', e.target.value)}
-                        placeholder="411001"
+                        placeholder="e.g. 411001"
+                        style={{ fontSize: '0.875rem' }}
                       />
                       {errors.pincode && <p className="text-red text-xs">{errors.pincode}</p>}
                     </div>
@@ -455,18 +458,18 @@ const Onboarding: React.FC = () => {
                   {/* Summary Card */}
                   <div className="glass-card glass-card--sm" style={{ background: 'rgba(34,197,94,0.06)', borderColor: 'rgba(34,197,94,0.2)' }}>
                     <div className="flex items-center gap-3 mb-3">
-                      <CheckCircle2 className="text-green" size={24} />
+                      <CheckCircle size={22} weight="duotone" color="#22C55E" />
                       <div>
-                        <h4 className="text-primary font-semibold" style={{ margin: 0 }}>Ready to Generate Solar Intelligence</h4>
-                        <p className="text-secondary text-xs" style={{ margin: 0 }}>DISCOM: {formData.discom}</p>
+                        <h4 className="text-primary font-semibold" style={{ margin: 0, fontSize: '0.9375rem' }}>Ready to Generate Solar Intelligence</h4>
+                        <p className="text-secondary text-xs" style={{ margin: 0, color: '#7A9484' }}>DISCOM: {formData.discom || 'Auto-detected'}</p>
                       </div>
                     </div>
 
                     <div className="grid-2 gap-3 text-xs" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.75rem' }}>
-                      <div><span className="text-muted">Name:</span> <strong className="text-primary">{formData.firstName || 'User'}</strong></div>
-                      <div><span className="text-muted">State:</span> <strong className="text-primary">{formData.state}</strong></div>
-                      <div><span className="text-muted">Monthly Bill:</span> <strong className="text-accent">₹{formData.billAmount}</strong></div>
-                      <div><span className="text-muted">Roof Area:</span> <strong className="text-primary">{formData.roofArea} sq ft</strong></div>
+                      <div><span style={{ color: '#4A6055' }}>Name:</span> <strong className="text-primary">{formData.firstName || 'User'}</strong></div>
+                      <div><span style={{ color: '#4A6055' }}>State:</span> <strong className="text-primary">{formData.state || 'Selected'}</strong></div>
+                      <div><span style={{ color: '#4A6055' }}>Monthly Bill:</span> <strong className="text-accent">₹{formData.billAmount || '—'}</strong></div>
+                      <div><span style={{ color: '#4A6055' }}>Roof Area:</span> <strong className="text-primary">{formData.roofArea || '—'} sq ft</strong></div>
                     </div>
                   </div>
                 </div>
@@ -475,18 +478,18 @@ const Onboarding: React.FC = () => {
               {/* Step Navigation Controls */}
               <div className="flex justify-between gap-4 mt-8">
                 {currentStep > 1 ? (
-                  <button type="button" className="btn btn-ghost" onClick={handlePrev}>
-                    <ArrowLeft size={16} /> {t('back') || 'Back'}
+                  <button type="button" className="btn btn-ghost" onClick={handlePrev} style={{ fontSize: '0.875rem' }}>
+                    <ArrowLeft size={15} /> {t('back') || 'Back'}
                   </button>
                 ) : <div />}
 
                 {currentStep < 5 ? (
-                  <button type="button" className="btn btn-primary" onClick={handleNext}>
-                    {t('next') || 'Next Step'} <ArrowRight size={16} />
+                  <button type="button" className="btn btn-primary" onClick={handleNext} style={{ fontSize: '0.875rem' }}>
+                    {t('next') || 'Next Step'} <ArrowRight size={15} />
                   </button>
                 ) : (
-                  <button type="submit" className="btn btn-primary btn-lg flex-1 justify-center">
-                    View My Solar Dashboard ☀️
+                  <button type="submit" className="btn btn-primary btn-lg flex-1 justify-center" style={{ fontSize: '0.9375rem' }}>
+                    View My Solar Dashboard <ArrowRight size={16} />
                   </button>
                 )}
               </div>
@@ -494,62 +497,122 @@ const Onboarding: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Live Savings & ROI Preview Card */}
-        <div className="onboarding-preview-col flex-col gap-6" style={{ width: '420px' }}>
-          <div
-            className="glass-card text-center"
-            style={{
-              background: 'linear-gradient(165deg, rgba(13,26,16,0.9) 0%, rgba(168,255,62,0.08) 100%)',
-              borderColor: 'rgba(168,255,62,0.2)',
-              padding: '2.5rem 2rem'
-            }}
-          >
+        {/* Right Column: Solar Possibilities Preview Card */}
+        <div className="onboarding-preview-col flex-col gap-6" style={{ width: '400px' }}>
+          {!hasBillData ? (
+            /* Possibilities Card before user enters bill */
             <div
-              className="flex items-center justify-center rounded-full mx-auto mb-4"
+              className="glass-card"
               style={{
-                width: '64px',
-                height: '64px',
-                background: 'rgba(168,255,62,0.12)',
-                border: '1px solid rgba(168,255,62,0.3)'
+                background: 'rgba(10,18,13,0.85)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                padding: '2.25rem 1.75rem'
               }}
             >
-              <Sparkles size={32} className="text-accent" />
-            </div>
-
-            <p className="stat-label text-xs letter-wide">Est. 25-Year Cumulative Savings</p>
-            <div className="stat-value stat-value--accent mb-1" style={{ fontSize: '2.75rem' }}>
-              {hasBillData ? `₹${savings25Year} Lakh` : '₹ —'}
-            </div>
-            <p className="stat-sublabel text-secondary">
-              {hasBillData 
-                ? `~₹${formattedSavings} / year based on your ₹${monthlyBill.toLocaleString('en-IN')} bill`
-                : 'Enter your monthly electricity bill to calculate live savings'}
-            </p>
-
-            <div className="divider" />
-
-            <div className="grid-2 gap-4 text-left">
-              <div>
-                <span className="stat-label">System Size</span>
-                <p className="text-lg font-bold text-primary" style={{ margin: 0 }}>
-                  {hasBillData ? `~${recommendedKW} kW` : '— kW'}
-                </p>
+              <div
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'rgba(168,255,62,0.08)',
+                  border: '1px solid rgba(168,255,62,0.18)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '1.25rem'
+                }}
+              >
+                <Sparkle size={24} weight="duotone" color="#A8FF3E" />
               </div>
-              <div>
-                <span className="stat-label">PM Subsidy</span>
-                <p className="text-lg font-bold text-amber" style={{ margin: 0 }}>
-                  {hasBillData ? (Number(recommendedKW) <= 1 ? '₹30,000' : Number(recommendedKW) <= 2 ? '₹60,000' : '₹78,000') : '—'}
-                </p>
+
+              <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.125rem', fontWeight: 700, color: '#ECF2EE', marginBottom: '0.375rem' }}>
+                Solar Possibilities in India
+              </h4>
+              <p style={{ fontSize: '0.8125rem', color: '#7A9484', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+                Fill in your details in the form to model your 25-year ROI, system capacity, and PM Surya Ghar subsidy.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <Lightning size={18} weight="duotone" color="#A8FF3E" style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ECF2EE' }}>Up to 100% Bill Offset</div>
+                    <div style={{ fontSize: '0.75rem', color: '#7A9484' }}>Generate up to 300 units of free electricity per month.</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <CheckCircle size={18} weight="duotone" color="#22C55E" style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ECF2EE' }}>Up to ₹78,000 Govt Subsidy</div>
+                    <div style={{ fontSize: '0.75rem', color: '#7A9484' }}>Direct Bank Transfer (DBT) credit under PM Surya Ghar.</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', background: 'rgba(255,255,255,0.03)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <CurrencyInr size={18} weight="duotone" color="#F59E0B" style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ECF2EE' }}>3 to 4 Years Payback</div>
+                    <div style={{ fontSize: '0.75rem', color: '#7A9484' }}>Full ROI within 4 years with 25-year panel lifetime.</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            /* Live Savings Card after user enters bill */
+            <div
+              className="glass-card text-center"
+              style={{
+                background: 'rgba(10,18,13,0.85)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(168,255,62,0.2)',
+                padding: '2.25rem 1.75rem'
+              }}
+            >
+              <div
+                className="flex items-center justify-center rounded-full mx-auto mb-4"
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  background: 'rgba(168,255,62,0.10)',
+                  border: '1px solid rgba(168,255,62,0.22)'
+                }}
+              >
+                <Sparkle size={28} weight="duotone" color="#A8FF3E" />
+              </div>
+
+              <p className="stat-label text-xs letter-wide">Est. 25-Year Cumulative Savings</p>
+              <div className="stat-value stat-value--accent mb-1" style={{ fontSize: '2.25rem', fontWeight: 800 }}>
+                ₹{savings25Year} Lakh
+              </div>
+              <p className="stat-sublabel text-secondary" style={{ fontSize: '0.8125rem' }}>
+                ~₹{formattedSavings} / year based on your ₹{monthlyBill.toLocaleString('en-IN')} bill
+              </p>
+
+              <div className="divider" />
+
+              <div className="grid-2 gap-4 text-left">
+                <div>
+                  <span className="stat-label">System Size</span>
+                  <p className="text-lg font-bold text-primary" style={{ margin: 0 }}>~{recommendedKW} kW</p>
+                </div>
+                <div>
+                  <span className="stat-label">PM Subsidy</span>
+                  <p className="text-lg font-bold text-amber" style={{ margin: 0 }}>
+                    ₹{Number(recommendedKW) <= 1 ? '30,000' : Number(recommendedKW) <= 2 ? '60,000' : '78,000'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Quick Info card */}
           <div className="glass-card glass-card--sm flex items-center gap-4">
-            <ShieldCheck size={28} className="text-green shrink-0" />
+            <ShieldCheck size={26} weight="duotone" color="#22C55E" style={{ flexShrink: 0 }} />
             <div>
-              <p className="text-primary font-semibold text-sm" style={{ margin: 0 }}>PM Surya Ghar Muft Bijli Yojana</p>
-              <p className="text-muted text-xs" style={{ margin: 0 }}>Up to ₹78,000 direct bank subsidy for residential rooftop solar.</p>
+              <p className="text-primary font-semibold text-sm" style={{ margin: 0, fontSize: '0.8125rem' }}>PM Surya Ghar Muft Bijli Yojana</p>
+              <p className="text-muted text-xs" style={{ margin: 0, color: '#7A9484' }}>Up to ₹78,000 direct bank subsidy for residential rooftop solar.</p>
             </div>
           </div>
 
@@ -559,6 +622,7 @@ const Onboarding: React.FC = () => {
             className="btn btn-secondary w-full justify-center onboarding-mobile-toggle"
             onClick={() => setShowMobilePreview(!showMobilePreview)}
             aria-expanded={showMobilePreview}
+            style={{ fontSize: '0.8125rem' }}
           >
             {showMobilePreview ? 'Hide' : 'Show'} Savings Preview
           </button>
