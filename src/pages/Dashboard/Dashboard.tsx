@@ -109,7 +109,20 @@ export default function Dashboard() {
     gridEscalation: isHi ? "ग्रिड लागत वृद्धि (7.8%/वर्ष)" : isMr ? "ग्रीड दर वाढ (7.8%/वर्ष)" : "Grid Cost Escalation (7.8%/yr)",
     netSolarSavingsLabel: isHi ? "नेट सौर बचत" : isMr ? "निव्वळ सोलर बचत" : "Net Solar Savings",
     netSavingsForecast: isHi ? `नेट ${yearSpan}-वर्षीय बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : isMr ? `निव्वळ ${yearSpan}-वर्षांची बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : `Net ${yearSpan}-Year Savings: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}`,
-    latestInsights: isHi ? "नवीनतम सौर समाचार एवं विश्लेषण" : isMr ? "नवीनतम सोलर बातम्या आणि विश्लेषण" : "Latest Solar News & Analysis"
+    latestInsights: isHi ? "नवीनतम सौर समाचार एवं विश्लेषण" : isMr ? "नवीनतम सोलर बातम्या आणि विश्लेषण" : "Latest Solar News & Analysis",
+    financialAdvisement: isHi ? "वित्तीय सलाहकार" : isMr ? "वित्तीय सल्लागार" : "Financial Advisement",
+    cashVsLoan: isHi ? "नकद बनाम सौर ऋण विकल्प" : isMr ? "रोख विरुद्ध सोलर कर्ज पर्याय" : "Cash vs. Solar Loan Options",
+    cashOutlayOption: isHi ? "एकमुश्त नकद विकल्प" : isMr ? "थेट रोख गुंतवणूक पर्याय" : "Cash Outlay Option",
+    grossTurnkey: isHi ? "कुल टर्नकी लागत" : isMr ? "एकूण टर्नकी खर्च" : "Gross Turnkey Cost",
+    subsidyDeduction: isHi ? "सब्सिडी कटौती" : isMr ? "अनुदान वजावट" : "Subsidy Deduction",
+    netCashNeeded: isHi ? "शुद्ध नकद आवश्यकता" : isMr ? "निव्वळ रोख आवश्यकता" : "Net Cash Needed",
+    solarLoanOption: isHi ? "सौर बैंक ऋण विकल्प" : isMr ? "सोलर बँक कर्ज पर्याय" : "Solar Loan Option",
+    downpayment: isHi ? "डाउन पेमेंट (20%)" : isMr ? "डाऊन पेमेंट (२०%)" : "Downpayment (20%)",
+    loanPrincipal: isHi ? "ऋण मूलधन (80%)" : isMr ? "कर्ज रक्कम (८०%)" : "Loan Principal (80%)",
+    estimatedEmi: isHi ? "अनुमानित मासिक EMI" : isMr ? "अंदाजे मासिक EMI" : "Estimated Monthly EMI",
+    loanInterestTerms: isHi ? "5 साल की अवधि के लिए @ ~9.5% वार्षिक ब्याज दर" : isMr ? "५ वर्षे कालावधीसाठी @ ~९.५% वार्षिक व्याज दर" : "5-year tenure @ ~9.5% p.a. solar interest rate",
+    cashDesc: isHi ? "बिना ब्याज के बिजली बिलों पर तत्काल बचत। पूर्ण स्वामित्व।" : isMr ? "कोणतेही व्याज न देता वीज बिलात तातडीने बचत. पूर्ण मालकी हक्क." : "Immediate utility bill savings, zero interest burden, full asset ownership.",
+    loanDesc: isHi ? "पीएम सूर्य घर योजना के तहत कोलेटरल-मुक्त बैंक ऋण। कम ब्याज।" : isMr ? "पीएम सूर्य घर योजनेंतर्गत विना-तारण बँक कर्ज. अत्यंत कमी व्याज." : "Collateral-free PM Surya Ghar national solar loans at low rates."
   };
 
   return (
@@ -122,9 +135,17 @@ export default function Dashboard() {
         fontFamily: 'var(--font-body)',
       }}
     >
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 900px) {
+          .dashboard-grid-container > div {
+            grid-column: span 12 !important;
+          }
+        }
+      `}} />
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* ══ VENTRILOC DATA DASHBOARD GRID ══ */}
         <div
+          className="dashboard-grid-container"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(12, 1fr)',
@@ -351,10 +372,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ── CARD 7: ROI PROJECTION CHART (Span 12 cols) ── */}
+          {/* ── CARD 7: ROI PROJECTION CHART (Span 8 cols) ── */}
           <div
             style={{
-              gridColumn: 'span 12',
+              gridColumn: 'span 8',
               background: 'var(--color-canvas-white)',
               border: '1px solid var(--color-mist)',
               borderRadius: '20px',
@@ -432,6 +453,91 @@ export default function Dashboard() {
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', color: 'var(--color-ember-orange)' }}>
                 {strings.netSavingsForecast}
               </div>
+            </div>
+          </div>
+
+          {/* ── CARD 7B: SOLAR FINANCING ADVISORY (Span 4 cols) ── */}
+          <div
+            style={{
+              gridColumn: 'span 4',
+              background: 'var(--color-canvas-white)',
+              border: '1px solid var(--color-mist)',
+              borderRadius: '20px',
+              padding: '32px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
+                {strings.financialAdvisement}
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', margin: '0 0 16px' }}>
+                {strings.cashVsLoan}
+              </h3>
+
+              {/* Cash Option */}
+              <div style={{ background: 'var(--color-fog)', border: '1px solid var(--color-mist)', borderRadius: '8px', padding: '16px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-graphite)' }}>
+                    {strings.cashOutlayOption}
+                  </span>
+                  <span className="badge badge--success" style={{ fontSize: '10px', background: 'rgba(22, 163, 74, 0.1)', color: '#16a34a', border: '1px solid rgba(22,163,74,0.2)' }}>
+                    {isHi ? "0% ब्याज" : isMr ? "०% व्याज" : "0% Interest"}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: 'var(--color-steel)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{strings.grossTurnkey}</span>
+                    <span style={{ color: 'var(--color-graphite)' }}>₹{roi.systemCost.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{strings.subsidyDeduction}</span>
+                    <span style={{ color: '#dc2626' }}>-₹{roi.subsidy.toLocaleString('en-IN')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--color-mist)', paddingTop: '6px', marginTop: '4px' }}>
+                    <strong style={{ color: 'var(--color-graphite)' }}>{strings.netCashNeeded}</strong>
+                    <strong style={{ color: 'var(--color-ember-orange)' }}>₹{roi.netInvestment.toLocaleString('en-IN')}</strong>
+                  </div>
+                </div>
+                <p style={{ fontSize: '11px', color: 'var(--color-slate)', margin: '10px 0 0', lineHeight: 1.4 }}>
+                  {strings.cashDesc}
+                </p>
+              </div>
+
+              {/* Loan Option */}
+              <div style={{ background: 'var(--color-fog)', border: '1px solid var(--color-mist)', borderRadius: '8px', padding: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--color-graphite)' }}>
+                    {strings.solarLoanOption}
+                  </span>
+                  <span className="badge badge--ember" style={{ fontSize: '10px', background: 'rgba(255, 104, 44, 0.1)', color: 'var(--color-ember-orange)', border: '1px solid rgba(255,104,44,0.2)' }}>
+                    ~9.5% p.a.
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', color: 'var(--color-steel)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{strings.downpayment}</span>
+                    <span style={{ color: 'var(--color-graphite)' }}>₹{Math.round(roi.netInvestment * 0.2).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>{strings.loanPrincipal}</span>
+                    <span style={{ color: 'var(--color-graphite)' }}>₹{Math.round(roi.netInvestment * 0.8).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--color-mist)', paddingTop: '6px', marginTop: '4px' }}>
+                    <strong style={{ color: 'var(--color-graphite)' }}>{strings.estimatedEmi}</strong>
+                    <strong style={{ color: 'var(--color-ember-orange)' }}>₹{Math.round(roi.netInvestment * 0.8 * 0.0210018).toLocaleString('en-IN')}/mo</strong>
+                  </div>
+                </div>
+                <p style={{ fontSize: '11px', color: 'var(--color-slate)', margin: '10px 0 0', lineHeight: 1.4 }}>
+                  {strings.loanDesc}
+                </p>
+              </div>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--color-mist)', paddingTop: '12px', marginTop: '16px', fontSize: '11px', color: 'var(--color-slate)', textAlign: 'center' }}>
+              {strings.loanInterestTerms}
             </div>
           </div>
 
