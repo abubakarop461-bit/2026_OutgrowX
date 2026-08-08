@@ -84,25 +84,20 @@ export default function Dashboard() {
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Page Header (Ventriloc style) */}
-        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <div>
-            <div style={{ fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
-              {state} · {discom} Jurisdiction
-            </div>
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '32px',
-                fontWeight: 400,
-                letterSpacing: '-0.64px',
-                lineHeight: 1.19,
-                color: 'var(--color-graphite)',
-                margin: 0,
-              }}
-            >
-              Solar Data Observatory — {name}
-            </h1>
-          </div>
+        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '32px',
+              fontWeight: 400,
+              letterSpacing: '-0.64px',
+              lineHeight: 1.19,
+              color: 'var(--color-graphite)',
+              margin: 0,
+            }}
+          >
+            Dashboard
+          </h1>
 
           <div style={{ display: 'flex', gap: '8px' }}>
             <span className="badge badge--success">

@@ -140,18 +140,10 @@ export default function AISolarReport() {
 
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header (Ventriloc style) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px', marginBottom: '32px' }}>
-          <div>
-            <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-              SuryaSetu Annual Observatory Report
-            </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 400, letterSpacing: '-0.64px', margin: 0 }}>
-              Solar Intelligence Briefing
-            </h1>
-            <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
-              Prepared for {userProfile.firstName || userProfile.name || 'Consumer'} · {userProfile.state || 'Maharashtra'} ({userProfile.discom || 'Maha Vitaran'})
-            </p>
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px', marginBottom: '32px' }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 400, letterSpacing: '-0.64px', margin: 0 }}>
+            Solar Report
+          </h1>
 
           <div className="no-print" style={{ display: 'flex', gap: '10px' }}>
             <button className="btn btn-secondary" onClick={handlePrint}>

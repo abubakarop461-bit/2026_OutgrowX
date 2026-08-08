@@ -41,9 +41,6 @@ export const PropertyAssessment: React.FC = () => {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header */}
         <header style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
-            MNRE &amp; PM Surya Ghar Assessment
-          </div>
           <h1
             style={{
               fontFamily: 'var(--font-display)',
@@ -54,11 +51,8 @@ export const PropertyAssessment: React.FC = () => {
               margin: 0,
             }}
           >
-            Property Assessment — {state}
+            Property Assessment
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
-            Technical feasibility, shadow modeling, and generation potential for rooftop &amp; land parcels.
-          </p>
         </header>
 
         {/* Tabs (Ventriloc Capsule Pill) */}

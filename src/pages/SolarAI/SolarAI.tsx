@@ -37,9 +37,6 @@ export const SolarAI: React.FC = () => {
         {/* Page Header */}
         <header className="vai-page-header">
           <h1 className="vai-page-title">Solar AI Intelligence</h1>
-          <p className="vai-page-subtitle">
-            Centralized Context Engine — parses your bill scans, appliance loads, and role pathway to deliver decision-ready solar briefs.
-          </p>
         </header>
 
         {/* Tab Navigation */}

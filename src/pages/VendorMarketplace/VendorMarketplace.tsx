@@ -99,9 +99,6 @@ ${name}`;
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Page Header (Ventriloc style) */}
         <header style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-            MNRE &amp; DISCOM Verified Network
-          </div>
           <h1
             style={{
               fontFamily: 'var(--font-display)',
@@ -112,11 +109,8 @@ ${name}`;
               margin: 0,
             }}
           >
-            Solar Installer Marketplace
+            Solar Marketplace
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
-            Connect with empanelled EPC contractors, tier-1 module distributors, and certified maintenance partners.
-          </p>
         </header>
 
         {/* Tabs (Ventriloc Capsule Pill) */}
