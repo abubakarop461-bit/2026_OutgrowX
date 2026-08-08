@@ -9,19 +9,23 @@
 /* ── Design Tokens ── */
 :root {
   /* Colors */
-  --bg-base:        #070D09;
-  --bg-surface:     #0D1A10;
-  --bg-elevated:    #122016;
+  --bg-base:        #060B08;
+  --bg-surface:     #0A1210;
+  --bg-elevated:    #101A14;
+  /* Lime green: ACCENT ONLY – not for backgrounds, text, or borders */
   --accent-primary: #A8FF3E;
   --accent-green:   #22C55E;
   --accent-amber:   #F59E0B;
   --accent-red:     #F97316;
-  --text-primary:   #F0FFF4;
-  --text-secondary: #8BAF95;
-  --text-muted:     #4B7060;
-  --border-subtle:  rgba(168, 255, 62, 0.08);
-  --border-active:  rgba(168, 255, 62, 0.25);
-  --glass-bg:       rgba(13, 26, 16, 0.72);
+  /* Text: neutral slate-white, NOT green-tinted */
+  --text-primary:   #ECF2EE;
+  --text-secondary: #7A9484;
+  --text-muted:     #4A6055;
+  /* Borders: white-alpha NOT green-alpha for general UI */
+  --border-subtle:  rgba(255, 255, 255, 0.07);
+  --border-active:  rgba(168, 255, 62, 0.30);
+  /* Glass: near-black, extremely subtle green undertone */
+  --glass-bg:       rgba(10, 18, 13, 0.78);
 
   /* Spacing */
   --space-1:  4px;
@@ -89,19 +93,19 @@ body::before {
   position: fixed;
   inset: 0;
   background-image: radial-gradient(
-    rgba(168, 255, 62, 0.045) 1px,
-    transparent 1px
+    rgba(255, 255, 255, 0.028) 1.5px,
+    transparent 1.5px
   );
-  background-size: 24px 24px;
-  /* Radial fade — brighter at center, transparent at edges */
+  background-size: 28px 28px;
+  /* Radial fade — visible at center, transparent at edges */
   mask-image: radial-gradient(
-    ellipse 85% 85% at 50% 40%,
-    black 30%,
+    ellipse 80% 80% at 50% 35%,
+    black 20%,
     transparent 100%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 85% 85% at 50% 40%,
-    black 30%,
+    ellipse 80% 80% at 50% 35%,
+    black 20%,
     transparent 100%
   );
   pointer-events: none;
@@ -135,21 +139,21 @@ a:hover { text-decoration: underline; }
 /* ── Glassmorphism Cards ── */
 .glass-card {
   position: relative;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: rgba(10, 18, 13, 0.78);
+  backdrop-filter: blur(22px) saturate(1.5);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
   padding: var(--space-6);
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--transition-normal),
-              box-shadow var(--transition-normal),
-              transform var(--transition-normal);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.04) inset;
+  transition: border-color 220ms ease,
+              box-shadow 220ms ease,
+              transform 220ms ease;
 }
 
 .glass-card:hover {
-  border-color: var(--border-active);
-  box-shadow: var(--shadow-card), var(--shadow-glow);
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55), 0 0 32px rgba(168,255,62,0.06);
   transform: translateY(-2px);
 }
 
