@@ -4,7 +4,7 @@ import {
   Buildings, Factory, HouseLine, Wrench, PlugCharging,
   BatteryCharging, Plant, Sun, Briefcase, X, Envelope,
   SealCheck, ArrowRight, FunnelSimple, Buildings as BuildingsIcon,
-  Certificate, Phone
+  Certificate, Phone, Globe
 } from '@phosphor-icons/react';
 import { useApp } from '../../context/AppContext';
 import { VENDORS } from '../../data/vendors';
@@ -355,6 +355,20 @@ ${name}`;
                             <Envelope size={12} style={{ display: 'inline', marginRight: '4px' }} />
                             {vendor.contactEmail}
                           </div>
+                          {vendor.phone && (
+                            <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-slate)' }}>
+                              <Phone size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                              {vendor.phone}
+                            </div>
+                          )}
+                          {vendor.website && (
+                            <div style={{ marginTop: '6px', fontSize: '12px', color: 'var(--color-slate)' }}>
+                              <Globe size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                              <a href={vendor.website} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-ember-orange)', textDecoration: 'underline' }}>
+                                {vendor.website.replace('https://', '').replace('http://', '').split('/')[0]}
+                              </a>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}

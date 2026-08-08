@@ -66,6 +66,8 @@ export interface VendorData {
   certifications: string[];
   description: string;
   contactEmail: string;
+  phone?: string;
+  website?: string;
 }
 
 export interface ChatMessage {
