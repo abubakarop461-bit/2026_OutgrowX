@@ -73,21 +73,34 @@ const AnimatedBar: React.FC<{ value: number; label: string; delay?: number }> = 
   );
 };
 
+import { useApp } from '../../context/AppContext';
+
 const Dashboard: React.FC = () => {
+  const { userProfile } = useApp();
   const [yearSpan, setYearSpan] = useState<10 | 20 | 25>(20);
   const [insightText, setInsightText] = useState('');
   
-  const fullInsight = "Based on MSEDCL's projected 8% annual tariff increase, every month you delay going solar costs you approximately ₹340 more in grid bills.";
-  
+  const userName = userProfile.firstName || userProfile.name || 'Friend';
+  const userState = userProfile.state || 'Maharashtra';
+  const userDiscom = userProfile.discom || 'MSEDCL';
+  const avgBill = Number(userProfile.avgBill || userProfile.billAmount || 3200);
+  const monthlySavings = Math.round(avgBill * 0.85);
+  const recommendedKW = Math.max(1, Number((avgBill / 1000).toFixed(1)));
+  const paybackYears = Math.min(6.5, Math.max(3.0, Number((4.2 * (3200 / (avgBill || 3200))).toFixed(1))));
+  const subsidyAmount = recommendedKW <= 2 ? 30000 * recommendedKW : recommendedKW <= 3 ? 60000 + 18000 * (recommendedKW - 2) : 78000;
+
+  const fullInsight = `Based on ${userDiscom}'s projected 8% annual tariff increase in ${userState}, your estimated monthly solar savings is ₹${monthlySavings.toLocaleString('en-IN')}.`;
+
   useEffect(() => {
     let i = 0;
     const timer = setInterval(() => {
       setInsightText(fullInsight.slice(0, i));
       i++;
       if (i > fullInsight.length) clearInterval(timer);
-    }, 30);
+    }, 25);
     return () => clearInterval(timer);
-  }, []);
+  }, [fullInsight]);
+
 
   // --- Chart Data ---
   
@@ -199,10 +212,10 @@ const Dashboard: React.FC = () => {
         <header className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-4 border-b border-surface">
           <div>
             <h1 className="text-4xl md:text-5xl font-display font-semibold mb-2">
-              Good morning, Rahul ☀️
+              Good morning, {userName} ☀️
             </h1>
             <p className="text-text-secondary text-lg">
-              Solar Intelligence for Maharashtra · DISCOM: MSEDCL
+              Solar Intelligence for {userState} · DISCOM: {userDiscom}
             </p>
           </div>
           <div className="mt-4 md:mt-0 text-right">
@@ -226,7 +239,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="stat-value stat-value--accent text-3xl font-bold text-accent">
-              <CountUp end={4320} prefix="₹" />
+              <CountUp end={monthlySavings} prefix="₹" />
             </div>
           </div>
 
@@ -236,7 +249,7 @@ const Dashboard: React.FC = () => {
               <DollarSign className="w-4 h-4 text-text-secondary" />
             </div>
             <div className="stat-value text-3xl font-bold text-text-primary">
-              <CountUp end={4.2} decimals={1} suffix=" years" />
+              <CountUp end={paybackYears} decimals={1} suffix=" years" />
             </div>
           </div>
 
@@ -246,7 +259,7 @@ const Dashboard: React.FC = () => {
               <div className="badge bg-white/10 text-white px-2 py-1 rounded-md text-xs">Recommended</div>
             </div>
             <div className="stat-value text-3xl font-bold text-text-primary">
-              3.5 <span className="text-xl text-text-secondary">kW</span>
+              {recommendedKW} <span className="text-xl text-text-secondary">kW</span>
             </div>
           </div>
 
@@ -256,7 +269,7 @@ const Dashboard: React.FC = () => {
               <CheckCircle2 className="w-4 h-4 text-amber-400" />
             </div>
             <div className="stat-value stat-value--amber text-3xl font-bold text-amber-400">
-              <CountUp end={78000} prefix="₹" />
+              <CountUp end={subsidyAmount} prefix="₹" />
             </div>
           </div>
         </div>

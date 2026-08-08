@@ -4,12 +4,27 @@ export type UserRole = 'consumer' | 'landowner' | 'business' | null;
 export type Language = 'en' | 'hi' | 'mr';
 
 export interface UserProfile {
+  firstName?: string;
   name?: string;
+  userType?: string;
+  occupation?: string;
+  propertyType?: string;
+  roofArea?: number | string;
+  roofSqFt?: number | string;
   state?: string;
   discom?: string;
+  billAmount?: number | string;
+  avgBill?: number | string;
+  hasSolar?: string | boolean;
+  systemSize?: number | string;
+  installYear?: number | string;
+  wantsBattery?: string | boolean;
+  city?: string;
   pinCode?: string;
+  pincode?: string;
   billData?: any;
   propertyData?: any;
+  userRole?: UserRole;
 }
 
 interface AppContextType {
@@ -17,7 +32,7 @@ interface AppContextType {
   language: Language;
   isOnboarded: boolean;
   userRole: UserRole;
-  setProfile: (profile: Partial<UserProfile>) => void;
+  setProfile: (profileUpdate: Partial<UserProfile>) => void;
   setLanguage: (lang: Language) => void;
   completeOnboarding: () => void;
   resetProfile: () => void;
@@ -26,10 +41,30 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider = ({ children }: { children: ReactNode }) => {
+const DEFAULT_PROFILE: UserProfile = {
+  firstName: 'Arjun',
+  userType: 'Homeowner',
+  propertyType: 'Independent House',
+  roofSqFt: 800,
+  roofArea: 800,
+  state: 'Maharashtra',
+  discom: 'MSEDCL',
+  avgBill: 3200,
+  billAmount: 3200,
+  hasSolar: 'No',
+  wantsBattery: 'Yes',
+  city: 'Pune',
+  pinCode: '411001',
+  pincode: '411001'
+};
+
+export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [userProfile, setUserProfileState] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('suryx_profile');
-    return saved ? JSON.parse(saved) : {};
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return DEFAULT_PROFILE;
   });
 
   const [language, setLanguageState] = useState<Language>(() => {
@@ -41,7 +76,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [userRole, setUserRoleState] = useState<UserRole>(() => {
-    return (localStorage.getItem('suryx_role') as UserRole) || null;
+    return (localStorage.getItem('suryx_role') as UserRole) || 'consumer';
   });
 
   useEffect(() => {
@@ -65,7 +100,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [userRole]);
 
   const setProfile = (profileUpdate: Partial<UserProfile>) => {
-    setUserProfileState(prev => ({ ...prev, ...profileUpdate }));
+    setUserProfileState(prev => {
+      const updated = { ...prev, ...profileUpdate };
+      // Sync duplicate key names for compatibility
+      if (profileUpdate.firstName) updated.name = profileUpdate.firstName;
+      if (profileUpdate.roofArea) updated.roofSqFt = profileUpdate.roofArea;
+      if (profileUpdate.roofSqFt) updated.roofArea = profileUpdate.roofSqFt;
+      if (profileUpdate.billAmount) updated.avgBill = profileUpdate.billAmount;
+      if (profileUpdate.avgBill) updated.billAmount = profileUpdate.avgBill;
+      if (profileUpdate.pincode) updated.pinCode = profileUpdate.pincode;
+      if (profileUpdate.pinCode) updated.pincode = profileUpdate.pinCode;
+      return updated;
+    });
   };
 
   const setLanguage = (lang: Language) => {
@@ -74,12 +120,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const completeOnboarding = () => {
     setIsOnboarded(true);
+    localStorage.setItem('suryx_onboarded', 'true');
   };
 
   const resetProfile = () => {
-    setUserProfileState({});
+    setUserProfileState(DEFAULT_PROFILE);
     setIsOnboarded(false);
-    setUserRoleState(null);
+    setUserRoleState('consumer');
     localStorage.removeItem('suryx_profile');
     localStorage.removeItem('suryx_onboarded');
     localStorage.removeItem('suryx_role');
@@ -108,7 +155,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useApp = () => {
+export const useApp = (): AppContextType => {
   const context = useContext(AppContext);
   if (context === undefined) {
     throw new Error('useApp must be used within an AppProvider');

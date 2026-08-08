@@ -26,12 +26,13 @@ ChartJS.register(
   Filler
 );
 
-// Stub imports — will be replaced when services are built
-const useApp = () => ({ profile: { firstName: 'Arjun', state: 'Maharashtra', discom: 'MSEDCL', avgBill: 3200, roofSqFt: 800 }, language: 'en', isOnboarded: true, userRole: 'consumer', setProfile: () => {}, setLanguage: () => {}, completeOnboarding: () => {} });
+import { useApp } from '../../context/AppContext';
 
 export default function AISolarReport() {
-  const { profile } = useApp();
+  const { userProfile } = useApp();
+  const profile = userProfile;
   const [isGenerated, setIsGenerated] = useState(false);
+
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerate = () => {
