@@ -544,15 +544,15 @@ ${name}`;
                     <CheckCircle size={36} color="var(--color-ember-orange)" />
                   </div>
                   <div>
-                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', margin: '0 0 10px' }}>
-                      {isHi ? "अनुरोध सफलतापूर्वक भेजा गया!" : isMr ? "विनंती यशस्वीरित्या पाठवली!" : "Request Sent Successfully!"}
+                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 400, color: 'var(--color-graphite)', margin: '0 0 10px' }}>
+                      {isHi ? "धन्यवाद!" : isMr ? "धन्यवाद!" : "Thank You!"}
                     </h3>
                     <p style={{ fontSize: '14px', color: 'var(--color-steel)', lineHeight: 1.6, margin: 0 }}>
                       {isHi 
-                        ? `आपका पूर्व-मूल्यांकित सोलर प्रोफ़ाइल सुरक्षित रूप से ${selectedVendor.companyName.split(' - ')[0]} के साथ साझा किया गया है। वे आपकी आवश्यकताओं की समीक्षा करेंगे और सोलर प्रदाता जल्द ही आपसे संपर्क करेंगे।`
+                        ? `सोलर प्रदाता जल्द ही आपसे संपर्क करेंगे। आपका पूर्व-मूल्यांकित सोलर प्रोफ़ाइल सुरक्षित रूप से ${selectedVendor.companyName.split(' - ')[0]} के साथ साझा कर दिया गया है।`
                         : isMr 
-                          ? `तुमचे पूर्व-मूल्यांकन केलेले सोलर प्रोफाइल ${selectedVendor.companyName.split(' - ')[0]} सोबत यशस्वीरित्या शेअर केले गेले आहे. ते तुमच्या गरजांचे पुनरावलोकन करतील आणि सोलर प्रदाता लवकरच तुमच्याशी संपर्क साधतील.`
-                          : `Your pre-assessed solar profile has been shared with ${selectedVendor.companyName.split(' - ')[0]}. They will review your requirement specs and the solar provider will connect you shortly.`}
+                          ? `सोलर प्रदाता लवकरच तुमच्याशी संपर्क साधतील. तुमचे पूर्व-मूल्यांकन केलेले सोलर प्रोफाइल ${selectedVendor.companyName.split(' - ')[0]} सोबत यशस्वीरित्या शेअर केले गेले आहे.`
+                          : `The Solar Vendor will connect you shortly. Your pre-assessed solar profile has been shared with ${selectedVendor.companyName.split(' - ')[0]}.`}
                     </p>
                   </div>
                   <button className="btn btn-primary" style={{ minWidth: '120px', justifyContent: 'center' }} onClick={() => setShowModal(false)}>
