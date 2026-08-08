@@ -262,8 +262,14 @@ const Onboarding: React.FC = () => {
                             update('companyName', '');
                           }
                         }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
                       >
-                        {opt === 'Homeowner' ? strings.homeowner : opt === 'Landowner' ? strings.landowner : strings.solarVendor}
+                        {opt === 'Homeowner' && <House size={16} />}
+                        {opt === 'Landowner' && <Plant size={16} />}
+                        {opt === 'Solar Vendor' && <Briefcase size={16} />}
+                        <span>
+                          {opt === 'Homeowner' ? strings.homeowner : opt === 'Landowner' ? strings.landowner : strings.solarVendor}
+                        </span>
                       </button>
                     ))}
                   </div>
