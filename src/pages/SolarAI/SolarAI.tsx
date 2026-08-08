@@ -59,14 +59,14 @@ export const SolarAI: React.FC = () => {
         </button>
       </div>
 
-      {activeTab === 'bill' && <BillScanner />}
+      {activeTab === 'bill' && <BillScanner onNavigateToAdvisor={() => setActiveTab('advisor')} />}
       {activeTab === 'calculator' && <ApplianceCalculator />}
       {activeTab === 'advisor' && <AIAdvisor />}
     </main>
   );
 };
 
-const BillScanner: React.FC = () => {
+const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigateToAdvisor }) => {
   const { userProfile, setProfile } = useApp();
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
@@ -112,6 +112,8 @@ const BillScanner: React.FC = () => {
     if (file) processFile(file);
   };
 
+  const [appliedSuccess, setAppliedSuccess] = useState(false);
+
   const handleApplyData = () => {
     if (!result) return;
     setProfile({
@@ -120,6 +122,7 @@ const BillScanner: React.FC = () => {
       discom: result.discom,
     });
     recordBillScanAction(result, userProfile);
+    setAppliedSuccess(true);
   };
 
   return (
@@ -164,7 +167,7 @@ const BillScanner: React.FC = () => {
         )}
 
         {result && (
-          <div className="glass-card">
+          <div className="glass-card" style={{ border: appliedSuccess ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.08)' }}>
             <div className="flex items-center justify-between mb-4">
               <h4 className="flex items-center gap-2 text-accent" style={{ fontSize: '1rem', margin: 0 }}>
                 <CheckCircle size={18} /> Extracted Bill Data
@@ -183,9 +186,34 @@ const BillScanner: React.FC = () => {
               <div><span className="text-muted">Billing Period:</span> <strong>{result.billingPeriod}</strong></div>
             </div>
 
-            <button className="btn btn-primary w-full justify-center" onClick={handleApplyData}>
-              Apply Data to Centralized AI Context
+            <button
+              className={`btn ${appliedSuccess ? 'btn-secondary' : 'btn-primary'} w-full justify-center gap-2 mb-3`}
+              onClick={handleApplyData}
+              style={{
+                fontSize: '0.9375rem',
+                background: appliedSuccess ? 'rgba(34,197,94,0.18)' : undefined,
+                borderColor: appliedSuccess ? 'rgba(34,197,94,0.35)' : undefined,
+                color: appliedSuccess ? '#22C55E' : undefined
+              }}
+            >
+              <CheckCircle size={18} />
+              {appliedSuccess ? 'Applied to Centralized AI Context Engine ✓' : 'Apply Data to Centralized AI Context'}
             </button>
+
+            {appliedSuccess && (
+              <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', padding: '0.75rem 1rem', borderRadius: '10px', fontSize: '0.8125rem', color: '#ECF2EE' }}>
+                <div style={{ fontWeight: 700, color: '#22C55E', marginBottom: '2px' }}>✓ Context Engine Updated!</div>
+                <div>DISCOM ({result.discom}) &amp; Monthly Bill (₹{result.billAmount.toLocaleString('en-IN')}) are now synced across all 3 AI tools, ROI models, and AI Advisor prompts.</div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm mt-2 text-accent p-0"
+                  onClick={onNavigateToAdvisor}
+                  style={{ textDecoration: 'underline', fontSize: '0.8125rem' }}
+                >
+                  Open AI Advisor Chat →
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
