@@ -1,0 +1,83 @@
+{
+  "mnreOverview": {
+    "agencyName": "Ministry of New and Renewable Energy (MNRE)",
+    "domain": "mnre.gov.in",
+    "primaryTarget": "500 GW non-fossil-fuel capacity by 2030",
+    "tollFreeHelpline": "1800-180-3333",
+    "keyFunctions": [
+      "Policy formulation for renewable energy",
+      "Implementation of national solar schemes (PM-KUSUM, PM Surya Ghar)",
+      "Financial incentives and subsidies",
+      "International cooperation (ISA - International Solar Alliance)",
+      "Monitoring and target setting for installed capacity"
+    ]
+  },
+  "schemes": [
+    {
+      "id": "pm-kusum",
+      "name": "PM-KUSUM Scheme",
+      "fullName": "Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan",
+      "components": [
+        {
+          "name": "Component A",
+          "description": "2 MW grid-connected solar power plants on barren or fallow farmland"
+        },
+        {
+          "name": "Component B",
+          "description": "Off-grid standalone solar pumps (2 to 10 HP) for agricultural irrigation"
+        },
+        {
+          "name": "Component C",
+          "description": "Grid-connected solar pumps and solarization of existing agricultural pumps"
+        }
+      ],
+      "subsidy": "30% to 50% Central + State Government subsidy",
+      "target": "30,800 MW total capacity, 25 lakh solar pumps",
+      "beneficiaries": "Farmers, Agricultural Cooperatives, Water User Associations",
+      "tollFree": "1800-180-3333"
+    },
+    {
+      "id": "national-solar-mission",
+      "name": "National Solar Mission (NSM)",
+      "fullName": "Jawaharlal Nehru National Solar Mission",
+      "description": "Part of India's National Action Plan on Climate Change to scale solar energy capacity to 500 GW non-fossil fuel by 2030."
+    },
+    {
+      "id": "solar-park-scheme",
+      "name": "Solar Park Scheme",
+      "description": "Establishes Ultra-Mega Solar Power Projects (500 MW+) providing plug-and-play land and transmission infrastructure for developers."
+    },
+    {
+      "id": "cpsu-scheme-phase2",
+      "name": "CPSU Scheme Phase-II",
+      "description": "Grid-connected rooftop and ground-mounted solar for Central Public Sector Undertakings using mandatory Domestic Content Requirement (DCR / Made in India) modules."
+    },
+    {
+      "id": "green-energy-corridors",
+      "name": "Green Energy Corridors (GEC)",
+      "description": "Dedicated intra-state and inter-state transmission network for renewable energy evacuation across solar-rich states."
+    }
+  ],
+  "nationalAchievements": {
+    "solarManufacturingCapacityGw": 100,
+    "solarInstalledCapacityGw": 162.15,
+    "windInstalledCapacityGw": 57.44,
+    "nonFossilInstalledSharePercentage": 54.18,
+    "globalRankSolar": 3,
+    "globalRankWind": 4,
+    "globalRankTotalRE": 3,
+    "asOfDate": "2026-08-07"
+  },
+  "almmFramework": {
+    "fullTitle": "Approved List of Models and Manufacturers (ALMM)",
+    "purpose": "Ensures quality and domestic content for solar PV modules installed under government-subsidized schemes.",
+    "list1": "Solar PV Modules (Over 100 GW total approved capacity)",
+    "list2": "Solar PV Cells",
+    "requirement": "Mandatory for PM Surya Ghar, PM-KUSUM, and Government building solar installations."
+  },
+  "ceaNetMeteringStandards": {
+    "regulatoryBody": "Central Electricity Authority (CEA)",
+    "sanctionedLoadRule": "Allowed AC inverter capacity for net metering must be evaluated against consumer's sanctioned load.",
+    "meteringType": "Bi-directional net meter measuring Import vs Export units."
+  }
+}

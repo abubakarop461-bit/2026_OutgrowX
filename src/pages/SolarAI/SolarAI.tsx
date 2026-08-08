@@ -13,7 +13,7 @@ import { Bar, Pie } from 'react-chartjs-2';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
 import { chatStream, Message } from '../../services/ai';
-import { buildSolarAdvisorPrompt } from '../../services/prompts';
+import { buildSolarAdvisorPrompt, MODEL_LABELS } from '../../services/prompts';
 import { scanBill, BillData } from '../../services/billScanner';
 import { APPLIANCES } from '../../data/applianceProfiles';
 
@@ -298,7 +298,7 @@ const ApplianceCalculator: React.FC = () => {
             <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
               <Pie data={pieData} options={{ plugins: { legend: { position: 'right', labels: { color: '#8BAF95' } } }, maintainAspectRatio: false }} />
             </div>
-          ) : (
+) : (
             <p className="text-muted text-center py-4">Add appliances to see breakdown.</p>
           )}
         </div>
@@ -317,12 +317,12 @@ const ApplianceCalculator: React.FC = () => {
 
 const AIAdvisor: React.FC = () => {
   const { userProfile, language } = useApp();
-  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am your Solar Pro Advisor. I have analyzed your context. How can I help you regarding your solar journey today?' }
+    { role: 'assistant', content: 'Hello! I am your SuryX Solar Pro Advisor backed by our Single Source of Truth Knowledge Base. How can I help you regarding PM Surya Ghar, subsidies, payback, or DISCOM policies today?' }
   ]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  const [activeModelLabel, setActiveModelLabel] = useState<string>(MODEL_LABELS.primary);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -331,57 +331,45 @@ const AIAdvisor: React.FC = () => {
 
   const send = useCallback(async (text: string) => {
     if (!text.trim() || isStreaming) return;
-
+    
     const userMsg: Message = { role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsStreaming(true);
 
-    const systemPrompt = buildSolarAdvisorPrompt(userProfile, language);
-    const chatHistory = messages
-      .filter(m => m.role === 'user' || m.role === 'assistant')
-      .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+    const aiMsg: Message = { role: 'assistant', content: '' };
+    setMessages(prev => [...prev, aiMsg]);
 
-    let currentText = '';
+    const systemPrompt = buildSolarAdvisorPrompt(userProfile, language, text);
+    const apiMessages: Message[] = [...messages, userMsg];
 
     try {
-      const stream = chatStream(
-        [...chatHistory, { role: 'user', content: text }],
-        systemPrompt
-      );
+      const stream = chatStream(apiMessages, systemPrompt, (modelLabel) => {
+        setActiveModelLabel(modelLabel);
+      });
 
+      let currentText = '';
       for await (const chunk of stream) {
         currentText += chunk;
         setMessages(prev => {
           const newMsgs = [...prev];
-          if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
-            newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], content: currentText };
-          }
+          newMsgs[newMsgs.length - 1] = { role: 'assistant', content: currentText };
           return newMsgs;
         });
       }
-    } catch {
-      setMessages(prev => {
-        const newMsgs = [...prev];
-        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
-          newMsgs[newMsgs.length - 1] = {
-            ...newMsgs[newMsgs.length - 1],
-            content: currentText || 'I apologize, but I encountered an issue. Please try again.'
-          };
-        }
-        return newMsgs;
-      });
+    } catch (err) {
+      console.error('Chat error:', err);
     } finally {
       setIsStreaming(false);
     }
   }, [isStreaming, messages, userProfile, language]);
 
   const prompts = [
-    "How many panels do I need?",
-    "What's my payback period?",
-    "PM Surya Ghar subsidy for me?",
-    "On-grid vs off-grid?",
-    "Best time to install in my state?"
+    "PM Surya Ghar subsidy for 3 kW?",
+    "Roof area needed for 2 kW?",
+    "PM-KUSUM scheme details?",
+    "Documents required to apply?",
+    "What is the capital of France?"
   ];
 
   return (
@@ -389,16 +377,19 @@ const AIAdvisor: React.FC = () => {
       <div className="flex items-center justify-between p-3 px-4" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
         <div className="model-badge">
           <Cpu size={14} />
-          <span>Solar Pro Advisor</span>
+          <span>{activeModelLabel}</span>
           <div className="model-badge__dot"></div>
         </div>
+        <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 600 }}>
+          SuryX Single Source of Truth Knowledge Engine
+        </span>
       </div>
 
-      <div className="chat-messages">
+      <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-4)' }}>
         {messages.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role === 'user' ? 'chat-message--user' : ''}`}>
             {msg.role === 'assistant' && (
-              <div className="chat-avatar"><Sparkles size={16} className="text-accent" /></div>
+              <div className="chat-avatar"><Sparkles size={16} color="var(--accent-primary)" /></div>
             )}
             <div className={`chat-bubble chat-bubble--${msg.role === 'user' ? 'user' : 'ai'} ${(msg.role === 'assistant' && isStreaming && i === messages.length - 1) ? 'streaming-cursor' : ''}`}>
               {msg.content}
@@ -408,20 +399,21 @@ const AIAdvisor: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="prompt-chips">
+      <div className="prompt-chips" style={{ padding: 'var(--space-2) var(--space-4)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
         {prompts.map(p => (
           <button key={p} className="prompt-chip" onClick={() => send(p)} disabled={isStreaming}>{p}</button>
         ))}
       </div>
 
-      <div className="chat-input-row">
-        <input
+      <div className="chat-input-row" style={{ padding: 'var(--space-3) var(--space-4)', display: 'flex', gap: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+        <input 
           className="chat-input"
-          placeholder="Ask anything about solar..."
+          placeholder="Ask anything about PM Surya Ghar, subsidies, DISCOM, solar pump rules..."
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)}
           disabled={isStreaming}
+          style={{ flex: 1 }}
         />
         <button
           className="btn btn-primary btn-sm"
@@ -438,3 +430,4 @@ const AIAdvisor: React.FC = () => {
 };
 
 export default SolarAI;
+

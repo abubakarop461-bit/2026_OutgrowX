@@ -1,0 +1,210 @@
+{
+  "schemeOverview": {
+    "name": "PM Surya Ghar: Muft Bijli Yojana",
+    "portal": "https://pmsuryaghar.gov.in",
+    "ministry": "Ministry of New and Renewable Energy (MNRE), Govt. of India",
+    "launchedBy": "Prime Minister Narendra Modi",
+    "targetHouseholds": 10000000,
+    "targetHouseholdsFormatted": "1 Crore (10 million) households",
+    "freeElectricityUnitsPerMonth": 300,
+    "maxSubsidyAmount": 78000,
+    "totalBudgetRupeesCr": 75021,
+    "technology": "Grid-connected Rooftop Solar PV",
+    "subsidyDisbursementMode": "Direct Benefit Transfer (DBT) to consumer bank account",
+    "netMeteringAvailable": true,
+    "paybackPeriodYears": "3 to 5 years",
+    "systemLifespanYears": 25,
+    "keyBenefits": [
+      "Up to 300 units free electricity every month",
+      "Central subsidy up to Rs. 78,000 per household",
+      "Collateral-free bank loans for remaining consumer cost",
+      "Net metering — earn income by selling surplus power to DISCOM",
+      "Direct Benefit Transfer (DBT) — subsidy credited directly to bank account with zero middlemen",
+      "25-year system life — full payback within 3 to 5 years"
+    ]
+  },
+  "subsidies": {
+    "residential": [
+      {
+        "capacityKw": 1,
+        "capacityLabel": "1 kW",
+        "subsidyRupees": 30000,
+        "formula": "Rs. 30,000 per kW up to 2 kW"
+      },
+      {
+        "capacityKw": 2,
+        "capacityLabel": "2 kW",
+        "subsidyRupees": 60000,
+        "formula": "Rs. 30,000 per kW up to 2 kW"
+      },
+      {
+        "capacityKw": 3,
+        "capacityLabel": "3 kW",
+        "subsidyRupees": 78000,
+        "formula": "Rs. 60,000 for 2 kW + Rs. 18,000 for 3rd kW"
+      },
+      {
+        "capacityKw": 5,
+        "capacityLabel": "Above 3 kW",
+        "subsidyRupees": 78000,
+        "formula": "Rs. 78,000 maximum capped subsidy"
+      }
+    ],
+    "housingSocietiesAndRWA": {
+      "subsidyRatePerKw": 18000,
+      "purpose": "Common facilities including EV charging",
+      "maxCapacityKwLimit": 500,
+      "formula": "Rs. 18,000 per kW up to 500 kW or (10 kW x number of flats), whichever is lower"
+    },
+    "specialStateIncentive": {
+      "additionalPercentage": 10,
+      "description": "For special states (Himalayan / North-Eastern / Islands), an additional 10% subsidy applies per kW"
+    }
+  },
+  "estimatedSavings": [
+    {
+      "systemCapacityKw": 1,
+      "monthlyGenerationUnits": 120,
+      "freeUnitsPerMonth": 120,
+      "surplusSoldUnitsMonth": 0,
+      "annualSavingsRupees": "Rs. 8,000 – 12,000"
+    },
+    {
+      "systemCapacityKw": 2,
+      "monthlyGenerationUnits": 240,
+      "freeUnitsPerMonth": 240,
+      "surplusSoldUnitsMonth": 0,
+      "annualSavingsRupees": "Rs. 16,000 – 22,000"
+    },
+    {
+      "systemCapacityKw": 3,
+      "monthlyGenerationUnits": 360,
+      "freeUnitsPerMonth": 300,
+      "surplusSoldUnitsMonth": 60,
+      "annualSavingsRupees": "Rs. 22,000 – 30,000"
+    },
+    {
+      "systemCapacityKw": 5,
+      "monthlyGenerationUnits": 600,
+      "freeUnitsPerMonth": 300,
+      "surplusSoldUnitsMonth": 300,
+      "annualSavingsRupees": "Rs. 32,000 – 45,000"
+    }
+  ],
+  "applicationSteps": [
+    {
+      "stepNumber": 1,
+      "action": "Register on https://pmsuryaghar.gov.in with electricity consumer number and mobile OTP",
+      "timeline": "Day 1"
+    },
+    {
+      "stepNumber": 2,
+      "action": "Fill application form, select capacity, upload electricity bill and roof photo",
+      "timeline": "Day 1–2"
+    },
+    {
+      "stepNumber": 3,
+      "action": "DISCOM conducts technical feasibility check and approves sanctioned load",
+      "timeline": "15–30 days"
+    },
+    {
+      "stepNumber": 4,
+      "action": "Select empanelled vendor from portal list and complete rooftop solar PV installation",
+      "timeline": "2–5 days"
+    },
+    {
+      "stepNumber": 5,
+      "action": "DISCOM inspects installation and installs bi-directional net meter",
+      "timeline": "15–30 days"
+    },
+    {
+      "stepNumber": 6,
+      "action": "System commissioning report issued by DISCOM and subsidy credited directly via DBT to bank account",
+      "timeline": "Within 30 days"
+    }
+  ],
+  "eligibilityAndDocs": {
+    "whoCanApply": "Any residential electricity consumer with an active connection and a suitable shadow-free rooftop.",
+    "roofAreaRequirements": [
+      { "capacityKw": 1, "areaSqMeters": 10, "areaSqFt": 107 },
+      { "capacityKw": 2, "areaSqMeters": 20, "areaSqFt": 215 },
+      { "capacityKw": 3, "areaSqMeters": 30, "areaSqFt": 323 },
+      { "capacityKw": 5, "areaSqMeters": 50, "areaSqFt": 538 }
+    ],
+    "documentsRequired": [
+      "Recent electricity bill (showing consumer number & DISCOM)",
+      "Aadhaar card / Voter ID / Passport",
+      "Bank account details (matching name on electricity bill for DBT transfer)",
+      "Clear shadow-free roof photograph",
+      "Property tax receipt / ownership documents",
+      "No Objection Certificate (NOC) from property owner if applicant is a tenant"
+    ]
+  },
+  "vendorRules": {
+    "registrationPortal": "https://pmsuryaghar.gov.in/#/vendor",
+    "discomEmpanelmentMandatory": true,
+    "mandatoryModuleSpec": "Must install ALMM-listed solar PV modules (Indian-made)",
+    "mandatoryInverterSpec": "Must use BIS-certified inverters (IS 16221 / IEC 62109)",
+    "warranties": {
+      "workmanshipYears": 5,
+      "panelPerformanceYears": 25
+    },
+    "rescoModel": {
+      "upfrontCost": "Zero for consumer",
+      "paymentMode": "Per-unit rate (lower than DISCOM grid tariff)",
+      "ownershipTransfer": "Transfers to consumer after contract period (5–10 years)",
+      "targetSection": "Ideal for consumers wanting solar without upfront capital"
+    }
+  },
+  "technicalStandards": [
+    { "component": "Solar PV Panels", "standard": "BIS IS 14286 / IEC 61215 / IEC 61730 / ALMM Listed" },
+    { "component": "Inverters", "standard": "BIS IS 16221 / IEC 62109" },
+    { "component": "Net Meter", "standard": "CEA Transmission of Electricity Regulations" },
+    { "component": "DC Cables", "standard": "BIS IS 694" },
+    { "component": "Earthing", "standard": "IS 3043" },
+    { "component": "MCB / Protection", "standard": "IS 60898" }
+  ],
+  "statistics": {
+    "totalApplications": 7826620,
+    "totalInstallations": 4247856,
+    "householdsBenefitted": 5087242,
+    "totalSubsidyReleasedRupeesCr": 28700.12,
+    "totalUniqueVendorsRegistered": 6196,
+    "totalDiscomsOnBoarded": 88,
+    "asOfDate": "2026-08-07"
+  },
+  "faqs": [
+    {
+      "question": "What is PM Surya Ghar Muft Bijli Yojana?",
+      "answer": "PM Surya Ghar: Muft Bijli Yojana is a Government of India scheme aiming to provide up to 300 units of free electricity per month to 1 crore households by installing rooftop solar PV systems, with Central financial assistance (subsidy) up to Rs. 78,000."
+    },
+    {
+      "question": "Who is eligible for PM Surya Ghar scheme?",
+      "answer": "Any residential electricity consumer in India with an active DISCOM electricity connection and a suitable shadow-free rooftop (approx 10 sq.m per 1 kW) is eligible."
+    },
+    {
+      "question": "How much subsidy is provided under PM Surya Ghar?",
+      "answer": "The subsidy structure is: Rs. 30,000 for 1 kW, Rs. 60,000 for 2 kW, and Rs. 78,000 for 3 kW and above. The subsidy is transferred directly to your bank account via DBT."
+    },
+    {
+      "question": "How long does it take from application to receiving subsidy?",
+      "answer": "The complete workflow from online application on pmsuryaghar.gov.in to technical feasibility, installation, net-metering commissioning, and DBT subsidy credit takes approximately 60 to 90 days."
+    },
+    {
+      "question": "Can I sell surplus solar electricity back to the grid?",
+      "answer": "Yes. Through net metering, any surplus solar energy generated and fed back into the DISCOM grid is credited against your electricity bill, reducing or eliminating your monthly charges."
+    },
+    {
+      "question": "Are collateral-free bank loans available for installing rooftop solar?",
+      "answer": "Yes. Leading public and private banks offer collateral-free solar loans at concessional interest rates (~7% p.a.) for covering the remaining consumer portion after subsidy."
+    },
+    {
+      "question": "Can tenants apply for PM Surya Ghar rooftop solar?",
+      "answer": "Yes, provided the tenant submits a signed No Objection Certificate (NOC) from the property owner along with the electricity bill and application."
+    },
+    {
+      "question": "What is the toll-free helpline number for PM Surya Ghar?",
+      "answer": "The official national toll-free helpline number is 1800-180-3333 or 15555."
+    }
+  ]
+}

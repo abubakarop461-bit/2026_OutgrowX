@@ -1,3 +1,5 @@
+import { knowledgeService } from './knowledgeService';
+
 export const MODEL_LABELS = {
   primary: 'Solar Pro Advisor',
   fallback: 'Solar Basic Advisor',
@@ -8,7 +10,7 @@ export const MODEL_LABELS = {
 /**
  * Builds the system prompt making the AI a regional Indian solar expert.
  */
-export function buildSolarAdvisorPrompt(profile: any, lang: string): string {
+export function buildSolarAdvisorPrompt(profile: any, lang: string, userQuery: string = ''): string {
   const { state, discom, billData, propertyData, userRole, firstName } = profile || {};
   
   const langInstruction = lang === 'hi' 
@@ -39,7 +41,13 @@ Current User Context:`;
     prompt += `\n- Property Data: ${JSON.stringify(propertyData)}`;
   }
 
-  prompt += `\n\nBe concise, authoritative, and encouraging. Focus on Indian solar context, PM Surya Ghar Muft Bijli Yojana subsidies (up to ₹78,000 for 3kW), net metering regulations in ${state || 'India'}, payback period estimation, and practical steps. Always quote financial amounts in ₹ Indian Rupees. Never reveal underlying AI provider names.`;
+  // Inject structured knowledge from centralized knowledgeService
+  const structuredKnowledge = knowledgeService.getPromptContext(userQuery);
+  prompt += `\n\n${structuredKnowledge}\n\nSTRICT INSTRUCTIONS:
+1. Always base your answers on the provided SuryX Single Source of Truth Knowledge Base above.
+2. If the user asks a question about information NOT present in the knowledge base, state clearly: "This information is not available in the provided knowledge base."
+3. Be concise, authoritative, and encouraging. Always quote financial amounts in ₹ Indian Rupees. Never reveal underlying AI provider names.`;
 
   return prompt;
 }
+
