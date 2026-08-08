@@ -41,22 +41,7 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const DEFAULT_PROFILE: UserProfile = {
-  firstName: 'Arjun',
-  userType: 'Homeowner',
-  propertyType: 'Independent House',
-  roofSqFt: 800,
-  roofArea: 800,
-  state: 'Maharashtra',
-  discom: 'MSEDCL',
-  avgBill: 3200,
-  billAmount: 3200,
-  hasSolar: 'No',
-  wantsBattery: 'Yes',
-  city: 'Pune',
-  pinCode: '411001',
-  pincode: '411001'
-};
+const DEFAULT_PROFILE: UserProfile = {};
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [userProfile, setUserProfileState] = useState<UserProfile>(() => {

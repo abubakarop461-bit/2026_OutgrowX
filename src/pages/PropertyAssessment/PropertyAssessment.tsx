@@ -142,8 +142,8 @@ export const PropertyAssessment: React.FC = () => {
 ═══════════════════════════════════════════════════════ */
 const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ state, isSpecialState }) => {
   const { userProfile } = useApp();
-  const [analyzed, setAnalyzed] = useState(true);
-  const [roofArea, setRoofArea] = useState<number>(Number(userProfile.roofArea || userProfile.roofSqFt) || 800);
+  const [analyzed, setAnalyzed] = useState(false);
+  const [roofArea, setRoofArea] = useState<number | ''>(userProfile.roofArea || userProfile.roofSqFt ? Number(userProfile.roofArea || userProfile.roofSqFt) : '');
   const [roofType, setRoofType] = useState('RCC Flat');
   const [buildingAge, setBuildingAge] = useState('0-5 years');
   const [shading, setShading] = useState('None');
@@ -162,8 +162,8 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
 
   // Calculation logic based on PM Surya Ghar requirements
   const calc = useMemo(() => {
-    // 1 kW requires ~107 sq ft (10 sq m) shadow-free area per PM Surya Ghar spec
-    const maxViableKW = Math.max(1, Math.floor(roofArea / 107));
+    const areaNum = Number(roofArea) || 800;
+    const maxViableKW = Math.max(1, Math.floor(areaNum / 107));
     
     // Monthly consumption units
     const monthlyUnits = monthlyBill / currentTariff;
@@ -175,7 +175,7 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
 
     // Usable shadow-free area (60% to 75% depending on shading)
     const usableAreaFactor = shading === 'None' ? 0.75 : shading === 'Partial' ? 0.60 : 0.45;
-    const usableAreaSqFt = Math.round(roofArea * usableAreaFactor);
+    const usableAreaSqFt = Math.round(areaNum * usableAreaFactor);
 
     // Number of panels (using standard 400W ALMM-listed monocrystalline PV modules)
     const panelsCount = Math.ceil((recommendedKW * 1000) / 400);
@@ -204,7 +204,7 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
     // Sub-scores (0-100)
     const solarResourceScore = Math.round(Math.min(100, Math.max(30, ((psh - 4.0) / 1.5) * 60 + 40)));
     
-    let roofSuitabilityScore = roofArea >= 1000 ? 95 : roofArea >= 500 ? 85 : 70;
+    let roofSuitabilityScore = areaNum >= 1000 ? 95 : areaNum >= 500 ? 85 : 70;
     if (roofType === 'RCC Flat' || roofType === 'Terrace') roofSuitabilityScore = Math.min(100, roofSuitabilityScore + 8);
     if (roofType === 'Metal Sheet') roofSuitabilityScore = Math.max(40, roofSuitabilityScore - 5);
 
@@ -488,8 +488,8 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
    LAND SOLAR COMPONENT (PM-KUSUM ALIGNED)
 ═══════════════════════════════════════════════════════ */
 const LandSolar: React.FC<{ state: string }> = ({ state }) => {
-  const [analyzed, setAnalyzed] = useState(true);
-  const [landArea, setLandArea] = useState<number>(5);
+  const [analyzed, setAnalyzed] = useState(false);
+  const [landArea, setLandArea] = useState<number | ''>(5);
   const [terrain, setTerrain] = useState('Flat');
   const [soilType, setSoilType] = useState('Sandy / Loamy');
   const [gridDistance, setGridDistance] = useState('< 1 km');
@@ -500,11 +500,12 @@ const LandSolar: React.FC<{ state: string }> = ({ state }) => {
 
   // Calculation based on solarPoliciesAndSchemes.json (PM-KUSUM rules)
   const calc = useMemo(() => {
+    const areaNum = Number(landArea) || 5;
     // Terrain capacity modifier
     const terrainMod = terrain === 'Flat' ? 1.0 : terrain === 'Gently Sloped' ? 0.88 : 0.65;
     
     // ~200 kW capacity per acre for utility / community scale
-    const estimatedCapacityKW = Math.round(landArea * 200 * terrainMod);
+    const estimatedCapacityKW = Math.round(areaNum * 200 * terrainMod);
     const capacityMW = (estimatedCapacityKW / 1000).toFixed(2);
 
     // Annual generation: kW * PSH * 365 * 0.78 efficiency
@@ -514,15 +515,15 @@ const LandSolar: React.FC<{ state: string }> = ({ state }) => {
     // PM-KUSUM Matching
     let schemeMatch = 'PM-KUSUM Component A';
     let schemeDesc = '0.5 MW to 2 MW grid-connected solar power plant on barren or fallow farmland.';
-    if (landArea < 2) {
+    if (areaNum < 2) {
       schemeMatch = 'PM-KUSUM Component B / C';
       schemeDesc = 'Off-grid standalone solar pumps (2–10 HP) or solarization of agricultural feeder pumps.';
     }
 
     // Revenue Options under PM-KUSUM
     // Option 1: Lease land to developer @ ₹35,000 to ₹50,000 per acre/year
-    const annualLeaseMin = Math.round(landArea * 35000);
-    const annualLeaseMax = Math.round(landArea * 52000);
+    const annualLeaseMin = Math.round(areaNum * 35000);
+    const annualLeaseMax = Math.round(areaNum * 52000);
 
     // Option 2: Sale of power to DISCOM at PPA tariff ~₹3.00 / unit
     const ppaTariff = 3.00;

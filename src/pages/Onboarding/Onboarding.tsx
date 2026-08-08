@@ -24,16 +24,16 @@ const Onboarding: React.FC = () => {
     firstName: userProfile.firstName || '',
     userType: userProfile.userType || 'Homeowner',
     propertyType: userProfile.propertyType || 'Independent House',
-    roofArea: userProfile.roofArea || 800,
-    state: userProfile.state || 'Maharashtra',
-    billAmount: userProfile.billAmount || 3200,
-    discom: userProfile.discom || 'MSEDCL',
+    roofArea: userProfile.roofArea || '',
+    state: userProfile.state || '',
+    billAmount: userProfile.billAmount || '',
+    discom: userProfile.discom || '',
     hasSolar: userProfile.hasSolar ? String(userProfile.hasSolar) : 'No',
-    systemSize: userProfile.systemSize || 3.5,
-    installYear: userProfile.installYear || 2023,
+    systemSize: userProfile.systemSize || '',
+    installYear: userProfile.installYear || '',
     wantsBattery: userProfile.wantsBattery ? String(userProfile.wantsBattery) : 'Yes',
-    city: userProfile.city || 'Pune',
-    pincode: userProfile.pincode || '411001'
+    city: userProfile.city || '',
+    pincode: userProfile.pincode || ''
   });
 
   const update = (field: string, val: string | number) => {
@@ -113,10 +113,11 @@ const Onboarding: React.FC = () => {
     navigate('/dashboard');
   };
 
-  const monthlyBill = Number(formData.billAmount) || 3200;
+  const hasBillData = Number(formData.billAmount) > 0;
+  const monthlyBill = Number(formData.billAmount) || 0;
   const annualBill = monthlyBill * 12;
   const annualSavings = Math.round(annualBill * 0.85);
-  const recommendedKW = (monthlyBill / 1000).toFixed(1);
+  const recommendedKW = monthlyBill > 0 ? (monthlyBill / 1000).toFixed(1) : '—';
   const formattedSavings = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(annualSavings);
   const savings25Year = (annualSavings * 25 / 100000).toFixed(1);
 
@@ -517,10 +518,12 @@ const Onboarding: React.FC = () => {
 
             <p className="stat-label text-xs letter-wide">Est. 25-Year Cumulative Savings</p>
             <div className="stat-value stat-value--accent mb-1" style={{ fontSize: '2.75rem' }}>
-              ₹{savings25Year} Lakh
+              {hasBillData ? `₹${savings25Year} Lakh` : '₹ —'}
             </div>
             <p className="stat-sublabel text-secondary">
-              ~₹{formattedSavings} / year based on your ₹{monthlyBill.toLocaleString('en-IN')} bill
+              {hasBillData 
+                ? `~₹${formattedSavings} / year based on your ₹${monthlyBill.toLocaleString('en-IN')} bill`
+                : 'Enter your monthly electricity bill to calculate live savings'}
             </p>
 
             <div className="divider" />
@@ -528,11 +531,15 @@ const Onboarding: React.FC = () => {
             <div className="grid-2 gap-4 text-left">
               <div>
                 <span className="stat-label">System Size</span>
-                <p className="text-lg font-bold text-primary" style={{ margin: 0 }}>~{recommendedKW} kW</p>
+                <p className="text-lg font-bold text-primary" style={{ margin: 0 }}>
+                  {hasBillData ? `~${recommendedKW} kW` : '— kW'}
+                </p>
               </div>
               <div>
                 <span className="stat-label">PM Subsidy</span>
-                <p className="text-lg font-bold text-amber" style={{ margin: 0 }}>₹78,000</p>
+                <p className="text-lg font-bold text-amber" style={{ margin: 0 }}>
+                  {hasBillData ? (Number(recommendedKW) <= 1 ? '₹30,000' : Number(recommendedKW) <= 2 ? '₹60,000' : '₹78,000') : '—'}
+                </p>
               </div>
             </div>
           </div>
