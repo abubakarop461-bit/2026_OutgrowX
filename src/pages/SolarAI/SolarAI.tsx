@@ -333,12 +333,10 @@ const AIAdvisor: React.FC = () => {
     if (!text.trim() || isStreaming) return;
     
     const userMsg: Message = { role: 'user', content: text };
-    setMessages(prev => [...prev, userMsg]);
+    const assistantMsg: Message = { role: 'assistant', content: '' };
+    setMessages(prev => [...prev, userMsg, assistantMsg]);
     setInput('');
     setIsStreaming(true);
-
-    const aiMsg: Message = { role: 'assistant', content: '' };
-    setMessages(prev => [...prev, aiMsg]);
 
     const systemPrompt = buildSolarAdvisorPrompt(userProfile, language, text);
     const apiMessages: Message[] = [...messages, userMsg];
@@ -353,12 +351,24 @@ const AIAdvisor: React.FC = () => {
         currentText += chunk;
         setMessages(prev => {
           const newMsgs = [...prev];
-          newMsgs[newMsgs.length - 1] = { role: 'assistant', content: currentText };
+          if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+            newMsgs[newMsgs.length - 1] = { role: 'assistant', content: currentText };
+          }
           return newMsgs;
         });
       }
     } catch (err) {
       console.error('Chat error:', err);
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+          newMsgs[newMsgs.length - 1] = {
+            role: 'assistant',
+            content: 'I apologize, but I encountered an issue. Please try again.'
+          };
+        }
+        return newMsgs;
+      });
     } finally {
       setIsStreaming(false);
     }
