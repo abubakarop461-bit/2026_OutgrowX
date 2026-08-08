@@ -9,11 +9,21 @@ const translations = {
   mr
 };
 
+export type TranslationKeys = keyof typeof en;
+
 export const useTranslation = () => {
   const { language } = useApp();
-  
-  // Return the selected language object, fallback to 'en'
-  const t = translations[language] || translations.en;
-  
-  return { t };
+
+  const currentLang = (language || 'en').toLowerCase() as keyof typeof translations;
+  const dict = translations[currentLang] || translations.en;
+
+  const t = (key: TranslationKeys | string): string => {
+    try {
+      return (dict as any)?.[key] || (en as any)?.[key] || String(key);
+    } catch {
+      return String(key);
+    }
+  };
+
+  return { t, dict };
 };

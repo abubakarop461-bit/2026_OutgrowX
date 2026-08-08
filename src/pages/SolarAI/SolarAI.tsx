@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -6,129 +6,167 @@ import {
   LinearScale,
   BarElement,
   ArcElement,
-  Title,
   Tooltip,
   Legend
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
+import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../i18n';
+import { chatStream, Message } from '../../services/ai';
+import { buildSolarAdvisorPrompt } from '../../services/prompts';
+import { scanBill, BillData } from '../../services/billScanner';
+import { APPLIANCES } from '../../data/applianceProfiles';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-const APPLIANCES = [
-  { id: 'ac', name: 'AC', emoji: '🌀', wattage: 1500 },
-  { id: 'cooler', name: 'Cooler', emoji: '💨', wattage: 200 },
-  { id: 'fan', name: 'Fan', emoji: '🪭', wattage: 75 },
-  { id: 'fridge', name: 'Refrigerator', emoji: '🧊', wattage: 150 },
-  { id: 'tv', name: 'TV', emoji: '📺', wattage: 100 },
-  { id: 'computer', name: 'Computer', emoji: '💻', wattage: 300 },
-  { id: 'lights', name: 'Lights', emoji: '💡', wattage: 10 },
-  { id: 'geyser', name: 'Geyser', emoji: '🫙', wattage: 2000 },
-  { id: 'ev', name: 'EV Charger', emoji: '🔌', wattage: 3300 },
-  { id: 'washing', name: 'Washing Machine', emoji: '🧺', wattage: 500 },
-  { id: 'induction', name: 'Induction', emoji: '🍳', wattage: 2000 },
-  { id: 'pump', name: 'Water Pump', emoji: '💧', wattage: 750 },
-];
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 export const SolarAI: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'bill' | 'calculator' | 'advisor'>('bill');
 
   return (
-    <div className="container" style={{ paddingBottom: 'var(--space-12)' }}>
-      <header style={{ marginBottom: 'var(--space-8)', marginTop: 'var(--space-8)' }}>
-        <h1>Solar AI Intelligence</h1>
-        <p>Analyze your energy usage and get personalized solar recommendations.</p>
+    <main className="container pb-12">
+      <header className="page-header mt-8">
+        <h1>{t('solarAI') || 'Solar AI Intelligence'}</h1>
+        <p className="text-secondary">Analyze your energy usage and get personalized solar recommendations.</p>
       </header>
 
-      <div className="tabs" style={{ marginBottom: 'var(--space-6)' }}>
-        <button 
+      <div className="tabs mb-6">
+        <button
           className={`tab-btn ${activeTab === 'bill' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('bill')}
         >
-          Bill Scanner
+          {t('scanBill') || 'Bill Scanner'}
         </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'calculator' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('calculator')}
         >
           Appliance Calculator
         </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'advisor' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('advisor')}
         >
-          AI Advisor
+          {t('askAdvisor') || 'AI Advisor'}
         </button>
       </div>
 
       {activeTab === 'bill' && <BillScanner />}
       {activeTab === 'calculator' && <ApplianceCalculator />}
       {activeTab === 'advisor' && <AIAdvisor />}
-    </div>
+    </main>
   );
 };
 
 const BillScanner: React.FC = () => {
+  const { setProfile } = useApp();
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [scanning, setScanning] = useState(false);
-  const [result, setResult] = useState<boolean>(false);
+  const [result, setResult] = useState<BillData | null>(null);
+  const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const processFile = async (file: File) => {
+    setScanning(true);
+    setError('');
+    setResult(null);
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string;
+        const mimeType = file.type || 'image/jpeg';
+        try {
+          const data = await scanBill(base64, mimeType);
+          setResult(data);
+        } catch (err) {
+          setError('Failed to scan bill. Please try again.');
+        } finally {
+          setScanning(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setError('Failed to read file.');
+      setScanning(false);
+    }
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    startScan();
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
-  const startScan = () => {
-    setScanning(true);
-    setResult(false);
-    setTimeout(() => {
-      setScanning(false);
-      setResult(true);
-    }, 2000);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+  };
+
+  const handleUseData = () => {
+    if (!result) return;
+    setProfile({
+      billAmount: result.billAmount,
+      avgBill: result.billAmount,
+      discom: result.discom,
+    });
   };
 
   return (
     <div className="grid-2">
       <div className="flex-col gap-4">
-        <div 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*,.pdf"
+          onChange={handleFileChange}
+          className="hidden"
+          aria-label="Upload electricity bill"
+        />
+        <div
           className={`upload-zone ${isDragging ? 'upload-zone--drag-over' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          onClick={startScan}
+          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
+          aria-label="Upload electricity bill for scanning"
         >
-          <UploadCloud className="upload-zone__icon" style={{ margin: '0 auto' }} />
+          <UploadCloud className="upload-zone__icon mx-auto" />
           <h4 className="upload-zone__text">Drag & drop your electricity bill here</h4>
           <p className="upload-zone__subtext">Supports PDF, JPG, PNG (Max 5MB)</p>
         </div>
 
         {scanning && (
-          <div className="glass-card flex-col items-center gap-3">
-            <div className="model-badge__dot"></div>
-            <p>Extracting bill data with AI...</p>
+          <div className="glass-card flex-col items-center gap-3 text-center">
+            <div className="spinner"></div>
+            <p className="text-secondary">Extracting bill data with AI...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className="error-state">
+            <p className="text-red text-sm">{error}</p>
           </div>
         )}
 
         {result && (
           <div className="glass-card">
-            <h4 style={{ marginBottom: 'var(--space-4)' }}>Extracted Bill Data:</h4>
-            <div className="flex-col gap-2" style={{ marginBottom: 'var(--space-6)' }}>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>DISCOM: MSEDCL</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>Consumer No: 123456789</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>Units Consumed: 342 kWh</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>Bill Amount: ₹3,240</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>Billing Period: May-Jun 2026</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} color="var(--accent-green)" /> <span>Consumer Category: Residential</span></div>
+            <h4 className="mb-4">Extracted Bill Data:</h4>
+            <div className="flex-col gap-2 mb-6">
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>DISCOM: {result.discom}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Consumer No: {result.consumerNumber}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Units Consumed: {result.unitsConsumed} kWh</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Bill Amount: ₹{result.billAmount.toLocaleString('en-IN')}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Billing Period: {result.billingPeriod}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Consumer Category: {result.consumerCategory}</span></div>
+              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Model: {result.modelUsed}</span></div>
             </div>
-            <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+            <button className="btn btn-primary w-full justify-center" onClick={handleUseData}>
               Use This Data
             </button>
           </div>
@@ -136,14 +174,14 @@ const BillScanner: React.FC = () => {
       </div>
       <div>
         <div className="glass-card glass-card--no-hover">
-          <div className="flex items-center gap-2" style={{ marginBottom: 'var(--space-4)' }}>
-            <Info size={20} color="var(--accent-primary)" />
+          <div className="flex items-center gap-2 mb-4">
+            <Info size={20} className="text-accent" />
             <h4>How it works</h4>
           </div>
-          <p style={{ marginBottom: 'var(--space-4)' }}>
+          <p className="mb-4 text-secondary">
             Our advanced AI scans your electricity bill to extract your historical consumption patterns, tariff rates, and sanctioned load. This helps us design a solar system tailored perfectly to your unique needs.
           </p>
-          <p>
+          <p className="text-secondary">
             Your data is processed securely and is never shared with third parties without your consent.
           </p>
         </div>
@@ -154,7 +192,11 @@ const BillScanner: React.FC = () => {
 
 const ApplianceCalculator: React.FC = () => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [hours, setHours] = useState({ summer: 8, monsoon: 5, winter: 3 });
+  const [hours, setHours] = useState<Record<string, number>>({
+    summer: 8,
+    monsoon: 5,
+    winter: 3
+  });
 
   const updateQty = (id: string, delta: number) => {
     setQuantities(prev => ({
@@ -165,7 +207,7 @@ const ApplianceCalculator: React.FC = () => {
 
   const calcSeasonKWh = (seasonHours: number) => {
     return APPLIANCES.reduce((sum, a) => {
-      return sum + (a.wattage / 1000) * seasonHours * 30 * (quantities[a.id] || 0);
+      return sum + (a.wattage * 1000) * seasonHours * 30 * (quantities[a.id] || 0) / 1000;
     }, 0);
   };
 
@@ -185,13 +227,12 @@ const ApplianceCalculator: React.FC = () => {
     ]
   };
 
+  const activeAppliances = APPLIANCES.filter(a => quantities[a.id]);
   const pieData = {
-    labels: APPLIANCES.filter(a => quantities[a.id]).map(a => a.name),
+    labels: activeAppliances.map(a => a.name),
     datasets: [{
-      data: APPLIANCES.filter(a => quantities[a.id]).map(a => (a.wattage / 1000) * hours.summer * 30 * (quantities[a.id] || 0)),
-      backgroundColor: [
-        '#A8FF3E', '#22C55E', '#F59E0B', '#F97316', '#3B82F6', '#8B5CF6'
-      ],
+      data: activeAppliances.map(a => (a.wattage * 1000) * hours.summer * 30 * (quantities[a.id] || 0) / 1000),
+      backgroundColor: ['#A8FF3E', '#22C55E', '#F59E0B', '#F97316', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'],
       borderWidth: 0,
     }]
   };
@@ -199,72 +240,74 @@ const ApplianceCalculator: React.FC = () => {
   return (
     <div className="grid-2">
       <div className="flex-col gap-6">
-        <div className="grid-4" style={{ gap: 'var(--space-3)' }}>
+        <div className="grid-4 gap-3">
           {APPLIANCES.map(a => (
             <div key={a.id} className="glass-card glass-card--sm flex-col items-center justify-center gap-2">
-              <div style={{ fontSize: '1.5rem' }}>{a.emoji}</div>
-              <div style={{ fontSize: '0.8125rem', fontWeight: 600, textAlign: 'center' }}>{a.name}</div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{a.wattage}W</div>
+              <div style={{ fontSize: '1.5rem' }}>{a.name.charAt(0)}</div>
+              <div className="text-xs font-semibold text-center">{a.name}</div>
+              <div className="text-xs text-muted">{a.wattage * 1000}W</div>
               <div className="qty-counter">
-                <button className="qty-btn" onClick={() => updateQty(a.id, -1)}>-</button>
+                <button className="qty-btn" onClick={() => updateQty(a.id, -1)} aria-label={`Decrease ${a.name}`}>-</button>
                 <span className="qty-value">{quantities[a.id] || 0}</span>
-                <button className="qty-btn" onClick={() => updateQty(a.id, 1)}>+</button>
+                <button className="qty-btn" onClick={() => updateQty(a.id, 1)} aria-label={`Increase ${a.name}`}>+</button>
               </div>
             </div>
           ))}
         </div>
 
         <div className="glass-card">
-          <h4 style={{ marginBottom: 'var(--space-4)' }}>Seasonal Usage Adjuster</h4>
-          
-          <div className="form-group" style={{ marginBottom: 'var(--space-3)' }}>
+          <h4 className="mb-4">Seasonal Usage Adjuster</h4>
+
+          <div className="form-group mb-3">
             <div className="flex justify-between"><label>Summer (hrs/day)</label><span>{hours.summer} hrs</span></div>
-            <input type="range" min="0" max="24" value={hours.summer} onChange={e => setHours({...hours, summer: parseInt(e.target.value)})} style={{ width: '100%', accentColor: 'var(--accent-primary)' }}/>
+            <input type="range" min="0" max="24" value={hours.summer} onChange={e => setHours({ ...hours, summer: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
           </div>
-          
-          <div className="form-group" style={{ marginBottom: 'var(--space-3)' }}>
+
+          <div className="form-group mb-3">
             <div className="flex justify-between"><label>Monsoon (hrs/day)</label><span>{hours.monsoon} hrs</span></div>
-            <input type="range" min="0" max="24" value={hours.monsoon} onChange={e => setHours({...hours, monsoon: parseInt(e.target.value)})} style={{ width: '100%', accentColor: 'var(--accent-primary)' }}/>
+            <input type="range" min="0" max="24" value={hours.monsoon} onChange={e => setHours({ ...hours, monsoon: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
           </div>
 
           <div className="form-group">
             <div className="flex justify-between"><label>Winter (hrs/day)</label><span>{hours.winter} hrs</span></div>
-            <input type="range" min="0" max="24" value={hours.winter} onChange={e => setHours({...hours, winter: parseInt(e.target.value)})} style={{ width: '100%', accentColor: 'var(--accent-primary)' }}/>
+            <input type="range" min="0" max="24" value={hours.winter} onChange={e => setHours({ ...hours, winter: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
           </div>
         </div>
       </div>
 
       <div className="flex-col gap-6">
         <div className="glass-card">
-          <h4 style={{ marginBottom: 'var(--space-4)' }}>Seasonal Consumption</h4>
-          <Bar 
-            data={barData} 
-            options={{ 
-              scales: { 
-                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                x: { grid: { display: false } }
-              },
-              plugins: { legend: { display: false } }
-            }} 
-          />
+          <h4 className="mb-4">Seasonal Consumption</h4>
+          <div className="chart-container chart-container--sm">
+            <Bar
+              data={barData}
+              options={{
+                scales: {
+                  y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8BAF95' } },
+                  x: { grid: { display: false }, ticks: { color: '#8BAF95' } }
+                },
+                plugins: { legend: { display: false } }
+              }}
+            />
+          </div>
         </div>
-        
+
         <div className="glass-card">
-          <h4 style={{ marginBottom: 'var(--space-4)' }}>Appliance Breakdown (Summer)</h4>
+          <h4 className="mb-4">Appliance Breakdown (Summer)</h4>
           {pieData.labels.length > 0 ? (
             <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
-              <Pie data={pieData} options={{ plugins: { legend: { position: 'right' } }, maintainAspectRatio: false }} />
+              <Pie data={pieData} options={{ plugins: { legend: { position: 'right', labels: { color: '#8BAF95' } } }, maintainAspectRatio: false }} />
             </div>
           ) : (
             <p className="text-muted text-center py-4">Add appliances to see breakdown.</p>
           )}
         </div>
 
-        <div className="glass-card glass-card--no-hover" style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-          <Sparkles color="var(--accent-primary)" />
+        <div className="glass-card glass-card--no-hover flex gap-3 items-start">
+          <Sparkles className="text-accent shrink-0" />
           <div>
-            <h5 style={{ marginBottom: 'var(--space-1)' }}>AI Insight</h5>
-            <p style={{ fontSize: '0.875rem' }}>Your cooling appliances contribute significantly to your summer usage. Consider sizing your solar system to cover the summer peak, ensuring 100% bill offset during the hottest months.</p>
+            <h5 className="mb-1">AI Insight</h5>
+            <p className="text-sm text-secondary">Your cooling appliances contribute significantly to your summer usage. Consider sizing your solar system to cover the summer peak, ensuring 100% bill offset during the hottest months.</p>
           </div>
         </div>
       </div>
@@ -272,11 +315,11 @@ const ApplianceCalculator: React.FC = () => {
   );
 };
 
-type Message = { role: 'user' | 'ai'; content: string };
-
 const AIAdvisor: React.FC = () => {
+  const { userProfile, language } = useApp();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'ai', content: 'Hello! I am your Solar Pro Advisor. I have analyzed your context. How can I help you regarding your solar journey today?' }
+    { role: 'assistant', content: 'Hello! I am your Solar Pro Advisor. I have analyzed your context. How can I help you regarding your solar journey today?' }
   ]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -286,32 +329,52 @@ const AIAdvisor: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isStreaming]);
 
-  const send = async (text: string) => {
+  const send = useCallback(async (text: string) => {
     if (!text.trim() || isStreaming) return;
-    
+
     const userMsg: Message = { role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsStreaming(true);
 
-    const aiMsg: Message = { role: 'ai', content: '' };
-    setMessages(prev => [...prev, aiMsg]);
+    const systemPrompt = buildSolarAdvisorPrompt(userProfile, language);
+    const chatHistory = messages
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
 
-    const response = "Based on your monthly bill of ₹3,240 and 342 kWh consumption, I recommend a 3 kW solar system. With PM Surya Ghar subsidy, your payback period could be as low as 3.5 years. Would you like to see a detailed financial breakdown?";
-    
     let currentText = '';
-    for (const char of response) {
-      currentText += char;
+
+    try {
+      const stream = chatStream(
+        [...chatHistory, { role: 'user', content: text }],
+        systemPrompt
+      );
+
+      for await (const chunk of stream) {
+        currentText += chunk;
+        setMessages(prev => {
+          const newMsgs = [...prev];
+          if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+            newMsgs[newMsgs.length - 1] = { ...newMsgs[newMsgs.length - 1], content: currentText };
+          }
+          return newMsgs;
+        });
+      }
+    } catch {
       setMessages(prev => {
         const newMsgs = [...prev];
-        newMsgs[newMsgs.length - 1].content = currentText;
+        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+          newMsgs[newMsgs.length - 1] = {
+            ...newMsgs[newMsgs.length - 1],
+            content: currentText || 'I apologize, but I encountered an issue. Please try again.'
+          };
+        }
         return newMsgs;
       });
-      await new Promise(r => setTimeout(r, 15));
+    } finally {
+      setIsStreaming(false);
     }
-    
-    setIsStreaming(false);
-  };
+  }, [isStreaming, messages, userProfile, language]);
 
   const prompts = [
     "How many panels do I need?",
@@ -322,22 +385,22 @@ const AIAdvisor: React.FC = () => {
   ];
 
   return (
-    <div className="glass-card p-0 flex-col" style={{ height: '600px', overflow: 'hidden', padding: 0 }}>
-      <div style={{ padding: 'var(--space-3) var(--space-4)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.02)' }}>
+    <div className="glass-card p-0 flex-col" style={{ height: '600px', overflow: 'hidden' }}>
+      <div className="flex items-center justify-between p-3 px-4" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
         <div className="model-badge">
           <Cpu size={14} />
           <span>Solar Pro Advisor</span>
           <div className="model-badge__dot"></div>
         </div>
       </div>
-      
+
       <div className="chat-messages">
         {messages.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role === 'user' ? 'chat-message--user' : ''}`}>
-            {msg.role === 'ai' && (
-              <div className="chat-avatar"><Sparkles size={16} color="var(--accent-primary)" /></div>
+            {msg.role === 'assistant' && (
+              <div className="chat-avatar"><Sparkles size={16} className="text-accent" /></div>
             )}
-            <div className={`chat-bubble chat-bubble--${msg.role} ${(msg.role === 'ai' && isStreaming && i === messages.length - 1) ? 'streaming-cursor' : ''}`}>
+            <div className={`chat-bubble chat-bubble--${msg.role === 'user' ? 'user' : 'ai'} ${(msg.role === 'assistant' && isStreaming && i === messages.length - 1) ? 'streaming-cursor' : ''}`}>
               {msg.content}
             </div>
           </div>
@@ -347,19 +410,26 @@ const AIAdvisor: React.FC = () => {
 
       <div className="prompt-chips">
         {prompts.map(p => (
-          <button key={p} className="prompt-chip" onClick={() => send(p)}>{p}</button>
+          <button key={p} className="prompt-chip" onClick={() => send(p)} disabled={isStreaming}>{p}</button>
         ))}
       </div>
 
       <div className="chat-input-row">
-        <input 
+        <input
           className="chat-input"
           placeholder="Ask anything about solar..."
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)}
+          disabled={isStreaming}
         />
-        <button className="btn btn-primary btn-sm" style={{ padding: '0 16px', borderRadius: 'var(--radius-full)' }} onClick={() => send(input)} disabled={isStreaming || !input.trim()}>
+        <button
+          className="btn btn-primary btn-sm"
+          style={{ padding: '0 16px', borderRadius: 'var(--radius-full)' }}
+          onClick={() => send(input)}
+          disabled={isStreaming || !input.trim()}
+          aria-label="Send message"
+        >
           <Send size={16} />
         </button>
       </div>

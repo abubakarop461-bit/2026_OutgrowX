@@ -1,37 +1,98 @@
-import React, { useState } from 'react';
-import { Search, MapPin, Star, Filter, ShieldCheck, TrendingUp, Users, CheckCircle, Mail, Sun } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { MapPin, Star, Filter, TrendingUp, Users, CheckCircle, Mail } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { useTranslation } from '../../i18n';
+import { VENDORS } from '../../data/vendors';
+import { calculateROI } from '../../services/roiCalculator';
+import type { VendorData } from '../../types';
 
 export default function VendorMarketplace() {
-  const { userRole } = useApp();
+  const { userProfile } = useApp();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'find' | 'business'>('find');
   const [showModal, setShowModal] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<VendorData | null>(null);
 
-  // Mock Vendor Data
-  const vendors = [
-    { id: 1, name: 'Solarworks India Pvt Ltd', rating: 4.8, reviews: 127, type: 'Installer', location: 'Maharashtra', specs: ['Residential', 'Subsidy Filing', 'Net Metering'], price: '₹₹' },
-    { id: 2, name: 'GreenEnergy Solutions', rating: 4.5, reviews: 89, type: 'Installer', location: 'Maharashtra', specs: ['Commercial', 'Battery Storage'], price: '₹₹₹' },
-    { id: 3, name: 'SunPower Tech', rating: 4.2, reviews: 45, type: 'Maintenance', location: 'Maharashtra', specs: ['Panel Cleaning', 'Inverter Repair'], price: '₹' },
-    { id: 4, name: 'EcoSolar Systems', rating: 4.9, reviews: 210, type: 'Installer', location: 'Karnataka', specs: ['Residential', 'Off-grid'], price: '₹₹' },
-  ];
+  // Filter state
+  const [stateFilter, setStateFilter] = useState(userProfile.state || 'All');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [ratingFilter, setRatingFilter] = useState('Any');
+  const [priceFilter, setPriceFilter] = useState('Any');
+
+  const filteredVendors = useMemo(() => {
+    return VENDORS.filter(v => {
+      if (stateFilter !== 'All' && !v.states.includes(stateFilter)) return false;
+      if (typeFilter !== 'All' && v.type !== typeFilter) return false;
+      if (ratingFilter === '4+' && v.rating < 4) return false;
+      if (ratingFilter === '3+' && v.rating < 3) return false;
+      if (priceFilter !== 'Any' && v.priceRange !== priceFilter) return false;
+      return true;
+    });
+  }, [stateFilter, typeFilter, ratingFilter, priceFilter]);
+
+  const handleGetQuote = (vendor: VendorData) => {
+    setSelectedVendor(vendor);
+    setShowModal(true);
+  };
+
+  const quoteText = useMemo(() => {
+    const name = userProfile.firstName || 'User';
+    const bill = userProfile.billAmount || userProfile.avgBill || 3200;
+    const area = userProfile.roofArea || userProfile.roofSqFt || 800;
+    const state = userProfile.state || 'Maharashtra';
+    const roi = calculateROI({
+      state,
+      billSize: Number(bill),
+      roofArea: Number(area),
+      roofType: 'flat'
+    });
+    return `Hello ${selectedVendor?.companyName || ''},
+
+I am interested in installing a solar system and would like a quote. Based on my SuryX AI assessment:
+
+- Recommended Size: ${roi.systemSizeKW} kW
+- Roof Area: ${area} sq ft
+- Current Monthly Bill: ₹${Number(bill).toLocaleString('en-IN')}
+- Location: ${state}
+- Estimated Payback: ${roi.paybackYears} years
+
+Please let me know your pricing, brands used, and availability for a site survey.
+
+Thanks,
+${name}`;
+  }, [userProfile, selectedVendor]);
+
+  const allStates = useMemo(() => {
+    const states = new Set<string>();
+    VENDORS.forEach(v => v.states.forEach(s => states.add(s)));
+    return ['All', ...Array.from(states).sort()];
+  }, []);
 
   return (
     <main className="container mx-auto px-4 pt-24 pb-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Solar Marketplace</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('marketplace') || 'Solar Marketplace'}</h1>
         <p className="text-gray-400">Connect with top-rated solar installers and businesses.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-8 border-b border-gray-800 pb-px">
-        <button 
-          className={`px-4 py-2 border-b-2 font-medium transition-colors ${activeTab === 'find' ? 'border-accent text-accent' : 'border-transparent text-gray-400 hover:text-white'}`}
+      <div className="flex gap-2 mb-8" style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1px' }}>
+        <button
+          className="px-4 py-2 font-medium transition-colors"
+          style={{
+            borderBottom: activeTab === 'find' ? '2px solid var(--accent-primary)' : '2px solid transparent',
+            color: activeTab === 'find' ? 'var(--accent-primary)' : 'var(--text-secondary)'
+          }}
           onClick={() => setActiveTab('find')}
         >
           Find Installers
         </button>
-        <button 
-          className={`px-4 py-2 border-b-2 font-medium transition-colors ${activeTab === 'business' ? 'border-accent text-accent' : 'border-transparent text-gray-400 hover:text-white'}`}
+        <button
+          className="px-4 py-2 font-medium transition-colors"
+          style={{
+            borderBottom: activeTab === 'business' ? '2px solid var(--accent-primary)' : '2px solid transparent',
+            color: activeTab === 'business' ? 'var(--accent-primary)' : 'var(--text-secondary)'
+          }}
           onClick={() => setActiveTab('business')}
         >
           Business Portal
@@ -39,91 +100,114 @@ export default function VendorMarketplace() {
       </div>
 
       {activeTab === 'find' && (
-        <div className="space-y-6">
+        <div className="flex-col gap-6">
           {/* Filters */}
           <div className="glass-card p-4 rounded-xl flex flex-wrap gap-4 items-center">
-            <div className="flex items-center gap-2 bg-bg-surface border border-gray-700 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
               <MapPin size={18} className="text-gray-400" />
-              <select className="bg-transparent border-none outline-none text-sm text-white">
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Delhi</option>
+              <select
+                className="bg-transparent border-none outline-none text-sm text-primary cursor-pointer"
+                value={stateFilter}
+                onChange={e => setStateFilter(e.target.value)}
+              >
+                {allStates.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div className="flex items-center gap-2 bg-bg-surface border border-gray-700 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
               <Filter size={18} className="text-gray-400" />
-              <select className="bg-transparent border-none outline-none text-sm text-white">
-                <option>All Types</option>
-                <option>Installer</option>
-                <option>Manufacturer</option>
-                <option>Maintenance</option>
+              <select
+                className="bg-transparent border-none outline-none text-sm text-primary cursor-pointer"
+                value={typeFilter}
+                onChange={e => setTypeFilter(e.target.value)}
+              >
+                <option value="All">All Types</option>
+                <option value="Installer">Installer</option>
+                <option value="Manufacturer">Manufacturer</option>
+                <option value="Maintenance">Maintenance</option>
               </select>
             </div>
-            <div className="flex items-center gap-2 bg-bg-surface border border-gray-700 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
               <Star size={18} className="text-gray-400" />
-              <select className="bg-transparent border-none outline-none text-sm text-white">
-                <option>4+ Stars</option>
-                <option>3+ Stars</option>
-                <option>Any Rating</option>
+              <select
+                className="bg-transparent border-none outline-none text-sm text-primary cursor-pointer"
+                value={ratingFilter}
+                onChange={e => setRatingFilter(e.target.value)}
+              >
+                <option value="Any">Any Rating</option>
+                <option value="4+">4+ Stars</option>
+                <option value="3+">3+ Stars</option>
               </select>
             </div>
-            <div className="flex items-center gap-2 bg-bg-surface border border-gray-700 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
               <span className="text-gray-400 font-medium">₹</span>
-              <select className="bg-transparent border-none outline-none text-sm text-white">
-                <option>Any Price</option>
-                <option>₹₹</option>
-                <option>₹₹₹</option>
+              <select
+                className="bg-transparent border-none outline-none text-sm text-primary cursor-pointer"
+                value={priceFilter}
+                onChange={e => setPriceFilter(e.target.value)}
+              >
+                <option value="Any">Any Price</option>
+                <option value="₹₹">₹₹</option>
+                <option value="₹₹₹">₹₹₹</option>
+                <option value="₹₹₹₹">₹₹₹₹</option>
               </select>
             </div>
+            <span className="text-sm text-gray-400 ml-auto">{filteredVendors.length} vendors found</span>
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {vendors.map(v => (
-              <div key={v.id} className="vendor-card glass-card p-5 rounded-2xl flex flex-col h-full border border-gray-800 hover:border-accent/50 transition-all">
+          <div className="vendor-grid">
+            {filteredVendors.map(v => (
+              <div key={v.id} className="vendor-card glass-card p-5 rounded-2xl flex flex-col h-full transition-all">
                 <div className="flex gap-4 items-start mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center shrink-0">
-                    <Sun className="text-accent" />
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--bg-elevated)' }}>
+                    <span className="text-xl">{v.logo}</span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-lg leading-tight">{v.name}</h3>
+                  <div className="vendor-info">
+                    <h3 className="font-semibold text-lg leading-tight">{v.companyName}</h3>
                     <div className="flex items-center gap-1 text-sm text-gray-400 mt-1">
                       <Star size={14} className="text-yellow-400 fill-yellow-400" />
-                      <span className="text-white font-medium">{v.rating}</span>
-                      <span>({v.reviews} reviews)</span>
+                      <span className="text-primary font-medium">{v.rating}</span>
+                      <span>({v.reviewCount} reviews)</span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="mb-4 space-y-2 flex-grow">
+
+                <div className="mb-4 flex-col gap-2 flex-grow">
                   <p className="text-sm text-gray-300 flex items-center gap-2">
-                    <span className="text-gray-500">Type:</span> {v.type} · {v.location}
+                    <span className="text-gray-500">Type:</span> {v.type} · {v.states.slice(0, 2).join(', ')}
                   </p>
-                  <p className="text-sm text-gray-300">
-                    <span className="text-gray-500">Specializations:</span> {v.specs.join(' · ')}
-                  </p>
+                  <div className="vendor-tags">
+                    {v.specializations.slice(0, 3).map((spec, i) => (
+                      <span key={i} className="badge badge--muted text-xs">{spec}</span>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-800">
-                  <span className="font-medium text-gray-300">{v.price}</span>
-                  <button 
+                <div className="flex items-center justify-between mt-auto pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                  <span className="font-medium text-gray-300">{v.priceRange}</span>
+                  <button
                     className="btn btn-primary px-4 py-2 text-sm"
-                    onClick={() => setShowModal(true)}
+                    onClick={() => handleGetQuote(v)}
                   >
-                    Get Quote →
+                    {t('getQuote') || 'Get Quote'} →
                   </button>
                 </div>
               </div>
             ))}
+            {filteredVendors.length === 0 && (
+              <div className="glass-card p-8 rounded-2xl text-center text-gray-400 col-span-full">
+                No vendors match your filters. Try adjusting your criteria.
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {activeTab === 'business' && (
-        <div className="space-y-8">
+        <div className="flex-col gap-8">
           {/* Simple Dashboard View */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="glass-card p-5 rounded-xl border-t-2 border-t-accent">
+          <div className="grid-3 gap-4">
+            <div className="glass-card p-5 rounded-xl" style={{ borderTop: '2px solid var(--accent-primary)' }}>
               <div className="flex justify-between items-start">
                 <div>
                   <p className="text-sm text-gray-400 mb-1">New Leads</p>
@@ -152,18 +236,17 @@ export default function VendorMarketplace() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-4">
+          <div className="grid-3 gap-6">
+            <div className="col-span-2 flex-col gap-4">
               <h3 className="text-xl font-semibold mb-2">Recent Leads</h3>
-              
-              {/* Lead Card */}
+
               <div className="glass-card p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
                   <h4 className="font-semibold text-lg">Arjun Sharma</h4>
-                  <p className="text-sm text-gray-400 flex items-center gap-1"><MapPin size={14}/> Pune, Maharashtra</p>
-                  <p className="text-sm mt-2">
-                    <span className="bg-gray-800 px-2 py-1 rounded text-xs mr-2">System: 4 kW</span>
-                    <span className="bg-green-900/30 text-green-400 px-2 py-1 rounded text-xs border border-green-800">Interest: High</span>
+                  <p className="text-sm text-gray-400 flex items-center gap-1"><MapPin size={14} /> Pune, Maharashtra</p>
+                  <p className="text-sm mt-2 flex gap-2">
+                    <span className="px-2 py-1 rounded text-xs" style={{ background: 'var(--bg-elevated)' }}>System: 4 kW</span>
+                    <span className="px-2 py-1 rounded text-xs badge--green">Interest: High</span>
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -171,15 +254,14 @@ export default function VendorMarketplace() {
                   <button className="btn btn-primary px-3 py-1.5 text-sm">Mark Active</button>
                 </div>
               </div>
-              
-              {/* Lead Card */}
+
               <div className="glass-card p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
                   <h4 className="font-semibold text-lg">Priya Patel</h4>
-                  <p className="text-sm text-gray-400 flex items-center gap-1"><MapPin size={14}/> Mumbai, Maharashtra</p>
-                  <p className="text-sm mt-2">
-                    <span className="bg-gray-800 px-2 py-1 rounded text-xs mr-2">System: 2.5 kW</span>
-                    <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded text-xs border border-yellow-800">Interest: Medium</span>
+                  <p className="text-sm text-gray-400 flex items-center gap-1"><MapPin size={14} /> Mumbai, Maharashtra</p>
+                  <p className="text-sm mt-2 flex gap-2">
+                    <span className="px-2 py-1 rounded text-xs" style={{ background: 'var(--bg-elevated)' }}>System: 2.5 kW</span>
+                    <span className="px-2 py-1 rounded text-xs badge--amber">Interest: Medium</span>
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -192,16 +274,16 @@ export default function VendorMarketplace() {
             <div className="glass-card p-6 rounded-2xl h-fit">
               <h3 className="font-semibold mb-4">Vendor Registration</h3>
               <p className="text-sm text-gray-400 mb-6">Want to receive verified solar leads? Register your business on SuryX.</p>
-              <form className="space-y-4" onSubmit={e => e.preventDefault()}>
-                <div>
-                  <label className="block text-sm mb-1 text-gray-300">Company Name</label>
-                  <input type="text" className="w-full bg-bg-surface border border-gray-700 rounded-lg px-3 py-2 text-white" placeholder="Solar Co." />
+              <form className="flex-col gap-4" onSubmit={e => e.preventDefault()}>
+                <div className="form-group">
+                  <label className="label">Company Name</label>
+                  <input type="text" className="input" placeholder="Solar Co." />
                 </div>
-                <div>
-                  <label className="block text-sm mb-1 text-gray-300">GSTIN</label>
-                  <input type="text" className="w-full bg-bg-surface border border-gray-700 rounded-lg px-3 py-2 text-white" placeholder="27XXXXX..." />
+                <div className="form-group">
+                  <label className="label">GSTIN</label>
+                  <input type="text" className="input" placeholder="27XXXXX..." />
                 </div>
-                <button className="btn btn-primary w-full">Apply Now</button>
+                <button className="btn btn-primary w-full justify-center">Apply Now</button>
               </form>
             </div>
           </div>
@@ -210,39 +292,64 @@ export default function VendorMarketplace() {
 
       {/* Quote Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="glass-card w-full max-w-lg rounded-2xl p-6 relative border border-gray-700 shadow-2xl">
-            <button 
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
-              onClick={() => setShowModal(false)}
-            >
-              ✕
-            </button>
-            <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2"><Mail className="text-accent" /> Draft Inquiry</h3>
-            <p className="text-gray-400 mb-6 text-sm">We've pre-filled this based on your AI Solar Report.</p>
-            
-            <div className="bg-bg-surface/50 border border-gray-800 p-4 rounded-xl mb-6">
-              <p className="text-sm text-gray-300 font-mono whitespace-pre-wrap">
-                Hello,<br/><br/>
-                I am interested in installing a solar system and would like a quote. Based on my SuryX AI assessment:<br/><br/>
-                - Recommended Size: 3.5 kW<br/>
-                - Roof Area: 800 sq ft<br/>
-                - Current Monthly Bill: ₹3,200<br/>
-                - Location: Maharashtra<br/><br/>
-                Please let me know your pricing, brands used, and availability for a site survey.<br/><br/>
-                Thanks,<br/>
-                Arjun
-              </p>
-            </div>
-            
-            <div className="flex justify-end gap-3">
-              <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={() => setShowModal(false)}>Send Inquiry</button>
-            </div>
-          </div>
-        </div>
+        <QuoteModal
+          vendor={selectedVendor}
+          quoteText={quoteText}
+          onClose={() => { setShowModal(false); setSelectedVendor(null); }}
+        />
       )}
-
     </main>
   );
 }
+
+const QuoteModal: React.FC<{
+  vendor: VendorData | null;
+  quoteText: string;
+  onClose: () => void;
+}> = ({ vendor, quoteText, onClose }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [handleKeyDown]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-label="Get Quote">
+      <div className="modal-content" ref={modalRef}>
+        <div className="modal-header">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
+            <Mail className="text-accent" /> Draft Inquiry
+          </h3>
+          <button className="text-gray-400 hover:text-primary transition-colors" onClick={onClose} aria-label="Close modal">
+            ✕
+          </button>
+        </div>
+        <div className="modal-body">
+          <p className="text-gray-400 mb-4 text-sm">
+            {vendor ? `Inquiry for ${vendor.companyName}` : 'Inquiry'} · Pre-filled from your AI Solar Report.
+          </p>
+          <div className="p-4 rounded-xl" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
+            <p className="text-sm text-gray-300 font-mono whitespace-pre-line">{quoteText}</p>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={onClose}>Send Inquiry</button>
+        </div>
+      </div>
+    </div>
+  );
+};

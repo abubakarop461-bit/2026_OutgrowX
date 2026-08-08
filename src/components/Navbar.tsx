@@ -1,69 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n';
 import LanguageSelector from './LanguageSelector';
 import { Sun, Menu, X, RotateCcw, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userProfile, resetProfile } = useApp();
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev);
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && mobileMenuOpen) {
+      closeMobileMenu();
+    }
+  }, [mobileMenuOpen, closeMobileMenu]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
 
   const handleReset = () => {
-    if (window.confirm("Do you want to reset your profile and re-run onboarding?")) {
+    closeMobileMenu();
+    if (window.confirm('Do you want to reset your profile and re-run onboarding?')) {
       resetProfile();
       navigate('/');
     }
   };
 
+  const safeT = (key: string, fallback: string) => {
+    try {
+      if (typeof t === 'function') {
+        const val = t(key);
+        if (val && val !== key) return val;
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return fallback;
+  };
+
   const navLinks = [
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Solar AI', path: '/solar-ai' },
-    { name: 'Property', path: '/property' },
-    { name: 'Report', path: '/report' },
-    { name: 'Marketplace', path: '/marketplace' },
+    { name: safeT('dashboard', 'Dashboard'), path: '/dashboard' },
+    { name: safeT('solarAI', 'Solar AI'), path: '/solar-ai' },
+    { name: safeT('propertyAssessment', 'Property'), path: '/property' },
+    { name: safeT('aiReport', 'Report'), path: '/report' },
+    { name: safeT('marketplace', 'Marketplace'), path: '/marketplace' },
   ];
 
   const userName = userProfile.firstName || userProfile.name || 'User';
 
   return (
-    <nav style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0,
-      right: 0,
-      height: '64px',
-      zIndex: 100, 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center',
-      padding: '0 2rem',
-      background: 'rgba(7, 13, 9, 0.85)',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--border-subtle)',
-    }}>
+    <nav
+      className="fixed top-0 left-0 right-0 flex items-center justify-between px-8"
+      style={{
+        height: '64px',
+        zIndex: 100,
+        background: 'rgba(7, 13, 9, 0.85)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}
+      aria-label="Main navigation"
+    >
       {/* Logo */}
-      <NavLink to="/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }}>
-        <div style={{
-          width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(168,255,62,0.12)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(168,255,62,0.25)'
-        }}>
-          <Sun size={18} color="#A8FF3E" />
+      <NavLink to="/dashboard" className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
+        <div
+          className="flex items-center justify-center rounded-full"
+          style={{
+            width: '32px', height: '32px', background: 'rgba(168,255,62,0.12)',
+            border: '1px solid rgba(168,255,62,0.25)'
+          }}
+        >
+          <Sun size={18} className="text-accent" />
         </div>
-        <span style={{ fontSize: '1.375rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: '#F0FFF4' }}>
-          Sury<span style={{ color: '#A8FF3E' }}>X</span>
+        <span className="font-bold text-primary" style={{ fontSize: '1.375rem', fontFamily: 'var(--font-display)' }}>
+          Sury<span className="text-accent">X</span>
         </span>
       </NavLink>
 
       {/* Desktop Links */}
-      <div className="desktop-links" style={{ display: 'flex', gap: '0.5rem' }}>
+      <div className="desktop-links flex gap-2">
         {navLinks.map((link) => (
-          <NavLink 
-            key={link.name} 
+          <NavLink
+            key={link.path}
             to={link.path}
+            className="transition-colors"
             style={({ isActive }) => ({
               color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
               textDecoration: 'none',
@@ -73,7 +101,6 @@ const Navbar: React.FC = () => {
               fontWeight: 500,
               backgroundColor: isActive ? 'rgba(168, 255, 62, 0.08)' : 'transparent',
               borderBottom: isActive ? '2px solid var(--accent-primary)' : '2px solid transparent',
-              transition: 'all var(--transition-fast)'
             })}
           >
             {link.name}
@@ -82,51 +109,65 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className="flex items-center gap-4">
         <LanguageSelector />
-        
-        <div className="desktop-greeting" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-          <User size={14} color="var(--accent-primary)" />
-          <span style={{ fontWeight: 500, color: '#F0FFF4' }}>{userName}</span>
+
+        <div className="desktop-greeting flex items-center gap-2 text-secondary text-sm">
+          <User size={14} className="text-accent" />
+          <span className="font-medium text-primary">{userName}</span>
           {userProfile.state && (
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>({userProfile.state})</span>
+            <span className="text-xs text-muted">({userProfile.state})</span>
           )}
         </div>
 
-        <button 
+        <button
           title="Re-run Onboarding / Reset Profile"
-          className="btn btn-ghost btn-sm" 
+          className="btn btn-ghost btn-sm"
           onClick={handleReset}
+          aria-label="Reset profile and re-run onboarding"
           style={{ padding: '6px 10px', color: 'var(--text-muted)' }}
         >
           <RotateCcw size={14} />
         </button>
 
-        <button className="mobile-menu-btn btn btn-ghost" onClick={toggleMobileMenu} style={{ padding: '6px', borderRadius: '8px' }}>
+        <button
+          className="mobile-menu-btn btn btn-ghost"
+          onClick={toggleMobileMenu}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          style={{ padding: '6px', borderRadius: '8px' }}
+        >
           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="glass-card mobile-menu" style={{ 
-          position: 'absolute', 
-          top: '64px', 
-          left: 0, 
-          right: 0, 
-          display: 'flex', 
-          flexDirection: 'column', 
-          padding: '0.75rem',
-          borderRadius: 0,
-          borderTop: '1px solid var(--border-subtle)',
-          background: 'rgba(13, 26, 16, 0.95)',
-          boxShadow: 'var(--shadow-card)'
-        }}>
+        <div
+          id="mobile-menu"
+          ref={menuRef}
+          className="glass-card mobile-menu flex-col p-3"
+          role="menu"
+          aria-label="Mobile navigation"
+          style={{
+            position: 'absolute',
+            top: '64px',
+            left: 0,
+            right: 0,
+            borderRadius: 0,
+            borderTop: '1px solid var(--border-subtle)',
+            background: 'rgba(13, 26, 16, 0.95)',
+            boxShadow: 'var(--shadow-card)'
+          }}
+        >
           {navLinks.map((link) => (
-            <NavLink 
-              key={link.name} 
+            <NavLink
+              key={link.path}
               to={link.path}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={closeMobileMenu}
+              className="transition-colors"
+              role="menuitem"
               style={({ isActive }) => ({
                 color: isActive ? 'var(--accent-primary)' : 'var(--text-primary)',
                 textDecoration: 'none',
@@ -139,12 +180,13 @@ const Navbar: React.FC = () => {
               {link.name}
             </NavLink>
           ))}
-          <button 
-            className="btn btn-ghost" 
-            onClick={() => { setMobileMenuOpen(false); handleReset(); }} 
-            style={{ justifyContent: 'flex-start', marginTop: '0.5rem', color: 'var(--text-muted)' }}
+          <button
+            className="btn btn-ghost mt-2 justify-start"
+            onClick={handleReset}
+            role="menuitem"
+            style={{ color: 'var(--text-muted)' }}
           >
-            <RotateCcw size={14} /> Reset Profile / Re-run Onboarding
+            <RotateCcw size={14} /> Reset Profile
           </button>
         </div>
       )}
