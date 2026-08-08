@@ -4,7 +4,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v1',
     companyName: 'SuryaTech Solar',
-    logo: '🌞',
+    logo: 'sun',
     states: ['Maharashtra', 'Gujarat', 'Goa'],
     type: 'Installer',
     rating: 4.8,
@@ -18,7 +18,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v2',
     companyName: 'Tata Power Solar',
-    logo: '⚡',
+    logo: 'lightning',
     states: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Uttar Pradesh', 'Gujarat'],
     type: 'Manufacturer',
     rating: 4.9,
@@ -32,7 +32,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v3',
     companyName: 'EcoPower Solutions',
-    logo: '🌱',
+    logo: 'plant',
     states: ['Rajasthan', 'Haryana', 'Punjab', 'Delhi'],
     type: 'Installer',
     rating: 4.5,
@@ -46,7 +46,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v4',
     companyName: 'Loom Solar',
-    logo: '🔋',
+    logo: 'battery',
     states: ['Haryana', 'Delhi', 'Uttar Pradesh', 'Punjab', 'Rajasthan'],
     type: 'Manufacturer',
     rating: 4.7,
@@ -60,7 +60,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v5',
     companyName: 'Waaree Energies',
-    logo: '🏭',
+    logo: 'factory',
     states: ['Gujarat', 'Maharashtra', 'Rajasthan', 'Karnataka', 'Tamil Nadu'],
     type: 'Manufacturer',
     rating: 4.6,
@@ -74,7 +74,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v6',
     companyName: 'Southern Solar',
-    logo: '☀️',
+    logo: 'sun',
     states: ['Tamil Nadu', 'Kerala', 'Karnataka', 'Andhra Pradesh'],
     type: 'Installer',
     rating: 4.4,
@@ -88,7 +88,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v7',
     companyName: 'CleanMax Enviro',
-    logo: '🏢',
+    logo: 'buildings',
     states: ['Maharashtra', 'Karnataka', 'Gujarat', 'Tamil Nadu', 'Delhi'],
     type: 'Installer',
     rating: 4.8,
@@ -102,7 +102,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v8',
     companyName: 'ZunRoof',
-    logo: '🏠',
+    logo: 'house',
     states: ['Delhi', 'Haryana', 'Uttar Pradesh', 'Punjab', 'Rajasthan'],
     type: 'Installer',
     rating: 4.3,
@@ -116,7 +116,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v9',
     companyName: 'Navitas Green',
-    logo: '🌿',
+    logo: 'plant',
     states: ['Gujarat', 'Maharashtra', 'Madhya Pradesh'],
     type: 'Manufacturer',
     rating: 4.5,
@@ -130,7 +130,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v10',
     companyName: 'KCP Solar',
-    logo: '🔧',
+    logo: 'wrench',
     states: ['Tamil Nadu', 'Kerala'],
     type: 'Maintenance',
     rating: 4.7,
@@ -144,7 +144,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v11',
     companyName: 'Vikram Solar',
-    logo: '🌞',
+    logo: 'sun',
     states: ['West Bengal', 'Odisha', 'Bihar', 'Jharkhand', 'Assam'],
     type: 'Manufacturer',
     rating: 4.7,
@@ -158,7 +158,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v12',
     companyName: 'SunTech Integrators',
-    logo: '🔌',
+    logo: 'plug',
     states: ['Madhya Pradesh', 'Chhattisgarh'],
     type: 'Installer',
     rating: 4.2,
@@ -172,7 +172,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v13',
     companyName: 'GreenTech Solutions',
-    logo: '♻️',
+    logo: 'plant',
     states: ['Andhra Pradesh', 'Telangana'],
     type: 'Installer',
     rating: 4.6,
@@ -186,7 +186,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v14',
     companyName: 'Himalayan Solar',
-    logo: '🏔️',
+    logo: 'sun',
     states: ['Himachal Pradesh', 'Uttarakhand', 'Jammu & Kashmir'],
     type: 'Installer',
     rating: 4.4,
@@ -200,7 +200,7 @@ export const VENDORS: VendorData[] = [
   {
     id: 'v15',
     companyName: 'Adani Solar',
-    logo: '🌅',
+    logo: 'factory',
     states: ['Gujarat', 'Maharashtra', 'Rajasthan', 'Karnataka', 'Tamil Nadu', 'Delhi'],
     type: 'Manufacturer',
     rating: 4.8,
