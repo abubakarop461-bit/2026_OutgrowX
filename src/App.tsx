@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
+import LanguageSelector from './components/LanguageSelector';
 import Landing from './pages/Landing/Landing';
 import Auth from './pages/Auth/Auth';
 import Onboarding from './pages/Onboarding/Onboarding';
@@ -24,7 +25,11 @@ function AppRoutes() {
 
   return (
     <>
-      {isOnboarded && <Navbar />}
+      {isOnboarded ? <Navbar /> : (
+        <div style={{ position: 'absolute', top: '20px', right: '48px', zIndex: 100 }}>
+          <LanguageSelector />
+        </div>
+      )}
       <main style={{ paddingTop: '0px', minHeight: '100vh' }}>
         <Routes>
           {/* Landing role selection */}
