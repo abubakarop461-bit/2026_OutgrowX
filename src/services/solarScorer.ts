@@ -14,7 +14,7 @@ export function calculateSolarScore(profile: UserProfile): SolarScore {
   // 1. Solar Resource (0–100)
   // India range: Assam 4.1 → Rajasthan 5.5 kWh/m²/day (NISE data)
   // Scale: 4.0 → 40 pts,  5.5 → 100 pts  (linear)
-  const irr = getSolarHoursPerDay(profile.state);
+  const irr = getSolarHoursPerDay(profile.state || 'Maharashtra');
   const solarResource = Math.round(
     Math.min(100, Math.max(20, ((irr.average - 4.0) / 1.5) * 60 + 40))
   );

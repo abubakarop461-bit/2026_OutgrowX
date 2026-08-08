@@ -1,13 +1,32 @@
 export interface UserProfile {
+  firstName?: string;
   name?: string;
   email?: string;
-  state: string;
+  phone?: string;
+  companyName?: string;
+  gstin?: string;
+  licenseNo?: string;
+  businessType?: string;
+  userType?: string;
+  occupation?: string;
+  propertyType?: string;
+  state?: string;
   discom?: string;
+  city?: string;
+  pinCode?: string;
+  pincode?: string;
   billSize?: number; // average monthly bill in INR
+  avgBill?: number;
+  billAmount?: number;
   roofArea?: number; // sq ft
+  roofSqFt?: number;
   roofType?: 'flat' | 'slanted';
   sunlightHours?: 'poor' | 'fair' | 'good' | 'excellent';
   appliances?: ApplianceSelection[];
+  hasSolar?: boolean;
+  systemSize?: number;
+  installYear?: number;
+  wantsBattery?: boolean;
 }
 
 export type UserRole = 'consumer' | 'vendor' | 'admin';

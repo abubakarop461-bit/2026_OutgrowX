@@ -6,6 +6,12 @@ export type Language = 'en' | 'hi' | 'mr';
 export interface UserProfile {
   firstName?: string;
   name?: string;
+  companyName?: string;
+  gstin?: string;
+  licenseNo?: string;
+  businessType?: string;
+  phone?: string;
+  email?: string;
   userType?: string;
   occupation?: string;
   propertyType?: string;

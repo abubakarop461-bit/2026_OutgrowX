@@ -91,7 +91,8 @@ export const GOVT_SCHEMES: GovtScheme[] = [
 export function checkSubsidyEligibility(profile: UserProfile): GovtScheme[] {
   const eligible = GOVT_SCHEMES.filter(s => s.type === 'Central');
   if (profile.state) {
-    const stateScheme = GOVT_SCHEMES.find(s => s.type === 'State' && s.state?.toLowerCase() === profile.state.toLowerCase());
+    const stateName = profile.state;
+    const stateScheme = GOVT_SCHEMES.find(s => s.type === 'State' && s.state?.toLowerCase() === stateName.toLowerCase());
     if (stateScheme) {
       eligible.push(stateScheme);
     }
