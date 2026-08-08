@@ -51,10 +51,10 @@ export async function* chatStream(
     if (onModelSwitch) onModelSwitch(MODEL_LABELS.primary);
     const client = getOmniClient();
     const stream = await client.chat.completions.create({
-      model: 'auto/best-reasoning', // or auto/fast / auto/chat
+      model: 'auto/best-reasoning', // High-reasoning model
       messages: allMessages,
       stream: true,
-      temperature: 0.7
+      temperature: 0.3
     });
 
     let hasYielded = false;
