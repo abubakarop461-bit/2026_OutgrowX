@@ -166,7 +166,7 @@ export async function generateAIInsight(profile: any): Promise<string> {
   try {
     const client = getOmniClient();
     const response = await client.chat.completions.create({
-      model: 'auto/fast',
+      model: 'auto/best-reasoning',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 80,
     });
