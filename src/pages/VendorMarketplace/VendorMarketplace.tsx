@@ -549,10 +549,10 @@ ${name}`;
                     </h3>
                     <p style={{ fontSize: '14px', color: 'var(--color-steel)', lineHeight: 1.6, margin: 0 }}>
                       {isHi 
-                        ? `आपका पूर्व-मूल्यांकित सोलर प्रोफ़ाइल सुरक्षित रूप से ${selectedVendor.companyName.split(' - ')[0]} के साथ साझा किया गया है। वे जल्द ही आपसे संपर्क करेंगे।`
+                        ? `आपका पूर्व-मूल्यांकित सोलर प्रोफ़ाइल सुरक्षित रूप से ${selectedVendor.companyName.split(' - ')[0]} के साथ साझा किया गया है। वे आपकी आवश्यकताओं की समीक्षा करेंगे और सोलर प्रदाता जल्द ही आपसे संपर्क करेंगे।`
                         : isMr 
-                          ? `तुमचे पूर्व-मूल्यांकन केलेले सोलर प्रोफाइल ${selectedVendor.companyName.split(' - ')[0]} सोबत यशस्वीरित्या शेअर केले गेले आहे. ते लवकरच तुमच्याशी संपर्क साधतील.`
-                          : `Your pre-assessed solar profile has been shared with ${selectedVendor.companyName.split(' - ')[0]}. They will review your requirement specs and reach out to you within 24–48 hours.`}
+                          ? `तुमचे पूर्व-मूल्यांकन केलेले सोलर प्रोफाइल ${selectedVendor.companyName.split(' - ')[0]} सोबत यशस्वीरित्या शेअर केले गेले आहे. ते तुमच्या गरजांचे पुनरावलोकन करतील आणि सोलर प्रदाता लवकरच तुमच्याशी संपर्क साधतील.`
+                          : `Your pre-assessed solar profile has been shared with ${selectedVendor.companyName.split(' - ')[0]}. They will review your requirement specs and the solar provider will connect you shortly.`}
                     </p>
                   </div>
                   <button className="btn btn-primary" style={{ minWidth: '120px', justifyContent: 'center' }} onClick={() => setShowModal(false)}>
