@@ -28,39 +28,40 @@ import './SolarAI.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
 export const SolarAI: React.FC = () => {
-  const { t } = useTranslation();
+  const { language } = useApp();
   const [activeTab, setActiveTab] = useState<'bill' | 'calculator' | 'advisor'>('bill');
+
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+
+  const tabLabels = {
+    bill: isHi ? "बिल स्कैनर एआई" : isMr ? "बिल स्कॅनर एआय" : "Bill Scanner AI",
+    calculator: isHi ? "उपकरण लोड एआई" : isMr ? "उपकरण लोड एआय" : "Appliance Load AI",
+    advisor: isHi ? "एआई सलाहकार चैट" : isMr ? "एआय सल्लागार चॅट" : "AI Advisor Chat",
+  };
 
   return (
     <div className="solar-ai-page">
-      <main className="container pb-12">
-        {/* Page Header */}
-        <header className="vai-page-header">
-          <h1 className="vai-page-title">Solar AI Intelligence</h1>
-          <p className="vai-page-subtitle">
-            Centralized Context Engine — parses your bill scans, appliance loads, and role pathway to deliver decision-ready solar briefs.
-          </p>
-        </header>
-
+      <main className="container pb-12" style={{ paddingTop: '8px' }}>
         {/* Tab Navigation */}
-        <div className="vai-tabs">
+        <div className="vai-tabs" style={{ marginTop: '4px' }}>
           <button
             className={`vai-tab-btn ${activeTab === 'bill' ? 'vai-tab-btn--active' : ''}`}
             onClick={() => setActiveTab('bill')}
           >
-            Bill Scanner AI
+            {tabLabels.bill}
           </button>
           <button
             className={`vai-tab-btn ${activeTab === 'calculator' ? 'vai-tab-btn--active' : ''}`}
             onClick={() => setActiveTab('calculator')}
           >
-            Appliance Load AI
+            {tabLabels.calculator}
           </button>
           <button
             className={`vai-tab-btn ${activeTab === 'advisor' ? 'vai-tab-btn--active' : ''}`}
             onClick={() => setActiveTab('advisor')}
           >
-            AI Advisor Chat
+            {tabLabels.advisor}
           </button>
         </div>
 

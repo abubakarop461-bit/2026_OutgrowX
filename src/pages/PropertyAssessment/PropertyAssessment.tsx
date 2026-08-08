@@ -22,60 +22,46 @@ const SPECIAL_STATES = [
 
 export const PropertyAssessment: React.FC = () => {
   const { t } = useTranslation();
-  const { userProfile } = useApp();
+  const { userProfile, language } = useApp();
   const [activeTab, setActiveTab] = useState<'roof' | 'land'>('roof');
 
   const state = userProfile.state || 'Maharashtra';
   const isSpecialState = SPECIAL_STATES.includes(state);
+
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+
+  const tabLabels = {
+    roof: isHi ? "रूफटॉप सौर मूल्यांकन" : isMr ? "छतावरील सौर मूल्यांकन" : "Rooftop Solar Assessment",
+    land: isHi ? "पीएम-कुसुम भूमि सौर" : isMr ? "पीएम-कुसुम जमीन सौर" : "PM-KUSUM Land Solar",
+  };
 
   return (
     <main
       style={{
         background: 'var(--color-canvas-white)',
         minHeight: '100vh',
-        padding: '32px 24px 80px',
+        padding: '8px 24px 80px',
         color: 'var(--color-graphite)',
         fontFamily: 'var(--font-body)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Header */}
-        <header style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
-            MNRE &amp; PM Surya Ghar Assessment
-          </div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '32px',
-              fontWeight: 400,
-              letterSpacing: '-0.64px',
-              color: 'var(--color-graphite)',
-              margin: 0,
-            }}
-          >
-            Property Assessment — {state}
-          </h1>
-          <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
-            Technical feasibility, shadow modeling, and generation potential for rooftop &amp; land parcels.
-          </p>
-        </header>
-
         {/* Tabs (Ventriloc Capsule Pill) */}
-        <div className="tabs">
+        <div className="tabs" style={{ marginTop: '4px' }}>
           <button
             className={`tab-btn ${activeTab === 'roof' ? 'tab-btn--active' : ''}`}
             onClick={() => setActiveTab('roof')}
           >
             <HouseLine size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
-            Rooftop Solar Assessment
+            {tabLabels.roof}
           </button>
           <button
             className={`tab-btn ${activeTab === 'land' ? 'tab-btn--active' : ''}`}
             onClick={() => setActiveTab('land')}
           >
             <Mountains size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
-            PM-KUSUM Land Solar
+            {tabLabels.land}
           </button>
         </div>
 

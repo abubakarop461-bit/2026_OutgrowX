@@ -39,7 +39,7 @@ const typeLabel = (type: string) => ({
 }[type] || type);
 
 export default function VendorMarketplace() {
-  const { userProfile } = useApp();
+  const { userProfile, language } = useApp();
   const [activeTab, setActiveTab] = useState<'find' | 'business'>('find');
   const [showModal, setShowModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<VendorData | null>(null);
@@ -110,17 +110,52 @@ ${name}`;
   const manufacturers = VENDORS.filter(v => v.type === 'Manufacturer').length;
   const maintenance = VENDORS.filter(v => v.type === 'Maintenance').length;
 
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+
+  const strings = {
+    totalPartners: isHi ? "कुल भागीदार" : isMr ? "एकूण भागीदार" : "Total Partners",
+    epcInstallers: isHi ? "EPC इंस्टॉलर्स" : isMr ? "EPC इंस्टॉलर्स" : "EPC Installers",
+    manufacturers: isHi ? "सौर निर्माता" : isMr ? "सोलर उत्पादक" : "Manufacturers",
+    omProviders: isHi ? "रखरखाव प्रदाता" : isMr ? "देखभाल प्रदाता" : "O&M Providers",
+    findVerified: isHi ? "सत्यापित भागीदार खोजें" : isMr ? "सत्यापित भागीदार शोधा" : "Find Verified Partners",
+    bizPortal: isHi ? "व्यवसाय पंजीकरण पोर्टल" : isMr ? "व्यवसाय नोंदणी पोर्टल" : "Business Registration Portal",
+    filters: isHi ? "फ़िल्टर" : isMr ? "फिल्टर" : "Filters",
+    state: isHi ? "राज्य" : isMr ? "राज्य" : "State",
+    partnerType: isHi ? "भागीदार प्रकार" : isMr ? "भागीदार प्रकार" : "Partner Type",
+    allPartners: isHi ? "सभी भागीदार" : isMr ? "सर्व भागीदार" : "All Partners",
+    minRating: isHi ? "न्यूनतम रेटिंग" : isMr ? "किमान रेटिंग" : "Min Rating",
+    allRatings: isHi ? "सभी रेटिंग" : isMr ? "सर्व रेटिंग" : "All Ratings",
+    above4: isHi ? "★ 4.0 और ऊपर" : isMr ? "★ ४.० आणि अधिक" : "★ 4.0 & Above",
+    above45: isHi ? "★ 4.5 और ऊपर" : isMr ? "★ ४.५ आणि अधिक" : "★ 4.5 & Above",
+    certification: isHi ? "प्रमाणन" : isMr ? "प्रमाणपत्र" : "Certification",
+    all: isHi ? "सभी" : isMr ? "सर्व" : "All",
+    mnreEmpanelled: isHi ? "MNRE प्रमाणित" : isMr ? "MNRE प्रमाणित" : "MNRE Empanelled",
+    almmListed: isHi ? "ALMM सूचीबद्ध" : isMr ? "ALMM सूचीबद्ध" : "ALMM Listed",
+    tier1Mfg: isHi ? "टियर-1 निर्माता" : isMr ? "टियर-१ उत्पादक" : "Tier-1 Manufacturer",
+    clearFilters: isHi ? "सभी फ़िल्टर साफ़ करें" : isMr ? "सर्व फिल्टर साफ करा" : "Clear All Filters",
+    partnersFound: (count: number) => isHi ? `${count} भागीदार मिले` : isMr ? `${count} भागीदार सापडले` : `${count} partners found`,
+    noPartners: isHi ? "कोई भागीदार नहीं मिला। अन्य फ़िल्टर आज़माएं।" : isMr ? "भागीदार सापडले नाहीत. इतर पर्याय निवडून पहा." : "No partners found for this filter combination. Try broadening your search.",
+    getQuote: isHi ? "कोट प्राप्त करें" : isMr ? "दरपत्रक मिळवा" : "Get Quote",
+    hideDetails: isHi ? "विवरण छुपाएं ↑" : isMr ? "तपशील लपवा ↑" : "Hide details ↑",
+    viewDetails: isHi ? "विवरण देखें ↓" : isMr ? "तपशील पहा ↓" : "View details ↓",
+    specializations: isHi ? "विशेषज्ञता" : isMr ? "विशेषीकरण" : "Specializations",
+    allCerts: isHi ? "सभी प्रमाणपत्र" : isMr ? "सर्व प्रमाणपत्रे" : "All Certifications",
+    serviceStates: isHi ? "सेवा प्रदान करने वाले राज्य" : isMr ? "कार्यरत राज्य" : "Service States",
+    submitBizApp: isHi ? "व्यवसाय पंजीकरण सबमिट करें →" : isMr ? "व्यवसाय नोंदणी सबमिट करा →" : "Submit Empanelment Application →",
+  };
+
   return (
-    <main style={{ background: 'var(--color-canvas-white)', minHeight: '100vh', padding: '24px 24px 80px', color: 'var(--color-graphite)', fontFamily: 'var(--font-body)' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto', paddingTop: '16px' }}>
+    <main style={{ background: 'var(--color-canvas-white)', minHeight: '100vh', padding: '8px 24px 80px', color: 'var(--color-graphite)', fontFamily: 'var(--font-body)' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
         {/* ── Marketplace Stats Banner ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
-            { label: 'Total Partners', value: VENDORS.length, color: 'var(--color-graphite)' },
-            { label: 'EPC Installers', value: installers, color: '#1d4ed8' },
-            { label: 'Manufacturers', value: manufacturers, color: '#7c3aed' },
-            { label: 'O&M Providers', value: maintenance, color: '#065f46' },
+            { label: strings.totalPartners, value: VENDORS.length, color: 'var(--color-graphite)' },
+            { label: strings.epcInstallers, value: installers, color: '#1d4ed8' },
+            { label: strings.manufacturers, value: manufacturers, color: '#7c3aed' },
+            { label: strings.omProviders, value: maintenance, color: '#065f46' },
           ].map(s => (
             <div key={s.label} style={{ background: 'var(--color-ash)', borderRadius: 'var(--radius-cards)', padding: '14px 18px' }}>
               <div style={{ fontSize: '22px', fontFamily: 'var(--font-display)', fontWeight: 400, color: s.color }}>{s.value}</div>
@@ -133,11 +168,11 @@ ${name}`;
         <div className="tabs" style={{ marginBottom: '20px' }}>
           <button className={`tab-btn ${activeTab === 'find' ? 'tab-btn--active' : ''}`} onClick={() => setActiveTab('find')}>
             <Storefront size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
-            Find Verified Partners
+            {strings.findVerified}
           </button>
           <button className={`tab-btn ${activeTab === 'business' ? 'tab-btn--active' : ''}`} onClick={() => setActiveTab('business')}>
             <Briefcase size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
-            Business Registration Portal
+            {strings.bizPortal}
           </button>
         </div>
 
@@ -149,12 +184,12 @@ ${name}`;
             <div style={{ background: 'var(--color-ash)', borderRadius: 'var(--radius-cards)', padding: '20px', position: 'sticky', top: '80px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '18px' }}>
                 <FunnelSimple size={15} color="var(--color-slate)" />
-                <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>Filters</span>
+                <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>{strings.filters}</span>
               </div>
 
               {/* State */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>State</label>
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>{strings.state}</label>
                 <select value={stateFilter} onChange={e => setStateFilter(e.target.value)}
                   style={{ width: '100%', background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', padding: '7px 10px', borderRadius: '6px', fontSize: '13px', color: 'var(--color-graphite)' }}>
                   {allStates.map(s => <option key={s} value={s}>{s}</option>)}
@@ -163,7 +198,7 @@ ${name}`;
 
               {/* Partner Type */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>Partner Type</label>
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>{strings.partnerType}</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {['All', 'Installer', 'Manufacturer', 'Maintenance'].map(t => (
                     <button key={t} onClick={() => setTypeFilter(t)}
@@ -173,7 +208,7 @@ ${name}`;
                         color: typeFilter === t ? '#fff' : 'var(--color-steel)',
                         fontFamily: 'var(--font-body)',
                       }}>
-                      {t === 'All' ? 'All Partners' : typeLabel(t)}
+                      {t === 'All' ? strings.allPartners : (isHi ? (t === 'Installer' ? 'प्रमाणित इंस्टॉलर' : t === 'Manufacturer' ? 'सौर निर्माता' : 'रखरखाव प्रदाता') : isMr ? (t === 'Installer' ? 'प्रमाणित इंस्टॉलर' : t === 'Manufacturer' ? 'सोलर उत्पादक' : 'देखभाल प्रदाता') : typeLabel(t))}
                     </button>
                   ))}
                 </div>
@@ -181,36 +216,36 @@ ${name}`;
 
               {/* Min Rating */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>Min Rating</label>
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>{strings.minRating}</label>
                 <select value={ratingFilter} onChange={e => setRatingFilter(e.target.value)}
                   style={{ width: '100%', background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', padding: '7px 10px', borderRadius: '6px', fontSize: '13px', color: 'var(--color-graphite)' }}>
-                  <option value="Any">All Ratings</option>
-                  <option value="4+">★ 4.0 & Above</option>
-                  <option value="4.5+">★ 4.5 & Above</option>
+                  <option value="Any">{strings.allRatings}</option>
+                  <option value="4+">{strings.above4}</option>
+                  <option value="4.5+">{strings.above45}</option>
                 </select>
               </div>
 
               {/* Certification */}
               <div style={{ marginBottom: '4px' }}>
-                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>Certification</label>
+                <label style={{ display: 'block', fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>{strings.certification}</label>
                 <select value={certFilter} onChange={e => setCertFilter(e.target.value)}
                   style={{ width: '100%', background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', padding: '7px 10px', borderRadius: '6px', fontSize: '13px', color: 'var(--color-graphite)' }}>
-                  <option value="Any">All</option>
-                  <option value="MNRE">MNRE Empanelled</option>
-                  <option value="ALMM">ALMM Listed</option>
-                  <option value="Tier1">Tier-1 Manufacturer</option>
+                  <option value="Any">{strings.all}</option>
+                  <option value="MNRE">{strings.mnreEmpanelled}</option>
+                  <option value="ALMM">{strings.almmListed}</option>
+                  <option value="Tier1">{strings.tier1Mfg}</option>
                 </select>
               </div>
 
               {(stateFilter !== 'All' || typeFilter !== 'All' || ratingFilter !== 'Any' || certFilter !== 'Any') && (
                 <button onClick={() => { setStateFilter('All'); setTypeFilter('All'); setRatingFilter('Any'); setCertFilter('Any'); }}
                   style={{ marginTop: '14px', width: '100%', background: 'transparent', border: '1px solid var(--color-mist)', borderRadius: '6px', padding: '7px', fontSize: '12px', color: 'var(--color-slate)', cursor: 'pointer', fontFamily: 'var(--font-body)' }}>
-                  Clear All Filters
+                  {strings.clearFilters}
                 </button>
               )}
 
               <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--color-slate)', borderTop: '1px solid var(--color-mist)', paddingTop: '14px' }}>
-                <strong style={{ color: 'var(--color-graphite)' }}>{filteredVendors.length}</strong> partners found
+                {strings.partnersFound(filteredVendors.length)}
               </div>
             </div>
 
@@ -218,7 +253,7 @@ ${name}`;
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filteredVendors.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--color-slate)', fontSize: '14px' }}>
-                  No partners found for this filter combination. Try broadening your search.
+                  {strings.noPartners}
                 </div>
               )}
 
@@ -246,7 +281,7 @@ ${name}`;
                             background: TYPE_COLORS[vendor.type] + '14',
                             color: TYPE_COLORS[vendor.type],
                             border: `1px solid ${TYPE_COLORS[vendor.type]}30`,
-                          }}>{typeLabel(vendor.type)}</span>
+                          }}>{isHi ? (vendor.type === 'Installer' ? 'प्रमाणित इंस्टॉलर' : vendor.type === 'Manufacturer' ? 'सौर निर्माता' : 'रखरखाव प्रदाता') : isMr ? (vendor.type === 'Installer' ? 'प्रमाणित इंस्टॉलर' : vendor.type === 'Manufacturer' ? 'सोलर उत्पादक' : 'देखभाल प्रदाता') : typeLabel(vendor.type)}</span>
                           <span style={{ fontSize: '12px', color: '#92400e', background: '#fef3c7', padding: '2px 8px', borderRadius: '99px', fontWeight: 600 }}>★ {vendor.rating}</span>
                         </div>
 
@@ -265,19 +300,19 @@ ${name}`;
                             {vendor.states.slice(0, 3).join(', ')}{vendor.states.length > 3 ? ` +${vendor.states.length - 3}` : ''}
                           </span>
                           {/* Reviews */}
-                          <span style={{ fontSize: '11px', color: 'var(--color-slate)' }}>{vendor.reviewCount} reviews</span>
+                          <span style={{ fontSize: '11px', color: 'var(--color-slate)' }}>{vendor.reviewCount} {isHi ? 'समीक्षाएं' : isMr ? 'समीक्षा' : 'reviews'}</span>
                         </div>
                       </div>
 
                       {/* Actions */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px', alignItems: 'flex-end' }}>
                         <button className="btn btn-primary" style={{ fontSize: '12px', padding: '8px 16px', whiteSpace: 'nowrap' }} onClick={() => handleGetQuote(vendor)}>
-                          Get Quote <ArrowRight size={13} style={{ display: 'inline', marginLeft: '4px' }} />
+                          {strings.getQuote} <ArrowRight size={13} style={{ display: 'inline', marginLeft: '4px' }} />
                         </button>
                         <button
                           onClick={() => setExpandedVendor(isExpanded ? null : vendor.id)}
                           style={{ fontSize: '12px', color: 'var(--color-slate)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', padding: '4px 0' }}>
-                          {isExpanded ? 'Hide details ↑' : 'View details ↓'}
+                          {isExpanded ? strings.hideDetails : strings.viewDetails}
                         </button>
                       </div>
                     </div>
@@ -286,7 +321,7 @@ ${name}`;
                     {isExpanded && (
                       <div style={{ borderTop: '1px solid var(--color-mist)', background: 'var(--color-fog)', padding: '18px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                         <div>
-                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>Specializations</div>
+                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>{strings.specializations}</div>
                           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {vendor.specializations.map(s => (
                               <li key={s} style={{ fontSize: '13px', color: 'var(--color-steel)' }}>
@@ -298,7 +333,7 @@ ${name}`;
                         </div>
 
                         <div>
-                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>All Certifications</div>
+                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>{strings.allCerts}</div>
                           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {vendor.certifications.map(c => (
                               <li key={c} style={{ fontSize: '13px', color: 'var(--color-steel)' }}>
@@ -310,7 +345,7 @@ ${name}`;
                         </div>
 
                         <div>
-                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>Service States</div>
+                          <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '8px' }}>{strings.serviceStates}</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                             {vendor.states.map(s => (
                               <span key={s} style={{ fontSize: '11px', background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', padding: '2px 8px', borderRadius: '4px', color: 'var(--color-steel)' }}>{s}</span>

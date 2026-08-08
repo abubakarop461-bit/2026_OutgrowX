@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
         zIndex: 100,
         background: 'var(--color-canvas-white)',
         borderBottom: '1px solid var(--color-mist)',
-        padding: '12px 24px',
+        padding: '12px 48px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

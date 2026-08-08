@@ -22,7 +22,7 @@ import { checkSubsidyEligibility } from '../../data/govtSchemes';
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend, Filler);
 
 export default function AISolarReport() {
-  const { userProfile } = useApp();
+  const { userProfile, language } = useApp();
   const { t } = useTranslation();
   const [isGenerated, setIsGenerated] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -69,33 +69,54 @@ export default function AISolarReport() {
 
   const handlePrint = () => window.print();
 
-  const years = roiData.yearlyData.map(d => d.year);
-  const cumulativeData = roiData.yearlyData.map(d => d.cumulative);
-  const savingsData = roiData.yearlyData.map(d => d.savings);
+  const avgBill = Number(userProfile.billAmount || userProfile.avgBill || 3200);
 
-  const roiChartData = {
-    labels: years,
-    datasets: [
-      {
-        label: 'Cumulative Savings (₹)',
-        data: cumulativeData,
-        fill: true,
-        backgroundColor: 'rgba(255, 104, 44, 0.06)',
-        borderColor: '#ff682c',
-        borderWidth: 2,
-        tension: 0.3,
-      }
-    ]
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+
+  const strings = {
+    printReport: isHi ? "रिपोर्ट प्रिंट करें" : isMr ? "अहवाल प्रिंट करा" : "Print Report",
+    regenerateBrief: isHi ? (isGenerating ? "डेटा विश्लेषण जारी है..." : "रिपोर्ट पुनः उत्पन्न करें") : isMr ? (isGenerating ? "डेटा गोळा केला जात आहे..." : "अहवाल पुन्हा तयार करा") : (isGenerating ? "Synthesizing Data…" : "Regenerate Brief"),
+    recommendedCapacity: isHi ? "अनुशंसित क्षमता" : isMr ? "शिफारस केलेली क्षमता" : "Recommended Capacity",
+    pmSuryaGharSubsidy: isHi ? "पीएम सूर्य घर सब्सिडी" : isMr ? "पीएम सूर्य घर अनुदान" : "PM Surya Ghar Subsidy",
+    annualBillSavings: isHi ? "वार्षिक बिल बचत" : isMr ? "वार्षिक बिलात बचत" : "Annual Bill Savings",
+    simplePayback: isHi ? "साधारण पेबैक" : isMr ? "गुंतवणूक परतावा काळ" : "Simple Payback",
+    cumulativeSavingsTitle: isHi ? "25-वर्षीय संचयी बचत प्रक्षेपवक्र" : isMr ? "25-वर्षांची संचित बचत आलेख" : "25-Year Cumulative Savings Trajectory",
+    financialReturnHorizon: isHi ? "वित्तीय लाभ क्षितिज" : isMr ? "वित्तीय परतावा अंदाज" : "Financial Return Horizon",
+    technicalSpecs: isHi ? "तकनीकी विशिष्टताएँ" : isMr ? "तांत्रिक तपशील" : "Technical Specifications",
+    plantArchitecture: isHi ? "सौर प्लांट वास्तुकला" : isMr ? "सोलर प्लांट रचना" : "Plant Architecture",
+    pvModules: isHi ? "सौर पैनल" : isMr ? "सोलर पॅनेल्स" : "PV Modules",
+    panelsDesc: (count: number) => isHi ? `${count} × 400W ALMM मोनोक्रिस्टलाइन` : isMr ? `${count} × 400W ALMM मोनोक्रिस्टलाईन` : `${count} × 400W ALMM Monocrystalline`,
+    annualGeneration: isHi ? "वार्षिक बिजली उत्पादन" : isMr ? "वार्षिक वीज निर्मिती" : "Annual Generation",
+    generationDesc: (gen: string) => isHi ? `~${gen} kWh/वर्ष` : isMr ? `~${gen} kWh/वर्ष` : `~${gen} kWh/yr`,
+    netCapitalOutlay: isHi ? "कुल पूंजीगत व्यय" : isMr ? "एकूण भांडवली खर्च" : "Net Capital Outlay",
+    netRoi: isHi ? "25-वर्षीय शुद्ध लाभ" : isMr ? "25-वर्षांचा निव्वळ परतावा" : "25-Year Net ROI",
+    lakh: (val: string) => isHi ? `+₹${val} लाख` : isMr ? `+₹${val} लाख` : `+₹${val} Lakh`,
+    discomVerifiedPartners: isHi ? "डिस्कॉम प्रमाणित साझेदार" : isMr ? "डिस्कॉम प्रमाणित भागीदार" : "DISCOM Verified Partners",
+    empanelledInstallersFor: (state: string) => isHi ? `${state} के प्रमाणित सोलर वेंडर` : isMr ? `${state} मधील प्रमाणित सोलर वेंडर` : `Empanelled Installers for ${state}`,
+    reviewsCount: (count: number) => isHi ? `${count} सत्यापित समीक्षाएँ` : isMr ? `${count} सत्यापित रिव्ह्यू` : `${count} Verified Reviews`,
+    specDetails: isHi ? "टियर-1 ALMM पैनल · 5 साल की व्यापक रखरखाव वारंटी" : isMr ? "टियर-१ ALMM पॅनेल्स · ५ वर्षे पूर्ण देखभाल सेवा समाविष्ट" : "Tier-1 ALMM Panels · 5-Yr Comprehensive O&M Included",
+    gridCost: isHi ? "ग्रिड लागत (सोलर के बिना)" : isMr ? "ग्रीड खर्च (सोलरशिवाय)" : "Grid Cost (No Solar)",
+    solarSavings: isHi ? "सौर संचयी बचत" : isMr ? "सोलर एकत्रित बचत" : "Solar Cumulative Savings"
   };
 
-  const yearlySavingsData = {
-    labels: years.map(y => `Y${y}`),
+  /* ─ ROI Chart configuration ─ */
+  const roiChartData = {
+    labels: Array.from({ length: 26 }, (_, i) => i.toString()),
     datasets: [
       {
-        label: 'Annual Savings (₹)',
-        data: savingsData,
-        backgroundColor: '#816729',
-        borderRadius: 2,
+        label: strings.gridCost,
+        data: Array.from({ length: 26 }, (_, i) => Math.round(Math.pow(1.078, i) * avgBill * 12 * i)),
+        borderColor: '#816729',
+        backgroundColor: 'rgba(129, 103, 41, 0.03)',
+        fill: true, tension: 0.4, borderWidth: 1.5,
+      },
+      {
+        label: strings.solarSavings,
+        data: roiData.yearlyData.map(y => Math.max(0, y.cumulative)),
+        borderColor: '#ff682c',
+        backgroundColor: 'rgba(255, 104, 44, 0.05)',
+        fill: true, tension: 0.4, borderWidth: 2,
       }
     ]
   };
@@ -103,17 +124,10 @@ export default function AISolarReport() {
   const roiOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (context: any) => `₹${context.raw.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-        }
-      }
-    },
+    plugins: { legend: { display: false } },
     scales: {
-      y: { grid: { color: '#f5f5f5' }, ticks: { color: '#828282', font: { size: 11 } } },
-      x: { grid: { display: false }, ticks: { color: '#828282', font: { size: 11 } } }
+      x: { grid: { display: false } },
+      y: { grid: { color: 'rgba(0,0,0,0.03)' } }
     }
   };
 
@@ -125,7 +139,7 @@ export default function AISolarReport() {
       style={{
         background: 'var(--color-canvas-white)',
         minHeight: '100vh',
-        padding: '32px 24px 80px',
+        padding: '8px 24px 80px',
         color: 'var(--color-graphite)',
         fontFamily: 'var(--font-body)',
       }}
@@ -139,47 +153,33 @@ export default function AISolarReport() {
       `}</style>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Header (Ventriloc style) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px', marginBottom: '32px' }}>
-          <div>
-            <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-              SuryaSetu Annual Observatory Report
-            </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 400, letterSpacing: '-0.64px', margin: 0 }}>
-              Solar Intelligence Briefing
-            </h1>
-            <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
-              Prepared for {userProfile.firstName || userProfile.name || 'Consumer'} · {userProfile.state || 'Maharashtra'} ({userProfile.discom || 'Maha Vitaran'})
-            </p>
-          </div>
-
-          <div className="no-print" style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn btn-secondary" onClick={handlePrint}>
-              <Printer size={15} /> Print Report
-            </button>
-            <button className="btn btn-primary" onClick={handleGenerate}>
-              {isGenerating ? 'Synthesizing Data…' : 'Regenerate Brief'}
-            </button>
-          </div>
+        {/* Header Control Buttons (No Title Texts) */}
+        <div className="no-print" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', paddingBottom: '16px', borderBottom: '1px solid var(--color-mist)', marginBottom: '24px' }}>
+          <button className="btn btn-secondary" onClick={handlePrint}>
+            <Printer size={15} /> {strings.printReport}
+          </button>
+          <button className="btn btn-primary" onClick={handleGenerate}>
+            {strings.regenerateBrief}
+          </button>
         </div>
 
         {/* ── Key Metrics Strip (Ventriloc 20px Cards) ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
           <div className="vai-stat">
             <div className="vai-stat-value">{roiData.systemSizeKW} kW</div>
-            <div className="vai-stat-label">Recommended Capacity</div>
+            <div className="vai-stat-label">{strings.recommendedCapacity}</div>
           </div>
           <div className="vai-stat">
             <div className="vai-stat-value" style={{ color: '#16a34a' }}>₹{roiData.subsidy.toLocaleString('en-IN')}</div>
-            <div className="vai-stat-label">PM Surya Ghar Subsidy</div>
+            <div className="vai-stat-label">{strings.pmSuryaGharSubsidy}</div>
           </div>
           <div className="vai-stat">
             <div className="vai-stat-value">₹{Math.round(roiData.annualSavings).toLocaleString('en-IN')}</div>
-            <div className="vai-stat-label">Annual Bill Savings</div>
+            <div className="vai-stat-label">{strings.annualBillSavings}</div>
           </div>
           <div className="vai-stat">
             <div className="vai-stat-value">{roiData.paybackYears} yrs</div>
-            <div className="vai-stat-label">Simple Payback</div>
+            <div className="vai-stat-label">{strings.simplePayback}</div>
           </div>
         </div>
 
@@ -188,10 +188,10 @@ export default function AISolarReport() {
           {/* ROI Chart Card */}
           <div className="vai-card--white">
             <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-              25-Year Cumulative Savings Trajectory
+              {strings.cumulativeSavingsTitle}
             </div>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '16px' }}>
-              Financial Return Horizon
+              {strings.financialReturnHorizon}
             </h3>
             <div style={{ height: '220px' }}>
               <Line data={roiChartData} options={roiOptions} />
@@ -201,28 +201,28 @@ export default function AISolarReport() {
           {/* System Spec Table (Ash Card) */}
           <div className="vai-card">
             <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-              Technical Specifications
+              {strings.technicalSpecs}
             </div>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '16px' }}>
-              Plant Architecture
+              {strings.plantArchitecture}
             </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-mist)', paddingBottom: '6px' }}>
-                <span style={{ color: 'var(--color-steel)' }}>PV Modules</span>
-                <strong>{panelsCount} × 400W ALMM Monocrystalline</strong>
+                <span style={{ color: 'var(--color-steel)' }}>{strings.pvModules}</span>
+                <strong>{strings.panelsDesc(panelsCount)}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-mist)', paddingBottom: '6px' }}>
-                <span style={{ color: 'var(--color-steel)' }}>Annual Generation</span>
-                <strong>~{annualGeneration.toLocaleString('en-IN')} kWh/yr</strong>
+                <span style={{ color: 'var(--color-steel)' }}>{strings.annualGeneration}</span>
+                <strong>{strings.generationDesc(annualGeneration.toLocaleString('en-IN'))}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-mist)', paddingBottom: '6px' }}>
-                <span style={{ color: 'var(--color-steel)' }}>Net Capital Outlay</span>
+                <span style={{ color: 'var(--color-steel)' }}>{strings.netCapitalOutlay}</span>
                 <strong>~₹{(roiData.netInvestment || Math.round(roiData.systemSizeKW * 65000 - roiData.subsidy)).toLocaleString('en-IN')}</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--color-mist)', paddingBottom: '6px' }}>
-                <span style={{ color: 'var(--color-steel)' }}>25-Year Net ROI</span>
-                <strong style={{ color: 'var(--color-ember-orange)' }}>+₹{(roiData.roi25Year / 100000).toFixed(1)} Lakh</strong>
+                <span style={{ color: 'var(--color-steel)' }}>{strings.netRoi}</span>
+                <strong style={{ color: 'var(--color-ember-orange)' }}>{strings.lakh((roiData.roi25Year / 100000).toFixed(1))}</strong>
               </div>
             </div>
           </div>
@@ -231,10 +231,10 @@ export default function AISolarReport() {
         {/* ── Matched Empanelled Installers ── */}
         <div className="vai-card--white">
           <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-            DISCOM Verified Partners
+            {strings.discomVerifiedPartners}
           </div>
           <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '16px' }}>
-            Empanelled Installers for {userProfile.state || 'Maharashtra'}
+            {strings.empanelledInstallersFor(userProfile.state || 'Maharashtra')}
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
@@ -245,10 +245,10 @@ export default function AISolarReport() {
                   <span className="badge badge--ember">★ {v.rating}</span>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--color-steel)', marginBottom: '8px' }}>
-                  {v.reviewCount * 4} Verified Reviews · {v.type}
+                  {strings.reviewsCount(v.reviewCount * 4)} · {v.type === 'Installer' ? (isHi ? 'प्रमाणित वेंडर' : isMr ? 'प्रमाणित वेंडर' : 'EPC Installer') : v.type}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>
-                  Tier-1 ALMM Panels · 5-Yr Comprehensive O&amp;M Included
+                  {strings.specDetails}
                 </div>
               </div>
             ))}

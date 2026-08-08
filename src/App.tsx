@@ -25,7 +25,7 @@ function AppRoutes() {
   return (
     <>
       {isOnboarded && <Navbar />}
-      <main style={{ paddingTop: isOnboarded ? '64px' : '0', minHeight: '100vh' }}>
+      <main style={{ paddingTop: '0px', minHeight: '100vh' }}>
         <Routes>
           {/* Landing role selection */}
           <Route path="/" element={<Landing />} />

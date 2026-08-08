@@ -49,13 +49,13 @@ const CountUp: React.FC<{ end: number; prefix?: string; suffix?: string; decimal
 };
 
 export default function Dashboard() {
-  const { userProfile } = useApp();
+  const { userProfile, language } = useApp();
   const [yearSpan, setYearSpan] = useState<10 | 20 | 25>(20);
 
   /* ─ Profile values ─ */
   const name     = userProfile.firstName || userProfile.name || 'there';
   const state    = userProfile.state    || 'Maharashtra';
-  const discom   = userProfile.discom   || 'Maha Vitaran';
+  const discom   = userProfile.discom   || 'MSEDCL';
   const avgBill  = Number(userProfile.avgBill || userProfile.billAmount || 3200);
 
   /* ─ Calculations ─ */
@@ -72,48 +72,56 @@ export default function Dashboard() {
   /* ─ ROI Chart Data ─ */
   const roiLabels = Array.from({ length: yearSpan + 1 }, (_, i) => (new Date().getFullYear() + i).toString());
 
+  /* ─ Local Translation dictionary ─ */
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+  
+  const strings = {
+    feasibilitySynthesis: isHi ? "सिस्टम व्यवहार्यता संश्लेषण" : isMr ? "सिस्टम व्यवहार्यता विश्लेषण" : "System Feasibility Synthesis",
+    pvConfig: isHi ? `${sysKW} kW सौर पीवी विन्यास` : isMr ? `${sysKW} kW सोलर पीव्ही रचना` : `${sysKW} kW Solar PV Configuration`,
+    feasibilityDesc: isHi 
+      ? `आपके ${discom} के ₹${avgBill.toLocaleString('en-IN')}/माह के बिल के आधार पर, ${sysKW} kW का रूफटॉप सिस्टम ग्रिड बिजली की 82–95% भरपाई करता है, जिसमें 25 वर्षों में लगभग ₹${(roi.roi25Year / 100000).toFixed(1)} लाख की बचत होगी।` 
+      : isMr 
+        ? `तुमच्या ${discom} च्या ₹${avgBill.toLocaleString('en-IN')}/महिना बिलाच्या आधारे, ${sysKW} kW ची छतावरील सोलर प्रणाली ग्रीड विजेचे 82–95% कमी करते, ज्यामध्ये 25 वर्षात अंदाजे ₹${(roi.roi25Year / 100000).toFixed(1)} लाख परतावा मिळेल.` 
+        : `Based on your ${discom} bill of ₹${avgBill.toLocaleString('en-IN')}/mo, installing a ${sysKW} kW rooftop system offsets 82–95% of grid power with an estimated 25-year return of ₹${(roi.roi25Year / 100000).toFixed(1)} Lakh.`,
+    requiredArea: isHi ? "आवश्यक क्षेत्र" : isMr ? "आवश्यक जागा" : "Required Area",
+    dailyYield: isHi ? "दैनिक उत्पादन" : isMr ? "दैनिक निर्मिती" : "Daily Yield",
+    monthlySavings: isHi ? "अनुमानित मासिक बचत" : isMr ? "अंदाजे मासिक बचत" : "Est. Monthly Savings",
+    annualSavingsTip: isHi ? `~₹${(monthlySavings * 12).toLocaleString('en-IN')} वार्षिक बिल कटौती` : isMr ? `~₹${(monthlySavings * 12).toLocaleString('en-IN')} वार्षिक बिलात बचत` : `~₹${(monthlySavings * 12).toLocaleString('en-IN')} annual bill reduction`,
+    solarScore: isHi ? "सोलर स्कोर" : isMr ? "सोलर स्कोर" : "Solar Score",
+    optimalViability: isHi ? "इष्टतम व्यवहार्यता" : isMr ? "योग्य व्यवहार्यता" : "OPTIMAL VIABILITY",
+    pmSubsidy: isHi ? "पीएम सब्सिडी पात्र" : isMr ? "पीएम अनुदान पात्र" : "PM Subsidy Eligible",
+    dbtSurcharge: isHi ? "डीबीटी डायरेक्ट बैंक ट्रांसफर" : isMr ? "थेट बँक हस्तांतरण" : "DBT Direct Bank",
+    pmSuryaGhar: isHi ? "पीएम सूर्य घर: मुफ्त बिजली योजना" : isMr ? "पीएम सूर्य घर: मोफत वीज योजना" : "PM Surya Ghar: Muft Bijli Yojana",
+    dbtDisclaimer: isHi ? "द्वि-दिशात्मक मीटर चालू होने पर सीधे बैंक खाते में क्रेडिट किया जाएगा।" : isMr ? "द्वि-दिशानिर्देशित मीटर बसवल्यावर थेट बँक खात्यात जमा केले जाईल." : "Direct Bank Transfer credited upon bi-directional meter commissioning.",
+    paybackPeriod: isHi ? "पेबैक अवधि" : isMr ? "पेबॅक कालावधी" : "Payback Period",
+    breakevenTimeline: isHi ? "निवेश वसूली समयसीमा" : isMr ? "गुंतवणूक परतावा कालावधी" : "Break-even timeline",
+    warrantyDisclaimer: isHi ? "25 साल की रैखिक प्रदर्शन वारंटी।" : isMr ? "25 वर्षे रेखीय कार्यक्षमता हमी." : "25-year linear performance warranty.",
+    genOffset: isHi ? "उत्पादन भरपाई" : isMr ? "उत्पादन बचत" : "Generation Offset",
+    offsetPercent: isHi ? "85% ऑफसेट" : isMr ? "85% बचत" : "85% Offset",
+    solarOutput: isHi ? `● सौर उत्पादन: ~${(sysKW * 125).toFixed(0)} kWh/माह` : isMr ? `● सोलर निर्मिती: ~${(sysKW * 125).toFixed(0)} kWh/महिना` : `● Solar Output: ~${(sysKW * 125).toFixed(0)} kWh/mo`,
+    gridBackup: isHi ? "● ग्रिड बैकअप: ~35 kWh/माह" : isMr ? "● ग्रीड बॅकअप: ~35 kWh/महिना" : "● Grid Backup: ~35 kWh/mo",
+    financialForecast: isHi ? "वित्तीय परतावा पूर्वानुमान" : isMr ? "वित्तीय परतावा अंदाज" : "Financial Return Forecast",
+    chartTitle: isHi ? "संचयी ग्रिड व्यय बनाम सौर बचत" : isMr ? "एकत्रित ग्रीड खर्च विरुद्ध सोलर बचत" : "Cumulative Grid Spend vs. Solar Savings",
+    years: isHi ? "वर्ष" : isMr ? "वर्षे" : "Years",
+    gridCostNoSolar: isHi ? "ग्रिड खर्च (बिना सोलर)" : isMr ? "ग्रीड खर्च (सोलरशिवाय)" : "Grid Cost (No Solar)",
+    solarCumulativeSavings: isHi ? "सौर संचयी बचत" : isMr ? "सोलर एकत्रित बचत" : "Solar Cumulative Savings",
+    gridEscalation: isHi ? "ग्रिड लागत वृद्धि (7.8%/वर्ष)" : isMr ? "ग्रीड दर वाढ (7.8%/वर्ष)" : "Grid Cost Escalation (7.8%/yr)",
+    netSolarSavingsLabel: isHi ? "नेट सौर बचत" : isMr ? "निव्वळ सोलर बचत" : "Net Solar Savings",
+    netSavingsForecast: isHi ? `नेट ${yearSpan}-वर्षीय बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : isMr ? `निव्वळ ${yearSpan}-वर्षांची बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : `Net ${yearSpan}-Year Savings: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}`
+  };
+
   return (
     <main
       style={{
         background: 'var(--color-canvas-white)',
         minHeight: '100vh',
-        padding: '32px 24px 80px',
+        padding: '12px 24px 80px',
         color: 'var(--color-graphite)',
         fontFamily: 'var(--font-body)',
       }}
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Page Header (Ventriloc style) */}
-        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <div>
-            <div style={{ fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
-              {state} · {discom} Jurisdiction
-            </div>
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '32px',
-                fontWeight: 400,
-                letterSpacing: '-0.64px',
-                lineHeight: 1.19,
-                color: 'var(--color-graphite)',
-                margin: 0,
-              }}
-            >
-              Solar Data Observatory — {name}
-            </h1>
-          </div>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <span className="badge badge--success">
-              <CheckCircle size={13} /> {schemes.length} Subsidies Active
-            </span>
-            <span className="badge badge--amber">
-              <Sun size={13} /> {irradiance.average} PSH / Day
-            </span>
-          </div>
-        </header>
-
         {/* ══ VENTRILOC DATA DASHBOARD GRID ══ */}
         <div
           style={{
@@ -136,23 +144,23 @@ export default function Dashboard() {
           >
             <div>
               <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '8px', fontFamily: 'var(--font-display)' }}>
-                System Feasibility Synthesis
+                {strings.feasibilitySynthesis}
               </div>
               <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 400, letterSpacing: '-0.02em', marginBottom: '12px' }}>
-                {sysKW} kW Solar PV Configuration
+                {strings.pvConfig}
               </h2>
               <p style={{ fontSize: '14px', color: 'var(--color-steel)', lineHeight: 1.6, marginBottom: '20px' }}>
-                Based on your {discom} bill of ₹{avgBill.toLocaleString('en-IN')}/mo, installing a {sysKW} kW rooftop system offsets 82–95% of grid power with an estimated 25-year return of ₹{(roi.roi25Year / 100000).toFixed(1)} Lakh.
+                {strings.feasibilityDesc}
               </p>
             </div>
 
             <div style={{ display: 'flex', gap: '16px', borderTop: '1px solid var(--color-mist)', paddingTop: '16px' }}>
               <div>
-                <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>Required Area</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>{strings.requiredArea}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', color: 'var(--color-graphite)' }}>~{Math.round(sysKW * 107)} sq ft</div>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>Daily Yield</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>{strings.dailyYield}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', color: 'var(--color-graphite)' }}>~{(sysKW * 4.2).toFixed(1)} kWh/day</div>
               </div>
             </div>
@@ -173,7 +181,7 @@ export default function Dashboard() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>
-                Est. Monthly Savings
+                {strings.monthlySavings}
               </span>
               <ArrowUpRight size={16} color="var(--color-ember-orange)" />
             </div>
@@ -184,7 +192,7 @@ export default function Dashboard() {
                 <span style={{ fontSize: '14px', color: 'var(--color-slate)', fontWeight: 400 }}> /mo</span>
               </div>
               <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px' }}>
-                ~₹{(monthlySavings * 12).toLocaleString('en-IN')} annual bill reduction
+                {strings.annualSavingsTip}
               </div>
             </div>
 
@@ -221,7 +229,7 @@ export default function Dashboard() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>
-                Solar Score
+                {strings.solarScore}
               </span>
               <ArrowUpRight size={15} color="var(--color-slate)" />
             </div>
@@ -232,13 +240,13 @@ export default function Dashboard() {
                 size={110}
                 thickness={8}
                 color="var(--color-ember-orange)"
-                label="Score"
+                label={isHi ? "स्कोर" : isMr ? "गुण" : "Score"}
                 sublabel="/100"
               />
             </div>
 
             <span className="badge badge--success" style={{ fontSize: '11px' }}>
-              OPTIMAL VIABILITY
+              {strings.optimalViability}
             </span>
           </div>
 
@@ -257,9 +265,9 @@ export default function Dashboard() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>
-                PM Subsidy Eligible
+                {strings.pmSubsidy}
               </span>
-              <span className="badge badge--brass">DBT Surcharge</span>
+              <span className="badge badge--brass">{strings.dbtSurcharge}</span>
             </div>
 
             <div>
@@ -267,12 +275,12 @@ export default function Dashboard() {
                 <CountUp end={subsidy} prefix="₹" />
               </div>
               <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px' }}>
-                PM Surya Ghar: Muft Bijli Yojana
+                {strings.pmSuryaGhar}
               </div>
             </div>
 
-            <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>
-              Direct Bank Transfer credited upon bi-directional meter commissioning.
+            <div style={{ fontSize: '12px', color: 'var(--color-slate)', lineHeight: 1.4 }}>
+              {strings.dbtDisclaimer}
             </div>
           </div>
 
@@ -291,22 +299,22 @@ export default function Dashboard() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>
-                Payback Period
+                {strings.paybackPeriod}
               </span>
               <CurrencyInr size={16} color="var(--color-slate)" />
             </div>
 
             <div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 400, color: 'var(--color-graphite)', lineHeight: 1 }}>
-                <CountUp end={payback} decimals={1} suffix=" yrs" />
+                <CountUp end={payback} decimals={1} suffix={isHi ? " वर्ष" : isMr ? " वर्षे" : " yrs"} />
               </div>
               <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px' }}>
-                Break-even timeline
+                {strings.breakevenTimeline}
               </div>
             </div>
 
             <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>
-              25-year linear performance warranty.
+              {strings.warrantyDisclaimer}
             </div>
           </div>
 
@@ -325,9 +333,9 @@ export default function Dashboard() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>
-                Generation Offset
+                {strings.genOffset}
               </span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', color: 'var(--color-ember-orange)' }}>85% Offset</span>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '14px', color: 'var(--color-ember-orange)' }}>{strings.offsetPercent}</span>
             </div>
 
             {/* Segmented bar */}
@@ -336,9 +344,9 @@ export default function Dashboard() {
               <div style={{ flex: 15, background: 'var(--color-ash)', borderRadius: '3px' }} />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--color-steel)' }}>
-              <span>● Solar Output: ~{(sysKW * 125).toFixed(0)} kWh/mo</span>
-              <span style={{ color: 'var(--color-slate)' }}>● Grid Backup: ~35 kWh/mo</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'var(--color-steel)' }}>
+              <span>{strings.solarOutput}</span>
+              <span style={{ color: 'var(--color-slate)' }}>{strings.gridBackup}</span>
             </div>
           </div>
 
@@ -357,10 +365,10 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
-                  Financial Return Forecast
+                  {strings.financialForecast}
                 </div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0 }}>
-                  Cumulative Grid Spend vs. Solar Savings ({yearSpan} Years)
+                  {strings.chartTitle} ({yearSpan} {strings.years})
                 </h3>
               </div>
 
@@ -382,7 +390,7 @@ export default function Dashboard() {
                       boxShadow: yearSpan === y ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                     }}
                   >
-                    {y} Years
+                    {y} {strings.years}
                   </button>
                 ))}
               </div>
@@ -393,14 +401,14 @@ export default function Dashboard() {
                 labels={roiLabels}
                 datasets={[
                   {
-                    label: 'Grid Cost (No Solar)',
+                    label: strings.gridCostNoSolar,
                     data: Array.from({ length: yearSpan + 1 }, (_, i) => Math.round(Math.pow(1.078, i) * avgBill * 12)),
                     color: '#816729',
                     fillColor: 'rgba(129, 103, 41, 0.04)',
                     borderWidth: 1.5,
                   },
                   {
-                    label: 'Solar Cumulative Savings',
+                    label: strings.solarCumulativeSavings,
                     data: roi.yearlyData.slice(0, yearSpan + 1).map(y => Math.max(0, y.cumulative)),
                     color: '#ff682c',
                     fillColor: 'rgba(255, 104, 44, 0.06)',
@@ -414,14 +422,14 @@ export default function Dashboard() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', color: 'var(--color-steel)', borderTop: '1px solid var(--color-mist)', paddingTop: '16px', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
               <div style={{ display: 'flex', gap: '20px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: 12, height: 3, borderRadius: 2, background: '#816729', display: 'inline-block' }} /> Grid Cost Escalation (7.8%/yr)
+                  <span style={{ width: 12, height: 3, borderRadius: 2, background: '#816729', display: 'inline-block' }} /> {strings.gridEscalation}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: 12, height: 3, borderRadius: 2, background: '#ff682c', display: 'inline-block' }} /> Net Solar Savings
+                  <span style={{ width: 12, height: 3, borderRadius: 2, background: '#ff682c', display: 'inline-block' }} /> {strings.netSolarSavingsLabel}
                 </span>
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', color: 'var(--color-ember-orange)' }}>
-                Net {yearSpan}-Year Savings: +₹{(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}
+                {strings.netSavingsForecast}
               </div>
             </div>
           </div>
