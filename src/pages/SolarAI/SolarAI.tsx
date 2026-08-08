@@ -554,10 +554,16 @@ const AIAdvisor: React.FC = () => {
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
   const centralCtx = getCentralizedContext(userProfile);
 
+  const initialGreeting = language === 'hi'
+    ? `नमस्ते ${userProfile.firstName || userProfile.name || 'जी'}! 👋 मैं आपका सूर्यसेतु AI सोलर सलाहकार हूँ। आपका ${role} संदर्भ लोड हो गया है। आज मैं आपकी क्या सहायता कर सकता हूँ?`
+    : language === 'mr'
+      ? `नमस्कार ${userProfile.firstName || userProfile.name || 'जी'}! 👋 मी तुमचा सूर्यसेतु AI सोलर सल्लागार आहे. तुमचे ${role} प्रोफाइल लोड झाले आहे. मी तुम्हाला कशी मदत करू शकतो?`
+      : `Hello ${userProfile.firstName || userProfile.name || 'there'}! 👋 I am your SuryaSetu Solar AI Advisor. I have loaded your centralized context aligned with your active role pathway (${role}). How can I assist you today?`;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `Hello ${userProfile.firstName || userProfile.name || 'there'}! I am your SuryaSetu Solar AI Advisor. I am powered by our Centralized Context Engine aligned with your active role pathway (${role}). How can I assist you today regarding subsidies, policy rules, payback, or DISCOM net-metering?`
+      content: initialGreeting
     }
   ]);
   const [input, setInput] = useState('');
@@ -582,9 +588,13 @@ const AIAdvisor: React.FC = () => {
     const apiMessages: Message[] = [...messages, userMsg];
 
     try {
-      const stream = chatStream(apiMessages, systemPrompt, (modelLabel) => {
-        setActiveModelLabel(modelLabel);
-      });
+      const stream = chatStream(
+        apiMessages,
+        systemPrompt,
+        (modelLabel) => { setActiveModelLabel(modelLabel); },
+        userProfile,
+        language
+      );
 
       let currentText = '';
       for await (const chunk of stream) {

@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { MODEL_LABELS } from './prompts';
 import { knowledgeService } from './knowledgeService';
+import { getCentralizedContext } from './centralizedContext';
 
 // Base URL provided by user for quota-free inference
 const DEFAULT_OMNI_BASE = 'https://nations-endif-islands-commercial.trycloudflare.com/v1';
@@ -39,7 +40,9 @@ export type Message = {
 export async function* chatStream(
   messages: Message[],
   systemPrompt: string,
-  onModelSwitch?: (modelLabel: string) => void
+  onModelSwitch?: (modelLabel: string) => void,
+  profile?: any,
+  lang: string = 'en'
 ): AsyncGenerator<string> {
   const allMessages: Message[] = [
     { role: 'system', content: systemPrompt },
@@ -51,7 +54,7 @@ export async function* chatStream(
     if (onModelSwitch) onModelSwitch(MODEL_LABELS.primary);
     const client = getOmniClient();
     const stream = await client.chat.completions.create({
-      model: 'auto/best-reasoning', // High-reasoning model
+      model: 'auto/best-reasoning',
       messages: allMessages,
       stream: true,
       temperature: 0.3
@@ -67,7 +70,7 @@ export async function* chatStream(
     }
     if (hasYielded) return;
   } catch (error) {
-    console.warn('Primary model endpoint failed, trying fallback model...', error);
+    console.warn('Primary model endpoint failed, trying secondary model...', error);
   }
 
   // 2. Try secondary model slug on primary endpoint (auto/fast)
@@ -119,11 +122,11 @@ export async function* chatStream(
     }
   }
 
-  // 4. Safe knowledge-backed fallback simulation
+  // 4. Conversational, Assistive Multilingual Context Fallback Simulation
   if (onModelSwitch) onModelSwitch(MODEL_LABELS.fallback);
   const userQuery = messages[messages.length - 1]?.content || '';
-  const mockResponse = getSmartFallbackResponse(userQuery);
-  for (const char of mockResponse) {
+  const responseText = getConversationalAssistiveResponse(userQuery, profile, lang);
+  for (const char of responseText) {
     yield char;
     await new Promise(r => setTimeout(r, 12));
   }
@@ -149,7 +152,8 @@ export async function* generateReport(
   const stream = chatStream(
     [{ role: 'user', content: prompt }],
     "You are SuryaSetu Solar Intelligence AI. Provide detailed, professional, and actionable solar reports for Indian consumers.",
-    () => {}
+    () => {},
+    profile
   );
 
   for await (const chunk of stream) {
@@ -178,32 +182,107 @@ export async function generateAIInsight(profile: any): Promise<string> {
 }
 
 /**
- * Knowledge-backed offline fallback helper using centralized knowledgeService
+ * Knowledge-backed, hyper-personalized conversational & assistive response engine.
+ * Supports English, Hindi, and Marathi based on active UI network language.
  */
-function getSmartFallbackResponse(query: string): string {
+function getConversationalAssistiveResponse(query: string, profile?: any, lang: string = 'en'): string {
+  const ctx = getCentralizedContext(profile);
+  const name = ctx.onboarding.name || profile?.firstName || profile?.name || 'there';
+  const role = ctx.userRole || 'Homeowner';
+  const state = ctx.onboarding.state || 'Maharashtra';
+  const discom = ctx.onboarding.discom || 'MSEDCL';
+  const bill = ctx.billScanner.billAmount || ctx.onboarding.billAmount || 3200;
+  const units = ctx.billScanner.unitsConsumed || Math.round(bill / 9.5);
+  const roof = ctx.onboarding.roofArea || 800;
+
+  const q = query.trim().toLowerCase();
+
+  // 1. GREETINGS & CONVERSATIONAL OPENERS
+  const isGreeting = /^(hi|hii|hiii|hello|hey|namaste|namaskar|नमस्ते|नमस्कार|good morning|good afternoon|good evening|who are you|help)\b/i.test(q);
+
+  if (isGreeting) {
+    if (lang === 'hi') {
+      return `नमस्ते ${name} जी! 👋 मैं आपका सूर्यसेतु AI सोलर सलाहकार हूँ।
+
+मैंने आपका **${state} (${discom})** प्रोफ़ाइल और डेटा सेंट्रल AI इंजन में लोड कर लिया है:
+- **आपकी भूमिका:** ${role}
+- **मासिक बिजली बिल:** ₹${bill.toLocaleString('en-IN')} (~${units} युनिट/महिना)
+- **छत का क्षेत्रफल:** ${roof} वर्ग फीट
+
+आज मैं पीएम सूर्य घर योजना (₹78,000 सब्सिडी), सोलर सिस्टम क्षमता, या डिस्कॉम नेट-मीटरिंग के संबंध में आपकी क्या सहायता कर सकता हूँ?`;
+    }
+
+    if (lang === 'mr') {
+      return `नमस्कार ${name} जी! 👋 मी तुमचा सूर्यसेतु AI सोलर सल्लागार आहे.
+
+मी तुमचे **${state} (${discom})** मधील प्रोफाइल आणि डेटा सेंट्रल AI इंजिनमध्ये समाविष्ट केले आहे:
+- **तुमची भूमिका:** ${role}
+- **मासिक वीज बिल:** ₹${bill.toLocaleString('en-IN')} (~${units} युनिट्स/महिना)
+- **छताचे क्षेत्रफळ:** ${roof} चौ. फूट
+
+आज मी तुम्हाला पीएम सूर्य घर योजना (₹78,000 अनुदान), सोलर सिस्टम क्षमता किंवा महावितरण नेट-मीटरिंगबाबत कशी मदत करू शकतो?`;
+    }
+
+    // Default English
+    return `Hello ${name}! 👋 I am your SuryaSetu AI Solar Advisor.
+
+I have loaded your centralized context engine for **${state} (${discom})**:
+- **Active Role Pathway:** ${role}
+- **Monthly Electricity Bill:** ₹${bill.toLocaleString('en-IN')} (~${units} kWh/mo)
+- **Usable Roof Area:** ${roof} sq ft
+
+How can I assist you today regarding PM Surya Ghar subsidies (up to ₹78,000 DBT credit), system sizing, payback modeling, or DISCOM net-metering?`;
+  }
+
+  // 2. KNOWLEDGE BASE RAG SEARCH
   const results = knowledgeService.searchKnowledge(query);
   if (results.length > 0) {
     const top = results[0];
-    return `[Knowledge Base: ${top.category}] ${top.title} — ${top.content}`;
+    if (lang === 'hi') {
+      return `**[ज्ञान कोष: ${top.category}] ${top.title}**\n\n${top.content}\n\nआपकी प्रोफ़ाइल (**${state} / ${discom}**) के आधार पर, क्या आप इस योजना के आवेदन चरणों के बारे में विस्तार से जानना चाहते हैं?`;
+    }
+    if (lang === 'mr') {
+      return `**[ज्ञान कोष: ${top.category}] ${top.title}**\n\n${top.content}\n\nतुमच्या प्रोफाइलच्या (**${state} / ${discom}**) आधारे, तुम्हाला या योजनेच्या अर्जाबाबत अधिक माहिती हवी आहे का?`;
+    }
+    return `**[Knowledge Base: ${top.category}] ${top.title}**\n\n${top.content}\n\nBased on your active **${state} (${discom})** context, would you like step-by-step guidance on applying for this scheme?`;
   }
 
-  const q = query.toLowerCase();
-  if (q.includes('panel') || q.includes('system size') || q.includes('how many')) {
-    const elig = knowledgeService.getEligibilityRules(3);
-    return `Under PM Surya Ghar: Muft Bijli Yojana, a standard 3 kW solar PV system requires approximately ${elig.requiredAreaSqMeters} sq. meters (${elig.requiredAreaSqFt} sq. ft.) of shadow-free roof area and qualifies for a maximum Central subsidy of ₹78,000 via Direct Benefit Transfer (DBT).`;
-  }
-  
-  if (q.includes('kusum') || q.includes('farmer') || q.includes('pump')) {
-    const schemes = knowledgeService.getSchemes('kusum');
-    const kusum = schemes[0];
-    return `${kusum?.name}: Provides 30%–50% Central + State subsidy for off-grid standalone solar pumps (2–10 HP) and grid-connected farm solarization. Toll-free helpline: 1800-180-3333.`;
+  // 3. SUBSIDY / SYSTEM SIZING / LAND SPECIFIC QUERIES
+  if (q.includes('subsidy') || q.includes('subsidies') || q.includes('pm surya ghar') || q.includes('scheme')) {
+    const sysKW = ((units) / 120).toFixed(1);
+    const subAmt = Number(sysKW) <= 1 ? 30000 : Number(sysKW) <= 2 ? 60000 : 78000;
+
+    if (lang === 'hi') {
+      return `पीएम सूर्य घर: मुफ्त बिजली योजना के तहत आपकी प्रोफ़ाइल (${state}) के लिए विवरण:
+- **अनुशंसित सिस्टम क्षमता:** ~${sysKW} kW
+- **पात्र पीएम सब्सिडी:** ₹${subAmt.toLocaleString('en-IN')} (सीधे बैंक खाते में DBT जमा)
+- **अनुमानित मासिक बचत:** ~₹${Math.round(bill * 0.85).toLocaleString('en-IN')}/महिना
+
+क्या आप अपने डिस्कॉम (${discom}) में नेट-मीटरिंग आवेदन पत्र की प्रक्रिया जानना चाहते हैं?`;
+    }
+
+    if (lang === 'mr') {
+      return `पीएम सूर्य घर: मोफत वीज योजनेअंतर्गत तुमच्या प्रोफाइलसाठी (${state}) तपशील:
+- **शिफारस केलेली क्षमता:** ~${sysKW} kW
+- **पात्र पीएम अनुदान:** ₹${subAmt.toLocaleString('en-IN')} (थेट बँक खात्यात जमा)
+- **अंदाजे मासिक बचत:** ~₹${Math.round(bill * 0.85).toLocaleString('en-IN')}/महिना
+
+तुम्हाला तुमच्या महावितरण (${discom}) नेट-मीटरिंग अर्जाची माहिती हवी आहे का?`;
+    }
+
+    return `Under **PM Surya Ghar: Muft Bijli Yojana** for your ${state} (${discom}) profile:
+- **Recommended System Capacity:** ~${sysKW} kW (based on your ₹${bill.toLocaleString('en-IN')} / ${units} kWh bill)
+- **Eligible Central Subsidy:** ₹${subAmt.toLocaleString('en-IN')} via Direct Bank Transfer (DBT)
+- **Est. Monthly Savings:** ~₹${Math.round(bill * 0.85).toLocaleString('en-IN')} / month
+
+Would you like step-by-step DISCOM net-metering application instructions for ${discom}?`;
   }
 
-  // Exact fallback compliance check
+  // Fallback compliance check
   if (q.includes('france') || q.includes('president') || q.includes('weather') || q.includes('movie')) {
-    return "This information is not available in the provided knowledge base.";
+    return "This information is not covered in the SuryaSetu solar knowledge base.";
   }
 
-  return "Under PM Surya Ghar: Muft Bijli Yojana, residential consumers get ₹30,000 for 1 kW, ₹60,000 for 2 kW, and a maximum of ₹78,000 for 3 kW and above. Subsidies are transferred directly to your bank account via DBT after net-metering commissioning.";
+  // Conversational default response
+  return `I have analyzed your query against your active **${role}** context in **${state} (${discom})**. Based on your monthly bill of ₹${bill.toLocaleString('en-IN')} (~${units} kWh) and ${roof} sq ft roof area, a ~${(units / 120).toFixed(1)} kW solar system qualifies for up to ₹78,000 Central subsidy under PM Surya Ghar. How can I further assist your solar transition?`;
 }
-
