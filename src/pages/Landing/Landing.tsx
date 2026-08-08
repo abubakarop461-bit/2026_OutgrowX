@@ -60,8 +60,8 @@ const Landing: React.FC = () => {
     { Icon: Sun,          label: 'AI Model Chain Powered'  },
   ];
 
-  return (
-    <main className="page page--centered" style={{ padding: '3rem 1.5rem' }}>
+return (
+    <main className="page--static page--static-centered" style={{ padding: '2rem 1rem' }}>
       <a href="#role-selector" className="skip-link">Skip to role selection</a>
 
       {/* Ambient glow */}
@@ -73,26 +73,26 @@ const Landing: React.FC = () => {
       }} />
 
       {/* Logo */}
-      <header className="section--lg text-center relative z-10">
+      <header className="section--lg text-center relative z-10" style={{ marginBottom: '1.5rem' }}>
         <div className="flex items-center justify-center gap-3 mb-2">
           <div style={{
-            width: 44, height: 44, borderRadius: '50%',
+            width: 40, height: 40, borderRadius: '50%',
             background: 'rgba(168,255,62,0.10)', border: '1px solid rgba(168,255,62,0.22)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
-            <Sun size={22} weight="duotone" color="#A8FF3E" />
+            <Sun size={20} weight="duotone" color="#A8FF3E" />
           </div>
           <h1 style={{
-            fontSize: '2.75rem', fontFamily: 'Outfit, sans-serif',
+            fontSize: '2.25rem', fontFamily: 'Outfit, sans-serif',
             fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#ECF2EE',
           }}>
             Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
           </h1>
         </div>
-        <h2 style={{ fontSize: '1.1rem', fontWeight: 400, color: '#7A9484', margin: '0.5rem 0 0' }}>
+        <h2 style={{ fontSize: '1rem', fontWeight: 400, color: '#7A9484', margin: '0.375rem 0 0' }}>
           India's AI-Powered Solar Intelligence Platform
         </h2>
-        <p style={{ fontSize: '0.8125rem', color: '#4A6055', marginTop: '0.375rem' }}>
+        <p style={{ fontSize: '0.8125rem', color: '#4A6055', marginTop: '0.25rem' }}>
           Instant bill parsing · 25-Year ROI modelling · Verified installers · DISCOM policy matching
         </p>
       </header>
@@ -102,8 +102,8 @@ const Landing: React.FC = () => {
         id="role-selector"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '1.25rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: '1rem',
           maxWidth: '1060px',
           width: '100%',
           margin: '0 auto',
@@ -119,8 +119,8 @@ const Landing: React.FC = () => {
               background: 'rgba(10,18,13,0.80)',
               backdropFilter: 'blur(20px)',
               border: isPrimary ? '1px solid rgba(168,255,62,0.20)' : '1px solid rgba(255,255,255,0.07)',
-              borderRadius: '18px',
-              padding: '2.25rem 1.75rem',
+              borderRadius: '16px',
+              padding: '1.75rem 1.25rem',
               display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
               cursor: 'pointer',
               transition: 'border-color 200ms, box-shadow 200ms, transform 200ms',
@@ -143,28 +143,28 @@ const Landing: React.FC = () => {
           >
             {/* Icon Box */}
             <div style={{
-              width: 56, height: 56, borderRadius: '14px', marginBottom: '1.25rem',
+              width: 52, height: 52, borderRadius: '12px', marginBottom: '1rem',
               background: isPrimary ? 'rgba(168,255,62,0.10)' : 'rgba(255,255,255,0.05)',
               border: isPrimary ? '1px solid rgba(168,255,62,0.20)' : '1px solid rgba(255,255,255,0.08)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Icon size={26} weight="duotone" color={isPrimary ? '#A8FF3E' : '#7A9484'} />
+              <Icon size={24} weight="duotone" color={isPrimary ? '#A8FF3E' : '#7A9484'} />
             </div>
             <h3 style={{
-              fontFamily: 'Outfit, sans-serif', fontSize: '1.25rem',
-              fontWeight: 700, color: '#ECF2EE', marginBottom: '0.625rem',
+              fontFamily: 'Outfit, sans-serif', fontSize: '1.125rem',
+              fontWeight: 700, color: '#ECF2EE', marginBottom: '0.5rem',
             }}>{title}</h3>
             <p style={{
-              fontSize: '0.875rem', lineHeight: 1.65, color: '#7A9484',
-              marginBottom: '1.75rem', flex: 1,
+              fontSize: '0.8125rem', lineHeight: 1.6, color: '#7A9484',
+              marginBottom: '1.25rem', flex: 1,
             }}>{desc}</p>
             <button
               className={isPrimary ? 'btn btn-primary w-full justify-center' : 'btn btn-ghost w-full justify-center'}
               onClick={e => { e.stopPropagation(); handleRoleSelect(role); }}
               aria-label={cta}
-              style={{ fontSize: '0.875rem', gap: '6px' }}
+              style={{ fontSize: '0.8125rem', gap: '6px', padding: '0.5rem 1rem' }}
             >
-              {cta} <ArrowRight size={15} />
+              {cta} <ArrowRight size={14} />
             </button>
           </div>
         ))}
@@ -172,16 +172,16 @@ const Landing: React.FC = () => {
 
       {/* Feature Strip */}
       <section style={{
-        marginTop: '3rem', padding: '1.25rem 0',
+        marginTop: '1.5rem', padding: '1rem 0',
         borderTop: '1px solid rgba(255,255,255,0.06)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
         maxWidth: '1060px', width: '100%',
         position: 'relative', zIndex: 10,
       }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
           {features.map(({ Icon, label, color }, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '7px', fontSize: '0.8125rem', color: '#7A9484' }}>
-              <Icon size={16} weight="duotone" color={color} />
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: '#7A9484' }}>
+              <Icon size={14} weight="duotone" color={color} />
               {label}
             </div>
           ))}
@@ -189,19 +189,19 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Footer badges */}
-      <footer style={{ marginTop: '2rem', textAlign: 'center', position: 'relative', zIndex: 10 }}>
-        <p style={{ fontSize: '0.875rem', color: '#7A9484', marginBottom: '0.875rem' }}>
-          Empowering Indian homeowners &amp; businesses to transition to clean energy
+      <footer style={{ marginTop: '1rem', textAlign: 'center', position: 'relative', zIndex: 10 }}>
+        <p style={{ fontSize: '0.8125rem', color: '#7A9484', marginBottom: '0.625rem' }}>
+          Empowering Indian homeowners & businesses to transition to clean energy
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           {statBadges.map(({ Icon, label }, i) => (
             <span key={i} style={{
-              display: 'inline-flex', alignItems: 'center', gap: '5px',
-              fontSize: '0.75rem', fontWeight: 600, color: '#7A9484',
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              fontSize: '0.6875rem', fontWeight: 600, color: '#7A9484',
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-              padding: '4px 12px', borderRadius: '999px',
+              padding: '3px 10px', borderRadius: '999px',
             }}>
-              <Icon size={13} weight="duotone" color="#A8FF3E" />
+              <Icon size={12} weight="duotone" color="#A8FF3E" />
               {label}
             </span>
           ))}

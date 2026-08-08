@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
 import { DISCOM_BY_STATE } from '../../data/stateElectricityRates';
 import {
-  House, Key, Buildings, Sparkle, ArrowRight, ArrowLeft,
+  House, Plant, Key, Buildings, Sparkle, ArrowRight, ArrowLeft,
   Check, ShieldCheck, Lightning, CurrencyInr, CheckCircle,
   IdentificationCard, MapPin, Briefcase
 } from '@phosphor-icons/react';
@@ -29,8 +29,8 @@ const Onboarding: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     companyName: '',
-    userType: userRole === 'business' ? 'Business Owner' : 'Homeowner',
-    propertyType: 'Independent House',
+    userType: userRole === 'business' ? 'Solar Vendor' : userRole === 'landowner' ? 'Landowner' : 'Homeowner',
+    propertyType: userRole === 'landowner' ? 'Agricultural Land' : 'Independent House',
     roofArea: '',
     state: '',
     billAmount: '',
@@ -49,7 +49,7 @@ const Onboarding: React.FC = () => {
     email: ''
   });
 
-  const isBusiness = formData.userType === 'Business Owner';
+  const isBusiness = formData.userType === 'Business Owner' || formData.userType === 'Solar Vendor';
 
   const update = (field: string, val: string | number) => {
     setFormData(prev => {
@@ -304,18 +304,23 @@ const Onboarding: React.FC = () => {
                     <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>I am a...</label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                       {[
-                        { label: 'Homeowner', Icon: House, color: '#A8FF3E' },
-                        { label: 'Tenant', Icon: Key, color: '#60A5FA' },
-                        { label: 'Business Owner', Icon: Buildings, color: '#F59E0B' }
-                      ].map(({ label, Icon, color }) => (
+                        { label: 'Homeowner', Icon: House, color: '#A8FF3E', role: 'consumer' },
+                        { label: 'Landowner', Icon: Plant, color: '#60A5FA', role: 'landowner' },
+                        { label: 'Solar Vendor', Icon: Buildings, color: '#F59E0B', role: 'business' }
+                      ].map(({ label, Icon, color, role }) => (
                         <button
                           key={label}
                           type="button"
-                          className={`toggle-option ${formData.userType === label ? 'toggle-option--selected' : ''}`}
-                          onClick={() => update('userType', label)}
+                          className={`toggle-option ${formData.userType === label || (label === 'Solar Vendor' && formData.userType === 'Business Owner') ? 'toggle-option--selected' : ''}`}
+                          onClick={() => {
+                            const targetType = label === 'Solar Vendor' ? 'Solar Vendor' : label;
+                            update('userType', targetType);
+                            if (label === 'Landowner') update('propertyType', 'Agricultural Land');
+                            if (label === 'Homeowner') update('propertyType', 'Independent House');
+                          }}
                           style={{ padding: '1.25rem 0.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.625rem' }}
                         >
-                          <Icon size={26} weight="duotone" color={formData.userType === label ? '#A8FF3E' : color} />
+                          <Icon size={26} weight="duotone" color={(formData.userType === label || (label === 'Solar Vendor' && formData.userType === 'Business Owner')) ? '#A8FF3E' : color} />
                           <span className="text-sm" style={{ fontWeight: 600 }}>{label}</span>
                         </button>
                       ))}
