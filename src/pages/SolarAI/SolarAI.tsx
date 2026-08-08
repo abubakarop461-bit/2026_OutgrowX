@@ -31,14 +31,7 @@ export const SolarAI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bill' | 'calculator' | 'advisor'>('bill');
 
   return (
-    <main className="container pb-12">
-      <header className="page-header mt-8">
-        <h1>{t('solarAI') || 'Solar AI Intelligence'}</h1>
-        <p className="text-secondary">
-          Centralized AI Context Engine parsing your bill scans, load calculations, and role pathways for hyper-personalized solar insights.
-        </p>
-      </header>
-
+    <main className="container pb-12" style={{ paddingTop: '12px' }}>
       <div className="tabs mb-6">
         <button
           className={`tab-btn ${activeTab === 'bill' ? 'tab-btn--active' : ''}`}

@@ -126,7 +126,7 @@ export default function AISolarReport() {
   const annualGeneration = Math.round(roiData.systemSizeKW * 4 * 365);
 
   return (
-    <main className="container mx-auto px-4 pt-20 pb-12">
+    <main className="container mx-auto px-4 pb-12" style={{ paddingTop: '16px' }}>
       <style>{`
         @media print {
           body { background: white; color: black; }

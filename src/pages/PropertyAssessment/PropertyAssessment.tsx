@@ -30,21 +30,7 @@ export const PropertyAssessment: React.FC = () => {
   const isSpecialState = SPECIAL_STATES.includes(state);
 
   return (
-    <main className="container pb-12" style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem 1rem' }}>
-      {/* Header */}
-      <header className="page-header mt-6 mb-6">
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.625rem', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase', color: '#7A9484', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', padding: '3px 10px', borderRadius: '999px', marginBottom: '0.5rem' }}>
-          <ShieldCheck size={13} weight="duotone" color="#A8FF3E" />
-          Knowledge-Base Channelized Assessment
-        </div>
-        <h1 style={{ fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(1.5rem, 3.5vw, 2.125rem)', fontWeight: 800, letterSpacing: '-0.03em', margin: 0, color: '#ECF2EE' }}>
-          {t('propertyAssessment') || 'Property Assessment'}
-        </h1>
-        <p style={{ fontSize: '0.875rem', color: '#7A9484', marginTop: '0.25rem' }}>
-          {t('propertyAssessmentDesc')} ({state})
-        </p>
-      </header>
-
+    <main className="container pb-12" style={{ maxWidth: '1240px', margin: '0 auto', padding: '8px 1rem 3rem' }}>
       {/* Tabs */}
       <div className="tabs mb-6">
         <button

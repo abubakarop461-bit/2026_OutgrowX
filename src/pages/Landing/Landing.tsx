@@ -145,7 +145,7 @@ const Landing: React.FC = () => {
               width: 52, height: 52, borderRadius: '12px',
               background: isPrimary ? 'rgba(168,255,62,0.12)' : 'rgba(255,255,255,0.05)',
               border: isPrimary ? '1px solid rgba(168,255,62,0.25)' : '1px solid rgba(255,255,255,0.08)',
-              display: 'flex', alignItems: 'center', justifyCenter: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               marginBottom: '1.25rem',
             }}>
               <Icon size={26} color={isPrimary ? '#A8FF3E' : '#7A9484'} />
