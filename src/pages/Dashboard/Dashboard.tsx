@@ -82,33 +82,7 @@ export default function Dashboard() {
         fontFamily: 'var(--font-body)',
       }}
     >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Page Header (Ventriloc style) */}
-        <header style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '32px',
-              fontWeight: 400,
-              letterSpacing: '-0.64px',
-              lineHeight: 1.19,
-              color: 'var(--color-graphite)',
-              margin: 0,
-            }}
-          >
-            Dashboard
-          </h1>
-
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <span className="badge badge--success">
-              <CheckCircle size={13} /> {schemes.length} Subsidies Active
-            </span>
-            <span className="badge badge--amber">
-              <Sun size={13} /> {irradiance.average} PSH / Day
-            </span>
-          </div>
-        </header>
-
+      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '16px' }}>
         {/* ══ VENTRILOC DATA DASHBOARD GRID ══ */}
         <div
           style={{

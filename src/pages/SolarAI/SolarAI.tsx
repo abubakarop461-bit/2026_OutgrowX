@@ -32,13 +32,8 @@ export const SolarAI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bill' | 'calculator' | 'advisor'>('bill');
 
   return (
-    <div className="solar-ai-page">
+    <div className="solar-ai-page" style={{ paddingTop: '24px' }}>
       <main className="container pb-12">
-        {/* Page Header */}
-        <header className="vai-page-header">
-          <h1 className="vai-page-title">Solar AI Intelligence</h1>
-        </header>
-
         {/* Tab Navigation */}
         <div className="vai-tabs">
           <button

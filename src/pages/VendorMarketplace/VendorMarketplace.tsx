@@ -96,23 +96,7 @@ ${name}`;
         fontFamily: 'var(--font-body)',
       }}
     >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Page Header (Ventriloc style) */}
-        <header style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '32px',
-              fontWeight: 400,
-              letterSpacing: '-0.64px',
-              color: 'var(--color-graphite)',
-              margin: 0,
-            }}
-          >
-            Solar Marketplace
-          </h1>
-        </header>
-
+      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '16px' }}>
         {/* Tabs (Ventriloc Capsule Pill) */}
         <div className="tabs">
           <button

@@ -138,13 +138,9 @@ export default function AISolarReport() {
         }
       `}</style>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Header (Ventriloc style) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px', marginBottom: '32px' }}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', fontWeight: 400, letterSpacing: '-0.64px', margin: 0 }}>
-            Solar Report
-          </h1>
-
+      <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '16px' }}>
+        {/* Actions bar (Ventriloc style) */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '24px' }}>
           <div className="no-print" style={{ display: 'flex', gap: '10px' }}>
             <button className="btn btn-secondary" onClick={handlePrint}>
               <Printer size={15} /> Print Report
