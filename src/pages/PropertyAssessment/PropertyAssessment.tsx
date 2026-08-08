@@ -244,7 +244,7 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
             <span className="badge badge--ember">{peakSunHours} PSH Avg</span>
           </div>
 
-          <div style={{ height: '180px' }}>
+          <div>
             <HeatmapChart
               data={HOURLY_IRRADIANCE_GRID}
               activeColor="rgba(255, 104, 44,"
