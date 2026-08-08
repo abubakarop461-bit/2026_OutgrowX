@@ -18,8 +18,27 @@ const INDIAN_STATES = [
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { userRole, setProfile, completeOnboarding } = useApp();
+  const { userRole, setProfile, completeOnboarding, language } = useApp();
   const { t } = useTranslation();
+
+  const isHi = language === 'hi';
+  const isMr = language === 'mr';
+
+  const strings = {
+    identityTitle: isHi ? "पहचान और मार्ग" : isMr ? "ओळख आणि मार्ग" : "Identity & Pathway",
+    identityDesc: isHi ? "बताएं कि आप सौर ऊर्जा से कैसे जुड़ना चाहते हैं।" : isMr ? "तुम्ही सौर ऊर्जेशी कसे जोडू इच्छिता ते सांगा." : "Tell us how you would like to engage with solar.",
+    iamA: isHi ? "मैं हूँ एक..." : isMr ? "मी आहे..." : "I am a...",
+    homeowner: isHi ? "गृहस्वामी" : isMr ? "घरमालक" : "Homeowner",
+    landowner: isHi ? "जमीन मालिक" : isMr ? "जमीन मालक" : "Landowner",
+    solarVendor: isHi ? "सौर वेंडर" : isMr ? "सोलर वेंडर" : "Solar Vendor",
+    firstNameLabel: isHi ? "आपका पहला नाम क्या है?" : isMr ? "तुमचे पहिले नाव काय आहे?" : "What is your first name?",
+    firstNamePlaceholder: isHi ? "अपना नाम दर्ज करें" : isMr ? "तुमचे नाव प्रविष्ट करा" : "Enter your name",
+    companyLabel: isHi ? "कंपनी का कानूनी नाम" : isMr ? "कंपनीचे कायदेशीर नाव" : "Company Legal Name",
+    companyPlaceholder: isHi ? "उदा. सूर्या पावर सॉल्यूशंस प्राइवेट लिमिटेड" : isMr ? "उदा. सूर्या पॉवर सोल्युशन्स प्रायव्हेट लिमिटेड" : "e.g. Surya Power Solutions Pvt Ltd",
+    contactLabel: isHi ? "संपर्क व्यक्ति का नाम" : isMr ? "संपर्क व्यक्तीचे नाव" : "Contact Person Name",
+    contactPlaceholder: isHi ? "आपका पूरा नाम" : isMr ? "तुमचे पूर्ण नाव" : "Your full name",
+    next: isHi ? "आगे" : isMr ? "पुढे" : "Next",
+  };
 
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -221,31 +240,54 @@ const Onboarding: React.FC = () => {
             {currentStep === 1 && (
               <div>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 400, letterSpacing: '-0.02em', marginBottom: '8px' }}>
-                  {isBusiness ? 'Company & Contact Profile' : 'Identity & Pathway'}
+                  {strings.identityTitle}
                 </h2>
                 <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginBottom: '24px' }}>
-                  {isBusiness ? 'Enter your legal company details.' : 'Tell us how you would like to engage with solar.'}
+                  {strings.identityDesc}
                 </p>
+
+                {/* Role Toggles (Always Visible so any user role can switch) */}
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label className="label">{strings.iamA}</label>
+                  <div className="toggle-group">
+                    {['Homeowner', 'Landowner', 'Solar Vendor'].map(opt => (
+                      <button
+                        key={opt}
+                        type="button"
+                        className={`toggle-option ${formData.userType === opt ? 'toggle-option--selected' : ''}`}
+                        onClick={() => {
+                          update('userType', opt);
+                          // Reset business fields if switching away from business, or vice versa
+                          if (opt !== 'Solar Vendor') {
+                            update('companyName', '');
+                          }
+                        }}
+                      >
+                        {opt === 'Homeowner' ? strings.homeowner : opt === 'Landowner' ? strings.landowner : strings.solarVendor}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {isBusiness ? (
                   <>
                     <div className="form-group">
-                      <label className="label">Company Legal Name</label>
+                      <label className="label">{strings.companyLabel}</label>
                       <input
                         type="text"
                         value={formData.companyName}
                         onChange={e => update('companyName', e.target.value)}
-                        placeholder="e.g. Surya Power Solutions Pvt Ltd"
+                        placeholder={strings.companyPlaceholder}
                       />
                       {errors.companyName && <p style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.companyName}</p>}
                     </div>
                     <div className="form-group">
-                      <label className="label">Contact Person Name</label>
+                      <label className="label">{strings.contactLabel}</label>
                       <input
                         type="text"
                         value={formData.firstName}
                         onChange={e => update('firstName', e.target.value)}
-                        placeholder="Your full name"
+                        placeholder={strings.contactPlaceholder}
                       />
                       {errors.firstName && <p style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.firstName}</p>}
                     </div>
@@ -253,30 +295,14 @@ const Onboarding: React.FC = () => {
                 ) : (
                   <>
                     <div className="form-group">
-                      <label className="label">What is your first name?</label>
+                      <label className="label">{strings.firstNameLabel}</label>
                       <input
                         type="text"
                         value={formData.firstName}
                         onChange={e => update('firstName', e.target.value)}
-                        placeholder="Enter your name"
+                        placeholder={strings.firstNamePlaceholder}
                       />
                       {errors.firstName && <p style={{ fontSize: '12px', color: '#dc2626', marginTop: '4px' }}>{errors.firstName}</p>}
-                    </div>
-
-                    <div className="form-group">
-                      <label className="label">I am a...</label>
-                      <div className="toggle-group">
-                        {['Homeowner', 'Landowner', 'Solar Vendor'].map(opt => (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={`toggle-option ${formData.userType === opt ? 'toggle-option--selected' : ''}`}
-                            onClick={() => update('userType', opt)}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </>
                 )}
