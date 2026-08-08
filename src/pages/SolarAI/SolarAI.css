@@ -1,0 +1,1043 @@
+/* ═══════════════════════════════════════════════════════════════
+   SuryaSetu Solar AI Intelligence — Ventriloc-Inspired Design System
+   Light theme · Warm paper canvas · Ember Orange accent
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+/* ── Ventriloc Design Tokens ── */
+.solar-ai-page {
+  /* Colors */
+  --vai-graphite:       #202020;
+  --vai-canvas:         #ffffff;
+  --vai-ash:            #efefef;
+  --vai-fog:            #f5f5f5;
+  --vai-ivory:          #ebe6dd;
+  --vai-steel:          #4d4d4d;
+  --vai-slate:          #828282;
+  --vai-mist:           #e8e8e8;
+  --vai-ember:          #ff682c;
+  --vai-brass:          #816729;
+
+  /* Typography */
+  --vai-font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --vai-font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Border Radius */
+  --vai-radius-card:    8px;
+  --vai-radius-btn:     0px;
+  --vai-radius-pill:    200px;
+  --vai-radius-tag:     20px;
+  --vai-radius-data:    20px;
+  --vai-radius-asym:    6px 0px 0px 6px;
+
+  background: var(--vai-canvas);
+  color: var(--vai-graphite);
+  font-family: var(--vai-font-body);
+  min-height: 100vh;
+}
+
+/* ── Page Header ── */
+.solar-ai-page .vai-page-header {
+  padding: 40px 0 32px;
+  border-bottom: 1px solid var(--vai-mist);
+  margin-bottom: 32px;
+}
+
+.solar-ai-page .vai-page-title {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.19;
+  letter-spacing: -0.64px;
+  color: var(--vai-graphite);
+  margin-bottom: 8px;
+}
+
+.solar-ai-page .vai-page-subtitle {
+  font-family: var(--vai-font-body);
+  font-size: 15px;
+  color: var(--vai-steel);
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+/* ── Tab Navigation ── */
+.solar-ai-page .vai-tabs {
+  display: inline-flex;
+  background: var(--vai-ash);
+  border-radius: var(--vai-radius-pill);
+  padding: 6px;
+  gap: 2px;
+  margin-bottom: 32px;
+}
+
+.solar-ai-page .vai-tab-btn {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 14px;
+  padding: 8px 20px;
+  border-radius: var(--vai-radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--vai-slate);
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.solar-ai-page .vai-tab-btn:hover {
+  color: var(--vai-graphite);
+  background: rgba(255,255,255,0.5);
+}
+
+.solar-ai-page .vai-tab-btn--active {
+  background: var(--vai-canvas);
+  color: var(--vai-graphite);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── Cards ── */
+.solar-ai-page .vai-card {
+  background: var(--vai-ash);
+  border-radius: var(--vai-radius-card);
+  padding: 28px;
+  border: none;
+}
+
+.solar-ai-page .vai-card--white {
+  background: var(--vai-canvas);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-data);
+  padding: 28px;
+}
+
+.solar-ai-page .vai-card--ivory {
+  background: var(--vai-ivory);
+  border-radius: var(--vai-radius-asym);
+  padding: 28px;
+}
+
+.solar-ai-page .vai-card--success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--vai-radius-card);
+  padding: 20px;
+}
+
+.solar-ai-page .vai-card h4,
+.solar-ai-page .vai-card-title {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: var(--vai-graphite);
+  margin-bottom: 16px;
+}
+
+/* ── Upload Zone ── */
+.solar-ai-page .vai-upload-zone {
+  border: 1.5px dashed var(--vai-mist);
+  border-radius: var(--vai-radius-card);
+  padding: 40px 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+  background: var(--vai-fog);
+}
+
+.solar-ai-page .vai-upload-zone:hover,
+.solar-ai-page .vai-upload-zone--dragover {
+  border-color: var(--vai-ember);
+  background: #fff8f5;
+}
+
+.solar-ai-page .vai-upload-icon {
+  color: var(--vai-ember);
+  margin-bottom: 16px;
+}
+
+.solar-ai-page .vai-upload-title {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  color: var(--vai-graphite);
+  margin-bottom: 8px;
+}
+
+.solar-ai-page .vai-upload-sub {
+  font-size: 14px;
+  color: var(--vai-slate);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* ── Buttons ── */
+.solar-ai-page .vai-btn-primary {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  background: var(--vai-graphite);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--vai-radius-btn);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solar-ai-page .vai-btn-primary:hover {
+  background: #333;
+}
+
+.solar-ai-page .vai-btn-primary--success {
+  background: #16a34a;
+  color: white;
+}
+
+.solar-ai-page .vai-btn-ghost {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  background: transparent;
+  color: var(--vai-graphite);
+  border: 1px solid var(--vai-graphite);
+  border-radius: var(--vai-radius-btn);
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solar-ai-page .vai-btn-ghost:hover {
+  background: var(--vai-graphite);
+  color: white;
+}
+
+.solar-ai-page .vai-btn-ember {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  background: transparent;
+  color: var(--vai-ember);
+  border: none;
+  border-radius: var(--vai-radius-tag);
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Tags / Badges ── */
+.solar-ai-page .vai-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--vai-radius-tag);
+  font-size: 12px;
+  font-family: var(--vai-font-body);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--vai-mist);
+  background: var(--vai-fog);
+  color: var(--vai-steel);
+}
+
+.solar-ai-page .vai-tag--ember {
+  background: #fff1ec;
+  border-color: #fed7aa;
+  color: var(--vai-ember);
+}
+
+.solar-ai-page .vai-tag--success {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #16a34a;
+}
+
+.solar-ai-page .vai-tag--brass {
+  background: #fdf8ee;
+  border-color: #e9d5a0;
+  color: var(--vai-brass);
+}
+
+/* ── Grid Layouts ── */
+.solar-ai-page .vai-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.solar-ai-page .vai-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.solar-ai-page .vai-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Data Grid Items (Bills, Activities) ── */
+.solar-ai-page .vai-bill-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--vai-radius-card);
+  border: 1px solid var(--vai-mist);
+  background: var(--vai-canvas);
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+
+.solar-ai-page .vai-bill-item:hover {
+  border-color: var(--vai-ember);
+  background: #fff8f5;
+}
+
+.solar-ai-page .vai-bill-item--active {
+  border-color: var(--vai-ember);
+  background: #fff8f5;
+}
+
+.solar-ai-page .vai-bill-label {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--vai-graphite);
+  letter-spacing: -0.02em;
+}
+
+.solar-ai-page .vai-bill-meta {
+  font-size: 12px;
+  color: var(--vai-slate);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.solar-ai-page .vai-bill-amount {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--vai-ember);
+  letter-spacing: -0.02em;
+}
+
+/* ── Section Divider ── */
+.solar-ai-page .vai-divider {
+  height: 1px;
+  background: var(--vai-mist);
+  margin: 24px 0;
+}
+
+/* ── Insight Block ── */
+.solar-ai-page .vai-insight-block {
+  background: var(--vai-ivory);
+  border-radius: var(--vai-radius-asym);
+  padding: 20px 24px;
+}
+
+.solar-ai-page .vai-insight-label {
+  font-family: var(--vai-font-display);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vai-brass);
+  margin-bottom: 8px;
+}
+
+.solar-ai-page .vai-insight-text {
+  font-size: 14px;
+  color: var(--vai-steel);
+  line-height: 1.6;
+}
+
+/* ── Appliance Card ── */
+.solar-ai-page .vai-appliance-card {
+  background: var(--vai-canvas);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-card);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 150ms ease;
+}
+
+.solar-ai-page .vai-appliance-card:hover {
+  border-color: var(--vai-ember);
+}
+
+.solar-ai-page .vai-appliance-letter {
+  font-family: var(--vai-font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--vai-ember);
+}
+
+.solar-ai-page .vai-appliance-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vai-graphite);
+  text-align: center;
+}
+
+.solar-ai-page .vai-appliance-watts {
+  font-size: 11px;
+  color: var(--vai-slate);
+}
+
+.solar-ai-page .vai-qty-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.solar-ai-page .vai-qty-btn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--vai-mist);
+  border-radius: 4px;
+  background: var(--vai-ash);
+  color: var(--vai-graphite);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 100ms ease;
+}
+
+.solar-ai-page .vai-qty-btn:hover {
+  background: var(--vai-graphite);
+  color: white;
+  border-color: var(--vai-graphite);
+}
+
+.solar-ai-page .vai-qty-value {
+  font-family: var(--vai-font-display);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--vai-graphite);
+  min-width: 16px;
+  text-align: center;
+}
+
+/* ── Range Sliders ── */
+.solar-ai-page .vai-range-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--vai-steel);
+  margin-bottom: 6px;
+}
+
+.solar-ai-page .vai-range-label strong {
+  color: var(--vai-ember);
+  font-weight: 500;
+}
+
+.solar-ai-page input[type="range"] {
+  accent-color: var(--vai-ember);
+  width: 100%;
+}
+
+/* ── Form Inputs ── */
+.solar-ai-page .vai-form-group {
+  margin-bottom: 16px;
+}
+
+.solar-ai-page .vai-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vai-slate);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ── ╔══════════════════════════════════╗
+       AI ADVISOR CHAT INTERFACE
+   ╚══════════════════════════════════╝ ── */
+
+.solar-ai-page .vai-chat-shell {
+  display: flex;
+  flex-direction: column;
+  height: 680px;
+  background: var(--vai-canvas);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-data);
+  overflow: hidden;
+}
+
+/* Chat header bar */
+.solar-ai-page .vai-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--vai-mist);
+  background: var(--vai-canvas);
+  flex-shrink: 0;
+}
+
+.solar-ai-page .vai-chat-model-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--vai-ash);
+  border-radius: var(--vai-radius-pill);
+  padding: 5px 14px 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vai-graphite);
+}
+
+.solar-ai-page .vai-chat-model-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.solar-ai-page .vai-chat-context-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--vai-ember);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--vai-font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Context signals banner */
+.solar-ai-page .vai-context-banner {
+  display: flex;
+  gap: 16px;
+  padding: 8px 20px;
+  background: #fff8f5;
+  border-bottom: 1px solid #fed7aa;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.solar-ai-page .vai-context-banner::-webkit-scrollbar { display: none; }
+
+.solar-ai-page .vai-context-signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--vai-steel);
+  white-space: nowrap;
+}
+
+.solar-ai-page .vai-context-signal strong {
+  color: var(--vai-graphite);
+  font-weight: 600;
+}
+
+.solar-ai-page .vai-context-signal .signal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vai-ember);
+  flex-shrink: 0;
+}
+
+/* Messages area */
+.solar-ai-page .vai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--vai-canvas);
+  scrollbar-width: thin;
+  scrollbar-color: var(--vai-mist) transparent;
+}
+
+/* Message row */
+.solar-ai-page .vai-msg-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.solar-ai-page .vai-msg-row--user {
+  flex-direction: row-reverse;
+}
+
+/* Avatar */
+.solar-ai-page .vai-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--vai-ash);
+  border: 1px solid var(--vai-mist);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--vai-ember);
+}
+
+/* User avatar */
+.solar-ai-page .vai-avatar--user {
+  background: var(--vai-graphite);
+  color: white;
+  border-color: var(--vai-graphite);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Bubble base */
+.solar-ai-page .vai-bubble {
+  max-width: 78%;
+  border-radius: 12px;
+}
+
+/* AI bubble — Ventriloc editorial style */
+.solar-ai-page .vai-bubble--ai {
+  background: var(--vai-ash);
+  border-radius: 2px 12px 12px 12px;
+  padding: 16px 20px;
+  border: none;
+}
+
+/* User bubble */
+.solar-ai-page .vai-bubble--user {
+  background: var(--vai-graphite);
+  color: white;
+  border-radius: 12px 2px 12px 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Markdown Content Rendering inside AI bubble ── */
+.solar-ai-page .vai-md {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--vai-graphite);
+  font-family: var(--vai-font-body);
+}
+
+/* Headings */
+.solar-ai-page .vai-md h1,
+.solar-ai-page .vai-md h2 {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: var(--vai-graphite);
+  margin: 18px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid var(--vai-ember);
+  line-height: 1.25;
+}
+
+.solar-ai-page .vai-md h1:first-child,
+.solar-ai-page .vai-md h2:first-child {
+  margin-top: 0;
+}
+
+.solar-ai-page .vai-md h3 {
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--vai-graphite);
+  margin: 14px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+  color: var(--vai-brass);
+}
+
+.solar-ai-page .vai-md h4,
+.solar-ai-page .vai-md h5 {
+  font-family: var(--vai-font-body);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--vai-graphite);
+  margin: 10px 0 4px;
+}
+
+/* Bold & Italic */
+.solar-ai-page .vai-md strong {
+  font-weight: 600;
+  color: var(--vai-graphite);
+  background: linear-gradient(to right, #fff1ec, #fff8f5);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.solar-ai-page .vai-md em {
+  color: var(--vai-brass);
+  font-style: italic;
+}
+
+/* Paragraphs */
+.solar-ai-page .vai-md p {
+  margin: 8px 0;
+  color: var(--vai-steel);
+}
+
+/* Lists */
+.solar-ai-page .vai-md ul,
+.solar-ai-page .vai-md ol {
+  padding-left: 20px;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.solar-ai-page .vai-md li {
+  color: var(--vai-steel);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.solar-ai-page .vai-md ul li::marker {
+  color: var(--vai-ember);
+}
+
+.solar-ai-page .vai-md ol li::marker {
+  color: var(--vai-ember);
+  font-weight: 600;
+}
+
+/* Tables */
+.solar-ai-page .vai-md table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.solar-ai-page .vai-md th {
+  background: var(--vai-graphite);
+  color: white;
+  font-family: var(--vai-font-display);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.solar-ai-page .vai-md td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--vai-mist);
+  color: var(--vai-steel);
+  line-height: 1.4;
+}
+
+.solar-ai-page .vai-md tr:nth-child(even) td {
+  background: var(--vai-fog);
+}
+
+.solar-ai-page .vai-md tr:hover td {
+  background: #fff8f5;
+}
+
+/* Code blocks */
+.solar-ai-page .vai-md code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12.5px;
+  background: var(--vai-fog);
+  border: 1px solid var(--vai-mist);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--vai-ember);
+}
+
+.solar-ai-page .vai-md pre {
+  background: var(--vai-graphite);
+  border-radius: 6px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.solar-ai-page .vai-md pre code {
+  background: transparent;
+  border: none;
+  color: #a8ff3e;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Blockquotes */
+.solar-ai-page .vai-md blockquote {
+  border-left: 3px solid var(--vai-ember);
+  padding: 8px 0 8px 16px;
+  margin: 10px 0;
+  background: #fff8f5;
+  border-radius: 0 6px 6px 0;
+}
+
+.solar-ai-page .vai-md blockquote p {
+  color: var(--vai-steel);
+  font-style: italic;
+}
+
+/* Horizontal rule */
+.solar-ai-page .vai-md hr {
+  border: none;
+  border-top: 1px solid var(--vai-mist);
+  margin: 14px 0;
+}
+
+/* Streaming cursor */
+.solar-ai-page .vai-bubble--streaming::after {
+  content: '▊';
+  color: var(--vai-ember);
+  animation: cursor-blink 0.7s step-start infinite;
+  font-size: 13px;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Prompt Chips ── */
+.solar-ai-page .vai-prompt-chips {
+  display: flex;
+  gap: 8px;
+  padding: 10px 20px;
+  overflow-x: auto;
+  border-top: 1px solid var(--vai-mist);
+  background: var(--vai-fog);
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+
+.solar-ai-page .vai-prompt-chips::-webkit-scrollbar { display: none; }
+
+.solar-ai-page .vai-chip {
+  padding: 7px 16px;
+  background: var(--vai-canvas);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-pill);
+  font-size: 12.5px;
+  color: var(--vai-steel);
+  cursor: pointer;
+  transition: all 130ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.solar-ai-page .vai-chip:hover {
+  border-color: var(--vai-ember);
+  color: var(--vai-ember);
+  background: #fff8f5;
+}
+
+.solar-ai-page .vai-chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── Chat Input ── */
+.solar-ai-page .vai-chat-input-row {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--vai-mist);
+  background: var(--vai-canvas);
+  flex-shrink: 0;
+}
+
+.solar-ai-page .vai-chat-input {
+  flex: 1;
+  background: var(--vai-fog);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-pill);
+  padding: 10px 18px;
+  font-size: 14px;
+  color: var(--vai-graphite);
+  outline: none;
+  font-family: var(--vai-font-body);
+  transition: border-color 150ms ease;
+}
+
+.solar-ai-page .vai-chat-input:focus {
+  border-color: var(--vai-ember);
+  background: var(--vai-canvas);
+}
+
+.solar-ai-page .vai-chat-input::placeholder {
+  color: var(--vai-slate);
+}
+
+.solar-ai-page .vai-send-btn {
+  width: 40px;
+  height: 40px;
+  background: var(--vai-graphite);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.solar-ai-page .vai-send-btn:hover {
+  background: var(--vai-ember);
+}
+
+.solar-ai-page .vai-send-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ── Stat Callout ── */
+.solar-ai-page .vai-stat-row {
+  display: flex;
+  gap: 16px;
+}
+
+.solar-ai-page .vai-stat {
+  flex: 1;
+  background: var(--vai-canvas);
+  border: 1px solid var(--vai-mist);
+  border-radius: var(--vai-radius-card);
+  padding: 16px 18px;
+  text-align: center;
+}
+
+.solar-ai-page .vai-stat-value {
+  font-family: var(--vai-font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--vai-ember);
+  line-height: 1;
+}
+
+.solar-ai-page .vai-stat-label {
+  font-size: 11px;
+  color: var(--vai-slate);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Spinner ── */
+.solar-ai-page .vai-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--vai-mist);
+  border-top-color: var(--vai-ember);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Error Banner ── */
+.solar-ai-page .vai-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--vai-radius-card);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+/* ── Section Header ── */
+.solar-ai-page .vai-section-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.solar-ai-page .vai-section-title {
+  font-family: var(--vai-font-display);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--vai-graphite);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.solar-ai-page .vai-section-meta {
+  font-size: 11px;
+  color: var(--vai-slate);
+  font-family: var(--vai-font-body);
+}
+
+/* Inline ember link underline */
+.solar-ai-page .vai-link {
+  color: var(--vai-graphite);
+  text-decoration: underline;
+  text-decoration-color: var(--vai-ember);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.solar-ai-page .vai-link:hover {
+  color: var(--vai-ember);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .solar-ai-page .vai-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .solar-ai-page .vai-chat-shell {
+    height: 520px;
+  }
+
+  .solar-ai-page .vai-bubble {
+    max-width: 92%;
+  }
+}
