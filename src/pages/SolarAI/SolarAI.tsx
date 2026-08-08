@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu } from 'lucide-react';
+import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu, Layers } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,6 +17,11 @@ import { chatStream, Message } from '../../services/ai';
 import { buildSolarAdvisorPrompt, MODEL_LABELS } from '../../services/prompts';
 import { scanBill, BillData } from '../../services/billScanner';
 import { APPLIANCES } from '../../data/applianceProfiles';
+import {
+  recordBillScanAction,
+  recordApplianceCalculatorAction,
+  getCentralizedContext
+} from '../../services/centralizedContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -28,7 +33,9 @@ export const SolarAI: React.FC = () => {
     <main className="container pb-12">
       <header className="page-header mt-8">
         <h1>{t('solarAI') || 'Solar AI Intelligence'}</h1>
-        <p className="text-secondary">Analyze your energy usage and get personalized solar recommendations.</p>
+        <p className="text-secondary">
+          Centralized AI Context Engine parsing your bill scans, load calculations, and role pathways for hyper-personalized solar insights.
+        </p>
       </header>
 
       <div className="tabs mb-6">
@@ -36,19 +43,19 @@ export const SolarAI: React.FC = () => {
           className={`tab-btn ${activeTab === 'bill' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('bill')}
         >
-          {t('scanBill') || 'Bill Scanner'}
+          {t('scanBill') || 'Bill Scanner AI'}
         </button>
         <button
           className={`tab-btn ${activeTab === 'calculator' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('calculator')}
         >
-          Appliance Calculator
+          Appliance Load AI
         </button>
         <button
           className={`tab-btn ${activeTab === 'advisor' ? 'tab-btn--active' : ''}`}
           onClick={() => setActiveTab('advisor')}
         >
-          {t('askAdvisor') || 'AI Advisor'}
+          {t('askAdvisor') || 'AI Advisor Chat'}
         </button>
       </div>
 
@@ -60,13 +67,15 @@ export const SolarAI: React.FC = () => {
 };
 
 const BillScanner: React.FC = () => {
-  const { setProfile } = useApp();
+  const { userProfile, setProfile } = useApp();
   const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<BillData | null>(null);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const role = userProfile.userType || userProfile.userRole || 'Homeowner';
 
   const processFile = async (file: File) => {
     setScanning(true);
@@ -81,6 +90,8 @@ const BillScanner: React.FC = () => {
         try {
           const data = await scanBill(base64, mimeType);
           setResult(data);
+          // Record scan action directly into the Centralized Context Engine
+          recordBillScanAction(data, userProfile);
         } catch (err) {
           setError('Failed to scan bill. Please try again.');
         } finally {
@@ -101,90 +112,99 @@ const BillScanner: React.FC = () => {
     if (file) processFile(file);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-  };
-
-  const handleUseData = () => {
+  const handleApplyData = () => {
     if (!result) return;
     setProfile({
       billAmount: result.billAmount,
       avgBill: result.billAmount,
       discom: result.discom,
     });
+    recordBillScanAction(result, userProfile);
   };
 
   return (
     <div className="grid-2">
-      <div className="flex-col gap-4">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*,.pdf"
-          onChange={handleFileChange}
-          className="hidden"
-          aria-label="Upload electricity bill"
-        />
+      <div className="flex-col gap-6">
         <div
           className={`upload-zone ${isDragging ? 'upload-zone--drag-over' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click(); }}
-          aria-label="Upload electricity bill for scanning"
         >
-          <UploadCloud className="upload-zone__icon mx-auto" />
-          <h4 className="upload-zone__text">Drag & drop your electricity bill here</h4>
-          <p className="upload-zone__subtext">Supports PDF, JPG, PNG (Max 5MB)</p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) processFile(file);
+            }}
+          />
+          <UploadCloud size={48} className="text-accent mb-4" />
+          <h3 className="mb-2" style={{ fontSize: '1.125rem' }}>Upload Electricity Bill</h3>
+          <p className="text-secondary text-sm mb-4">
+            Drag &amp; drop your bill image or PDF here, or click to browse.
+          </p>
+          <span className="badge badge--green">AI OCR Vision Model Powered</span>
         </div>
 
         {scanning && (
-          <div className="glass-card flex-col items-center gap-3 text-center">
-            <div className="spinner"></div>
-            <p className="text-secondary">Extracting bill data with AI...</p>
+          <div className="glass-card flex items-center justify-center gap-3 py-8">
+            <div className="spinner" />
+            <span>Scanning bill with AI OCR Vision Model...</span>
           </div>
         )}
 
         {error && (
-          <div className="error-state">
-            <p className="text-red text-sm">{error}</p>
+          <div className="glass-card bg-red-900/20 border-red-500/30 text-red-400 p-4">
+            {error}
           </div>
         )}
 
         {result && (
           <div className="glass-card">
-            <h4 className="mb-4">Extracted Bill Data:</h4>
-            <div className="flex-col gap-2 mb-6">
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>DISCOM: {result.discom}</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Consumer No: {result.consumerNumber}</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Units Consumed: {result.unitsConsumed} kWh</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Bill Amount: ₹{result.billAmount.toLocaleString('en-IN')}</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Billing Period: {result.billingPeriod}</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Consumer Category: {result.consumerCategory}</span></div>
-              <div className="flex items-center gap-2"><CheckCircle size={16} className="text-green" /> <span>Model: {result.modelUsed}</span></div>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="flex items-center gap-2 text-accent" style={{ fontSize: '1rem', margin: 0 }}>
+                <CheckCircle size={18} /> Extracted Bill Data
+              </h4>
+              <span className="badge badge--accent" style={{ fontSize: '0.6875rem' }}>
+                Recorded in Centralized AI Context Engine
+              </span>
             </div>
-            <button className="btn btn-primary w-full justify-center" onClick={handleUseData}>
-              Use This Data
+
+            <div className="grid-2 gap-4 mb-6 text-sm">
+              <div><span className="text-muted">DISCOM:</span> <strong>{result.discom}</strong></div>
+              <div><span className="text-muted">Consumer No:</span> <strong>{result.consumerNumber}</strong></div>
+              <div><span className="text-muted">Units Consumed:</span> <strong>{result.unitsConsumed} kWh</strong></div>
+              <div><span className="text-muted">Bill Amount:</span> <strong className="text-accent">₹{result.billAmount.toLocaleString('en-IN')}</strong></div>
+              <div><span className="text-muted">Category:</span> <strong>{result.consumerCategory}</strong></div>
+              <div><span className="text-muted">Billing Period:</span> <strong>{result.billingPeriod}</strong></div>
+            </div>
+
+            <button className="btn btn-primary w-full justify-center" onClick={handleApplyData}>
+              Apply Data to Centralized AI Context
             </button>
           </div>
         )}
       </div>
-      <div>
-        <div className="glass-card glass-card--no-hover">
-          <div className="flex items-center gap-2 mb-4">
-            <Info size={20} className="text-accent" />
-            <h4>How it works</h4>
+
+      <div className="flex-col gap-6">
+        <div className="glass-card">
+          <h4 className="mb-3" style={{ fontSize: '1rem' }}>Personalized Role AI Insight</h4>
+          <p className="text-secondary text-sm leading-relaxed mb-4">
+            {role === 'Landowner'
+              ? 'As a Landowner, electricity bill scans help establish baseline power tariffs for agricultural solar feeder projects under PM-KUSUM Component A/C.'
+              : role === 'Solar Vendor'
+              ? 'As a Solar Vendor, client bill OCR scans automatically structure customer quotes, tariff slab offsets, and DISCOM net-metering application forms.'
+              : 'As a Homeowner, your monthly bill is parsed to determine exact kW solar PV sizing, PM Surya Ghar subsidy tiers, and 25-year cumulative savings.'}
+          </p>
+
+          <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-secondary flex items-start gap-2">
+            <Info size={16} className="text-accent shrink-0 mt-0.5" />
+            <span>Supported DISCOMs: MSEDCL, TANGEDCO, BESCOM, UGVCL, JVVNL, BSES, PSPCL, KSEB, WBSEDCL &amp; all state utilities across India.</span>
           </div>
-          <p className="mb-4 text-secondary">
-            Our advanced AI scans your electricity bill to extract your historical consumption patterns, tariff rates, and sanctioned load. This helps us design a solar system tailored perfectly to your unique needs.
-          </p>
-          <p className="text-secondary">
-            Your data is processed securely and is never shared with third parties without your consent.
-          </p>
         </div>
       </div>
     </div>
@@ -192,35 +212,53 @@ const BillScanner: React.FC = () => {
 };
 
 const ApplianceCalculator: React.FC = () => {
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [hours, setHours] = useState<Record<string, number>>({
+  const { userProfile } = useApp();
+  const [quantities, setQuantities] = useState<Record<string, number>>({
+    'ac-1.5': 2,
+    'fan-75': 4,
+    'fridge-150': 1,
+    'tv-100': 1,
+    'led-10': 8,
+  });
+
+  const [hours, setHours] = useState({
     summer: 8,
     monsoon: 5,
-    winter: 3
+    winter: 3,
   });
 
   const updateQty = (id: string, delta: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [id]: Math.max(0, (prev[id] || 0) + delta)
-    }));
+    setQuantities(prev => {
+      const current = prev[id] || 0;
+      const next = Math.max(0, current + delta);
+      return { ...prev, [id]: next };
+    });
   };
 
-  const calcSeasonKWh = (seasonHours: number) => {
-    return APPLIANCES.reduce((sum, a) => {
-      return sum + (a.wattage * 1000) * seasonHours * 30 * (quantities[a.id] || 0) / 1000;
+  const calculateKWh = (hrs: number) => {
+    return APPLIANCES.reduce((total, app) => {
+      const qty = quantities[app.id] || 0;
+      return total + (app.wattage * qty * hrs * 30);
     }, 0);
   };
 
-  const summerKWh = calcSeasonKWh(hours.summer);
-  const monsoonKWh = calcSeasonKWh(hours.monsoon);
-  const winterKWh = calcSeasonKWh(hours.winter);
+  const summerKWh = Math.round(calculateKWh(hours.summer));
+  const monsoonKWh = Math.round(calculateKWh(hours.monsoon));
+  const winterKWh = Math.round(calculateKWh(hours.winter));
+
+  // Sync with Centralized Context Engine on load changes
+  useEffect(() => {
+    const activeList = APPLIANCES.map(a => ({ ...a, quantity: quantities[a.id] || 0 }));
+    recordApplianceCalculatorAction(activeList, hours, summerKWh, userProfile);
+  }, [quantities, hours, summerKWh, userProfile]);
+
+  const role = userProfile.userType || userProfile.userRole || 'Homeowner';
 
   const barData = {
     labels: ['Summer', 'Monsoon', 'Winter'],
     datasets: [
       {
-        label: 'Energy Consumption (kWh)',
+        label: 'Energy Consumption (kWh/mo)',
         data: [summerKWh, monsoonKWh, winterKWh],
         backgroundColor: 'rgba(168, 255, 62, 0.8)',
         borderRadius: 4,
@@ -232,7 +270,7 @@ const ApplianceCalculator: React.FC = () => {
   const pieData = {
     labels: activeAppliances.map(a => a.name),
     datasets: [{
-      data: activeAppliances.map(a => (a.wattage * 1000) * hours.summer * 30 * (quantities[a.id] || 0) / 1000),
+      data: activeAppliances.map(a => (a.wattage * hours.summer * 30 * (quantities[a.id] || 0))),
       backgroundColor: ['#A8FF3E', '#22C55E', '#F59E0B', '#F97316', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'],
       borderWidth: 0,
     }]
@@ -244,9 +282,9 @@ const ApplianceCalculator: React.FC = () => {
         <div className="grid-4 gap-3">
           {APPLIANCES.map(a => (
             <div key={a.id} className="glass-card glass-card--sm flex-col items-center justify-center gap-2">
-              <div style={{ fontSize: '1.5rem' }}>{a.name.charAt(0)}</div>
+              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#A8FF3E' }}>{a.name.charAt(0)}</div>
               <div className="text-xs font-semibold text-center">{a.name}</div>
-              <div className="text-xs text-muted">{a.wattage * 1000}W</div>
+              <div className="text-xs text-muted">{(a.wattage * 1000).toFixed(0)}W</div>
               <div className="qty-counter">
                 <button className="qty-btn" onClick={() => updateQty(a.id, -1)} aria-label={`Decrease ${a.name}`}>-</button>
                 <span className="qty-value">{quantities[a.id] || 0}</span>
@@ -257,7 +295,7 @@ const ApplianceCalculator: React.FC = () => {
         </div>
 
         <div className="glass-card">
-          <h4 className="mb-4">Seasonal Usage Adjuster</h4>
+          <h4 className="mb-4">Seasonal Hours Adjuster</h4>
 
           <div className="form-group mb-3">
             <div className="flex justify-between"><label>Summer (hrs/day)</label><span>{hours.summer} hrs</span></div>
@@ -295,7 +333,6 @@ const ApplianceCalculator: React.FC = () => {
 
         <div className="glass-card">
           <h4 className="mb-4">Appliance Breakdown (Summer)</h4>
-          {/* Appliance Breakdown using BKLIT UI (@bklit/pie-chart) */}
           {pieData.labels.length > 0 ? (
             <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
               <PieChart
@@ -314,8 +351,14 @@ const ApplianceCalculator: React.FC = () => {
         <div className="glass-card glass-card--no-hover flex gap-3 items-start">
           <Sparkles className="text-accent shrink-0" />
           <div>
-            <h5 className="mb-1">AI Insight</h5>
-            <p className="text-sm text-secondary">Your cooling appliances contribute significantly to your summer usage. Consider sizing your solar system to cover the summer peak, ensuring 100% bill offset during the hottest months.</p>
+            <h5 className="mb-1" style={{ fontSize: '0.9375rem', fontWeight: 700 }}>Personalized Load AI Insight ({role})</h5>
+            <p className="text-sm text-secondary leading-relaxed">
+              {role === 'Landowner'
+                ? `Summer peak demand reaches ${summerKWh} kWh/mo. Solarizing agricultural pumps under PM-KUSUM Component B eliminates grid reliance during daytime irrigation.`
+                : role === 'Solar Vendor'
+                ? `Client summer load model indicates ${summerKWh} kWh/mo peak demand. Recommend proposing a ${((summerKWh) / 120).toFixed(1)} kW system with hybrid battery storage.`
+                : `Your cooling appliances contribute significantly to your ${summerKWh} kWh summer usage. Consider sizing your solar system to cover the summer peak for 100% bill offset.`}
+            </p>
           </div>
         </div>
       </div>
@@ -325,8 +368,14 @@ const ApplianceCalculator: React.FC = () => {
 
 const AIAdvisor: React.FC = () => {
   const { userProfile, language } = useApp();
+  const role = userProfile.userType || userProfile.userRole || 'Homeowner';
+  const centralCtx = getCentralizedContext(userProfile);
+
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: 'Hello! I am your SuryaSetu Solar Pro Advisor backed by our Single Source of Truth Knowledge Base. How can I help you regarding PM Surya Ghar, subsidies, payback, or DISCOM policies today?' }
+    {
+      role: 'assistant',
+      content: `Hello ${userProfile.firstName || userProfile.name || 'there'}! I am your SuryaSetu Solar AI Advisor. I am powered by our Centralized Context Engine aligned with your active role pathway (${role}). How can I assist you today regarding subsidies, policy rules, payback, or DISCOM net-metering?`
+    }
   ]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -382,27 +431,51 @@ const AIAdvisor: React.FC = () => {
     }
   }, [isStreaming, messages, userProfile, language]);
 
-  const prompts = [
-    "PM Surya Ghar subsidy for 3 kW?",
-    "Roof area needed for 2 kW?",
-    "PM-KUSUM scheme details?",
-    "Documents required to apply?",
-    "What is the capital of France?"
-  ];
+  const prompts = role === 'Landowner'
+    ? [
+        "PM-KUSUM Component A 0.5MW land lease revenue?",
+        "Substation distance requirements for solar plant?",
+        "PM-KUSUM Component B standalone solar pumps?",
+        "DISCOM 25-year Power Purchase Agreement (PPA) rates?"
+      ]
+    : role === 'Solar Vendor'
+    ? [
+        "PM Surya Ghar installer portal empanelment steps?",
+        "GSTIN & DISCOM license compliance checklist?",
+        "ALMM certified solar module procurement?",
+        "Customer ROI closing pitch generator?"
+      ]
+    : [
+        "PM Surya Ghar subsidy for 3 kW system?",
+        "Roof area required for 2 kW solar?",
+        "DISCOM net-metering application procedure?",
+        "On-grid vs hybrid battery solar storage?"
+      ];
 
   return (
-    <div className="glass-card p-0 flex-col" style={{ height: '600px', overflow: 'hidden' }}>
+    <div className="glass-card p-0 flex-col" style={{ height: '640px', overflow: 'hidden' }}>
+      {/* Top Header Bar */}
       <div className="flex items-center justify-between p-3 px-4" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
         <div className="model-badge">
           <Cpu size={14} />
           <span>{activeModelLabel}</span>
           <div className="model-badge__dot"></div>
         </div>
-        <span style={{ fontSize: '0.75rem', color: 'var(--accent-primary)', fontWeight: 600 }}>
-          SuryX Single Source of Truth Knowledge Engine
-        </span>
+        <div className="flex items-center gap-2" style={{ fontSize: '0.75rem', color: '#A8FF3E', fontWeight: 600 }}>
+          <Layers size={14} />
+          Centralized AI Context Engine Active ({role})
+        </div>
       </div>
 
+      {/* Centralized Context Signal Banner */}
+      <div style={{ background: 'rgba(168,255,62,0.04)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '6px 16px', display: 'flex', gap: '12px', overflowX: 'auto', fontSize: '0.6875rem', color: '#7A9484' }}>
+        <span>📍 <strong>Location:</strong> {centralCtx.onboarding.state} ({centralCtx.onboarding.discom})</span>
+        <span>🧾 <strong>Bill Signal:</strong> {centralCtx.billScanner.scannedAt ? `${centralCtx.billScanner.unitsConsumed} kWh` : `₹${centralCtx.onboarding.billAmount}/mo`}</span>
+        <span>⚡ <strong>Load Model:</strong> {centralCtx.applianceCalculator.calculatedAt ? `${centralCtx.applianceCalculator.totalMonthlyKWh} kWh` : 'Baseline'}</span>
+        <span>🏠 <strong>Property:</strong> {centralCtx.onboarding.roofArea} sq ft</span>
+      </div>
+
+      {/* Chat Messages Container */}
       <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-4)' }}>
         {messages.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role === 'user' ? 'chat-message--user' : ''}`}>
@@ -417,16 +490,18 @@ const AIAdvisor: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Suggested Prompt Chips */}
       <div className="prompt-chips" style={{ padding: 'var(--space-2) var(--space-4)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
         {prompts.map(p => (
           <button key={p} className="prompt-chip" onClick={() => send(p)} disabled={isStreaming}>{p}</button>
         ))}
       </div>
 
+      {/* Input Row */}
       <div className="chat-input-row" style={{ padding: 'var(--space-3) var(--space-4)', display: 'flex', gap: '8px', borderTop: '1px solid var(--border-subtle)' }}>
         <input 
           className="chat-input"
-          placeholder="Ask anything about PM Surya Ghar, subsidies, DISCOM, solar pump rules..."
+          placeholder={role === 'Landowner' ? "Ask about PM-KUSUM, land lease revenue, PPA rates..." : role === 'Solar Vendor' ? "Ask about installer empanelment, GSTIN compliance, DISCOM rules..." : "Ask anything about PM Surya Ghar, subsidies, DISCOM net-metering..."}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)}
@@ -448,4 +523,3 @@ const AIAdvisor: React.FC = () => {
 };
 
 export default SolarAI;
-

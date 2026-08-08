@@ -7,6 +7,7 @@ import {
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
 import { HeatmapChart } from '../../components/ui/bklit';
+import { recordPropertyAssessmentAction } from '../../services/centralizedContext';
 import { HOURLY_IRRADIANCE_GRID, getSolarHoursPerDay } from '../../data/solarIrradiance';
 import { getStateTariffHistory } from '../../data/stateElectricityRates';
 import pmSuryaGharData from '../../knowledge/pmSuryaGhar.json';
@@ -322,7 +323,14 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
             </select>
           </div>
 
-          <button className="btn btn-primary w-full justify-center mt-2" onClick={() => setAnalyzed(true)} style={{ fontSize: '0.875rem' }}>
+          <button
+            className="btn btn-primary w-full justify-center mt-2"
+            onClick={() => {
+              setAnalyzed(true);
+              recordPropertyAssessmentAction({ roofArea: Number(roofArea) || 800, score: calc.overallScore }, userProfile);
+            }}
+            style={{ fontSize: '0.875rem' }}
+          >
             Recalculate Rooftop Potential <CaretRight size={15} />
           </button>
         </div>
@@ -473,6 +481,7 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
    LAND SOLAR COMPONENT (PM-KUSUM ALIGNED)
 ═══════════════════════════════════════════════════════ */
 const LandSolar: React.FC<{ state: string }> = ({ state }) => {
+  const { userProfile } = useApp();
   const [analyzed, setAnalyzed] = useState(false);
   const [landArea, setLandArea] = useState<number | ''>(5);
   const [terrain, setTerrain] = useState('Flat');
@@ -634,7 +643,14 @@ const LandSolar: React.FC<{ state: string }> = ({ state }) => {
             </select>
           </div>
 
-          <button className="btn btn-primary w-full justify-center mt-2" onClick={() => setAnalyzed(true)} style={{ fontSize: '0.875rem' }}>
+          <button
+            className="btn btn-primary w-full justify-center mt-2"
+            onClick={() => {
+              setAnalyzed(true);
+              recordPropertyAssessmentAction({ acres: Number(landArea) || 5, capacityMW: Number(calc.capacityMW) || 0.5 }, userProfile);
+            }}
+            style={{ fontSize: '0.875rem' }}
+          >
             Recalculate Land Potential <CaretRight size={15} />
           </button>
         </div>

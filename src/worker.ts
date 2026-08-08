@@ -8,6 +8,10 @@
  * Integrates OCR extraction pipeline with Cloudflare D1 database (suryasetu-db).
  */
 
+interface D1Database {
+  prepare: (query: string) => { bind: (...args: any[]) => { run: () => Promise<any> } };
+}
+
 export interface Env {
   DB: D1Database;
   NVIDIA_API_KEY?: string;
