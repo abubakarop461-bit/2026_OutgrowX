@@ -13,7 +13,7 @@ import {
   ChartOptions
 } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
-import { TrendingUp, DollarSign, CheckCircle2, Calendar, Sparkles } from 'lucide-react';
+import { TrendUp, CurrencyInr, CheckCircle, CalendarBlank, Sparkle } from '@phosphor-icons/react';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
 import { calculateROI, getStateGridHistory } from '../../services/roiCalculator';
@@ -239,38 +239,38 @@ export default function Dashboard() {
         }}>
           <div>
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
-              color: '#A8FF3E', background: 'rgba(168,255,62,0.08)', border: '1px solid rgba(168,255,62,0.16)',
-              padding: '3px 10px', borderRadius: '999px', marginBottom: '0.75rem',
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#A8FF3E', display: 'inline-block', animation: 'pulse-dot 2s infinite' }} />
-              Live · Solar Intelligence
-            </div>
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            fontSize: '0.625rem', fontWeight: 700, letterSpacing: '0.09em', textTransform: 'uppercase',
+            color: '#7A9484', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+            padding: '3px 10px', borderRadius: '999px', marginBottom: '0.625rem',
+          }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#22C55E', display: 'inline-block', animation: 'pulse-dot 2s infinite' }} />
+            Live · Solar Intelligence
+          </div>
             <h1 style={{
-              fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#ECF8F0',
+              fontFamily: 'Outfit, sans-serif', fontSize: 'clamp(1.5rem, 3.5vw, 2.125rem)',
+              fontWeight: 800, letterSpacing: '-0.03em', margin: 0, color: '#ECF2EE',
             }}>
-              Good morning, {name} ☀️
+              Good morning, {name}
             </h1>
-            <p style={{ margin: '0.375rem 0 0', fontSize: '1rem', color: '#5A7A66' }}>
-              {state} · <span style={{ color: '#8BAF95' }}>{discom}</span>
+            <p style={{ margin: '0.375rem 0 0', fontSize: '0.875rem', color: '#4A6055' }}>
+              {state} · <span style={{ color: '#7A9484' }}>{discom}</span>
             </p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#5A7A66',
-              fontSize: '0.8125rem', marginBottom: '0.5rem', justifyContent: 'flex-end',
+              display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#4A6055',
+              fontSize: '0.75rem', marginBottom: '0.5rem', justifyContent: 'flex-end',
             }}>
-              <Calendar size={14} style={{ color: '#5A7A66' }} />
+              <CalendarBlank size={13} weight="duotone" color="#4A6055" />
               {new Date().toLocaleDateString('en-IN', { weekday: 'long', month: 'long', day: 'numeric' })}
             </div>
             <div style={{
               display: 'inline-flex', gap: '6px', alignItems: 'center',
-              fontSize: '0.75rem', color: '#5A7A66', background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.06)', padding: '4px 12px', borderRadius: '999px',
+              fontSize: '0.75rem', color: '#7A9484', background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.07)', padding: '4px 12px', borderRadius: '999px',
             }}>
-              <CheckCircle2 size={13} style={{ color: '#22C55E' }} />
+              <CheckCircle size={13} weight="duotone" color="#22C55E" />
               {schemes.length} subsidy schemes eligible
             </div>
           </div>
@@ -281,35 +281,35 @@ export default function Dashboard() {
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '1rem', marginBottom: '1.75rem',
         }}>
-          <KpiCard label="Monthly Savings" accent icon={<TrendingUp size={15} />}>
-            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#A8FF3E', lineHeight: 1.1 }}>
-              <CountUp end={monthlySavings} prefix="₹" />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
-              <span style={{ fontSize: '0.75rem', color: '#22C55E', fontWeight: 700 }}>↑ ~85%</span>
-              <span style={{ fontSize: '0.75rem', color: '#5A7A66' }}>bill offset post-solar</span>
+          <KpiCard label="Monthly Savings" accent icon={<TrendUp size={15} weight="duotone" />}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#A8FF3E', lineHeight: 1.1 }}>
+            <CountUp end={monthlySavings} prefix="₹" />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '4px' }}>
+            <span style={{ fontSize: '0.6875rem', color: '#22C55E', fontWeight: 700 }}>↑ ~85%</span>
+            <span style={{ fontSize: '0.6875rem', color: '#4A6055' }}>bill offset post-solar</span>
             </div>
           </KpiCard>
 
-          <KpiCard label="Payback Period" icon={<DollarSign size={15} />}>
-            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#ECF8F0', lineHeight: 1.1 }}>
-              <CountUp end={payback} decimals={1} suffix=" yrs" />
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#5A7A66', marginTop: '4px' }}>Under PM Surya Ghar</div>
+          <KpiCard label="Payback Period" icon={<CurrencyInr size={15} />}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#ECF2EE', lineHeight: 1.1 }}>
+            <CountUp end={payback} decimals={1} suffix=" yrs" />
+          </div>
+          <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>Under PM Surya Ghar</div>
           </KpiCard>
 
           <KpiCard label="Recommended System">
-            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#ECF8F0', lineHeight: 1.1 }}>
-              {sysKW} <span style={{ fontSize: '1.125rem', color: '#5A7A66', fontWeight: 600 }}>kW</span>
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#5A7A66', marginTop: '4px' }}>~{Math.round(sysKW * 90)} sq ft roof required</div>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#ECF2EE', lineHeight: 1.1 }}>
+            {sysKW} <span style={{ fontSize: '0.9375rem', color: '#4A6055', fontWeight: 600 }}>kW</span>
+          </div>
+          <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>~{Math.round(sysKW * 90)} sq ft roof required</div>
           </KpiCard>
 
-          <KpiCard label="PM Subsidy Eligible" icon={<CheckCircle2 size={15} />}>
-            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#F59E0B', lineHeight: 1.1 }}>
-              <CountUp end={subsidy} prefix="₹" />
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#5A7A66', marginTop: '4px' }}>Direct bank transfer (DBT)</div>
+          <KpiCard label="PM Subsidy Eligible" icon={<CheckCircle size={15} />}>
+            <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.875rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#F59E0B', lineHeight: 1.1 }}>
+            <CountUp end={subsidy} prefix="₹" />
+          </div>
+          <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>Direct bank transfer (DBT)</div>
           </KpiCard>
         </div>
 
@@ -326,10 +326,10 @@ export default function Dashboard() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.0625rem', fontWeight: 700, margin: 0, color: '#ECF8F0' }}>
-                  {yearSpan}-Year ROI Projection
-                </h3>
-                <p style={{ fontSize: '0.8125rem', color: '#5A7A66', margin: '2px 0 0' }}>
+                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#ECF2EE' }}>
+                {yearSpan}-Year ROI Projection
+              </h3>
+              <p style={{ fontSize: '0.75rem', color: '#4A6055', margin: '2px 0 0' }}>
                   Grid escalation vs cumulative solar savings
                 </p>
               </div>
@@ -370,14 +370,14 @@ export default function Dashboard() {
             display: 'flex', flexDirection: 'column',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.0625rem', fontWeight: 700, margin: 0, color: '#ECF8F0' }}>
+              <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: 0, color: '#ECF2EE' }}>
                 Solar Score
               </h3>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.03em', color: '#A8FF3E', lineHeight: 1 }}>
+                <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#A8FF3E', lineHeight: 1 }}>
                   {score.overall}
                 </div>
-                <div style={{ fontSize: '0.6875rem', color: '#5A7A66', fontWeight: 600 }}>/100 overall</div>
+                <div style={{ fontSize: '0.625rem', color: '#4A6055', fontWeight: 600 }}>/100 overall</div>
               </div>
             </div>
             <div style={{ flex: 1 }}>
@@ -401,7 +401,7 @@ export default function Dashboard() {
             background: 'rgba(10,20,13,0.75)', backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '1.75rem 2rem',
           }}>
-            <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 1.25rem', color: '#ECF8F0' }}>
+            <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.875rem', fontWeight: 700, margin: '0 0 1.25rem', color: '#ECF2EE' }}>
               Monthly Bill (Before vs After)
             </h4>
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
@@ -423,7 +423,7 @@ export default function Dashboard() {
             border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '1.75rem 2rem',
             display: 'flex', flexDirection: 'column', alignItems: 'center',
           }}>
-            <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 1rem', color: '#ECF8F0', alignSelf: 'flex-start' }}>
+            <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.875rem', fontWeight: 700, margin: '0 0 1rem', color: '#ECF2EE', alignSelf: 'flex-start' }}>
               Energy Source Mix
             </h4>
             <div style={{ height: '140px', width: '140px', marginBottom: '1rem' }}>
@@ -460,18 +460,18 @@ export default function Dashboard() {
             }} />
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
               <div style={{
-                width: 34, height: 34, borderRadius: '10px',
-                background: 'rgba(168,255,62,0.08)', border: '1px solid rgba(168,255,62,0.15)',
+                width: 32, height: 32, borderRadius: '9px',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Sparkles size={16} color="#A8FF3E" />
+                <Sparkle size={15} weight="duotone" color="#A8FF3E" />
               </div>
               <div>
-                <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#ECF8F0', fontFamily: 'Outfit, sans-serif' }}>AI Insight</div>
-                <div style={{ fontSize: '0.6875rem', color: '#5A7A66', fontWeight: 600 }}>Solar Pro Advisor · Live</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ECF2EE', fontFamily: 'Outfit, sans-serif' }}>AI Insight</div>
+                <div style={{ fontSize: '0.625rem', color: '#4A6055', fontWeight: 600 }}>Solar Pro Advisor · Live</div>
               </div>
             </div>
-            <p style={{ fontSize: '0.9rem', lineHeight: 1.65, color: '#8BAF95', margin: 0 }}>
+            <p style={{ fontSize: '0.8125rem', lineHeight: 1.65, color: '#7A9484', margin: 0 }}>
               {insightText}
               <span style={{ color: '#A8FF3E', animation: 'blink 0.9s step-start infinite' }}>▊</span>
             </p>
