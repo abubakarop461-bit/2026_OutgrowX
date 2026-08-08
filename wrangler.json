@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "suryasetu-api",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-08-08",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "suryasetu-db",
+      "database_id": "3a44a7de-1ba6-4e39-a77f-e272fe587cdd",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

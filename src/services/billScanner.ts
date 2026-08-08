@@ -294,6 +294,40 @@ async function tryGeminiModel(
  *  6. Offline mock
  */
 export async function scanBill(imageBase64: string, mimeType: string): Promise<BillData> {
+  // ── 0. Try Cloudflare Worker API Endpoint (/api/bills/scan) ─────────────
+  try {
+    console.log('[BillScanner] Calling Cloudflare Worker API (/api/bills/scan)…');
+    const apiRes = await fetch('/api/bills/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64,
+        mimeType,
+        filename: 'electricity_bill.jpg',
+      }),
+    });
+
+    if (apiRes.ok) {
+      const json = await apiRes.json();
+      if (json.success && json.data) {
+        console.log('[BillScanner] ✓ Worker API + D1 persistence succeeded:', json.data.modelUsed);
+        return {
+          discom: json.data.discom || 'Unknown',
+          consumerNumber: json.data.consumerNumber || '',
+          unitsConsumed: Number(json.data.unitsConsumed) || 0,
+          billAmount: Number(json.data.billAmount) || 0,
+          billingPeriod: json.data.billingPeriod || '',
+          consumerCategory: json.data.tariff || json.data.consumerCategory || 'Residential',
+          sanctionedLoad: Number(json.data.sanctionedLoad) || 0,
+          extractedSuccessfully: json.data.extractedSuccessfully ?? true,
+          modelUsed: json.data.modelUsed || 'suryasetu-api (Worker + D1)',
+        };
+      }
+    }
+  } catch (apiErr) {
+    console.warn('[BillScanner] Worker API unavailable, falling back to local OCR chain…', apiErr);
+  }
+
   const base64Data = stripDataUri(imageBase64);
 
   const geminiKey = (import.meta.env.VITE_GEMINI_VISION_API_KEY as string) || '';
