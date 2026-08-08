@@ -75,13 +75,16 @@ return (
       {/* Logo */}
       <header className="section--lg text-center relative z-10" style={{ marginBottom: '1.5rem' }}>
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div style={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: 'rgba(168,255,62,0.10)', border: '1px solid rgba(168,255,62,0.22)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Sun size={20} weight="duotone" color="#A8FF3E" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="SuryaSetu Logo"
+            style={{
+              height: '52px',
+              width: 'auto',
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 4px 16px rgba(255,183,3,0.4))'
+            }}
+          />
           <h1 style={{
             fontSize: '2.25rem', fontFamily: 'Outfit, sans-serif',
             fontWeight: 900, letterSpacing: '-0.03em', margin: 0, color: '#ECF2EE',

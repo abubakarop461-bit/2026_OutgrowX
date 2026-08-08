@@ -75,21 +75,17 @@ export const Auth: React.FC = () => {
       <div style={{ maxWidth: '440px', width: '100%', position: 'relative', zIndex: 10 }}>
         {/* Header Branding */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div
+          <img
+            src="/logo.png"
+            alt="SuryaSetu Logo"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '52px',
-              height: '52px',
-              borderRadius: '50%',
-              background: 'rgba(168,255,62,0.10)',
-              border: '1px solid rgba(168,255,62,0.22)',
+              height: '56px',
+              width: 'auto',
+              objectFit: 'contain',
               marginBottom: '0.875rem',
+              filter: 'drop-shadow(0 4px 16px rgba(255,183,3,0.4))'
             }}
-          >
-            <Sun size={26} weight="duotone" color="#A8FF3E" />
-          </div>
+          />
 
           <h1
             style={{

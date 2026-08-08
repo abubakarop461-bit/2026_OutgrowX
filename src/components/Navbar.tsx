@@ -71,15 +71,16 @@ const Navbar: React.FC = () => {
     >
       {/* Logo */}
       <NavLink to="/dashboard" className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
-        <div
-          className="flex items-center justify-center rounded-full"
+        <img
+          src="/logo.png"
+          alt="SuryaSetu Logo"
           style={{
-            width: '32px', height: '32px', background: 'rgba(168,255,62,0.12)',
-            border: '1px solid rgba(168,255,62,0.25)'
+            height: '38px',
+            width: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 2px 8px rgba(255,183,3,0.35))'
           }}
-        >
-          <Sun size={18} className="text-accent" />
-        </div>
+        />
         <span className="font-bold text-primary" style={{ fontSize: '1.375rem', fontFamily: 'var(--font-display)' }}>
           Surya<span className="text-accent">Setu</span>
         </span>

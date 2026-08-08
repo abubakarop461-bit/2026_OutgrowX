@@ -213,17 +213,16 @@ const Onboarding: React.FC = () => {
         <div id="onboarding-form" className="flex-1 max-w-2xl">
           {/* Header Branding */}
           <div className="flex items-center gap-3 mb-4">
-            <div
-              className="flex items-center justify-center rounded-full"
+            <img
+              src="/logo.png"
+              alt="SuryaSetu Logo"
               style={{
-                width: '36px',
-                height: '36px',
-                background: 'rgba(168,255,62,0.10)',
-                border: '1px solid rgba(168,255,62,0.22)'
+                height: '40px',
+                width: 'auto',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 10px rgba(255,183,3,0.35))'
               }}
-            >
-              <Lightning size={20} weight="duotone" color="#A8FF3E" />
-            </div>
+            />
             <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.5rem', color: '#ECF2EE' }}>
               Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
             </span>
