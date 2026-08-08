@@ -9,9 +9,10 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { Bar, Pie } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
+import { PieChart } from '../../components/ui/bklit';
 import { chatStream, Message } from '../../services/ai';
 import { buildSolarAdvisorPrompt, MODEL_LABELS } from '../../services/prompts';
 import { scanBill, BillData } from '../../services/billScanner';
@@ -294,11 +295,18 @@ const ApplianceCalculator: React.FC = () => {
 
         <div className="glass-card">
           <h4 className="mb-4">Appliance Breakdown (Summer)</h4>
+          {/* Appliance Breakdown using BKLIT UI (@bklit/pie-chart) */}
           {pieData.labels.length > 0 ? (
             <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
-              <Pie data={pieData} options={{ plugins: { legend: { position: 'right', labels: { color: '#8BAF95' } } }, maintainAspectRatio: false }} />
+              <PieChart
+                labels={pieData.labels}
+                data={pieData.datasets[0].data}
+                colors={pieData.datasets[0].backgroundColor}
+                centerText={`${pieData.labels.length} Devices`}
+                centerSubtext="Summer"
+              />
             </div>
-) : (
+          ) : (
             <p className="text-muted text-center py-4">Add appliances to see breakdown.</p>
           )}
         </div>

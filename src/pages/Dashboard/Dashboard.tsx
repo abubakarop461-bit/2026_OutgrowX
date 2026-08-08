@@ -12,10 +12,10 @@ import {
   Legend,
   ChartOptions
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { GaugeChart, LineChart } from '../../components/ui/bklit';
 import {
   TrendUp, CurrencyInr, CheckCircle, Sparkle, Sun,
-  Lightning, BatteryCharging, ChartBar, Gauge, ArrowUpRight
+  Lightning, BatteryCharging, ChartBar, ArrowUpRight
 } from '@phosphor-icons/react';
 import { useApp } from '../../context/AppContext';
 import { calculateROI, getStateGridHistory } from '../../services/roiCalculator';
@@ -273,26 +273,16 @@ export default function Dashboard() {
             <ArrowUpRight size={16} weight="bold" color="#7A9484" />
           </div>
 
-          {/* Ring Gauge */}
-          <div style={{ position: 'relative', width: '90px', height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="90" height="90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.06)" strokeWidth="9" fill="none" />
-              <circle
-                cx="50" cy="50" r="42"
-                stroke="#A8FF3E" strokeWidth="9" fill="none"
-                strokeDasharray="264"
-                strokeDashoffset={264 - (264 * score.overall) / 100}
-                strokeLinecap="round"
-                transform="rotate(-90 50 50)"
-                style={{ transition: 'stroke-dashoffset 1.2s ease-out' }}
-              />
-            </svg>
-            <div style={{ position: 'absolute', textAlign: 'center' }}>
-              <span style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.625rem', fontWeight: 800, color: '#A8FF3E', lineHeight: 1 }}>
-                {score.overall}
-              </span>
-              <span style={{ display: 'block', fontSize: '0.625rem', color: '#7A9484' }}>/100</span>
-            </div>
+          {/* BKLIT.ui Gauge Chart (@bklit/gauge-chart) */}
+          <div style={{ margin: '0.25rem 0' }}>
+            <GaugeChart
+              value={score.overall}
+              size={110}
+              thickness={9}
+              color="#A8FF3E"
+              label="Solar Score"
+              sublabel="/100 overall"
+            />
           </div>
 
           <span style={{ fontSize: '0.75rem', color: '#22C55E', fontWeight: 700, background: 'rgba(34,197,94,0.1)', padding: '2px 10px', borderRadius: '999px' }}>
@@ -396,8 +386,28 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* BKLIT.ui Line Chart (@bklit/line-chart) */}
           <div style={{ flex: 1, minHeight: 0, margin: '0.5rem 0' }}>
-            <Line data={roiChartData} options={roiOptions} />
+            <LineChart
+              labels={roiLabels}
+              datasets={[
+                {
+                  label: 'Grid Cost (No Solar)',
+                  data: Array.from({ length: yearSpan + 1 }, (_, i) => Math.round(Math.pow(1.078, i) * avgBill * 12)),
+                  color: 'rgba(249,115,22,0.75)',
+                  fillColor: 'rgba(249,115,22,0.06)',
+                  borderWidth: 1.5,
+                },
+                {
+                  label: 'Solar Cumulative Savings',
+                  data: roi.yearlyData.slice(0, yearSpan + 1).map(y => Math.max(0, y.cumulative)),
+                  color: '#A8FF3E',
+                  fillColor: 'rgba(168,255,62,0.08)',
+                  borderWidth: 2,
+                }
+              ]}
+              height="100%"
+            />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: '#7A9484', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.5rem' }}>

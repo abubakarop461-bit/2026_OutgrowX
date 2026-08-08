@@ -6,6 +6,7 @@ import {
 } from '@phosphor-icons/react';
 import { useApp } from '../../context/AppContext';
 import { useTranslation } from '../../i18n';
+import { HeatmapChart } from '../../components/ui/bklit';
 import { HOURLY_IRRADIANCE_GRID, getSolarHoursPerDay } from '../../data/solarIrradiance';
 import { getStateTariffHistory } from '../../data/stateElectricityRates';
 import pmSuryaGharData from '../../knowledge/pmSuryaGhar.json';
@@ -433,7 +434,7 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
               </div>
             </div>
 
-            {/* Annual Irradiance Heatmap */}
+            {/* Annual Irradiance Heatmap using BKLIT UI (@bklit/heatmap-chart) */}
             <div style={{
               background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
               border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
@@ -446,27 +447,11 @@ const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ st
                 <span style={{ fontSize: '0.6875rem', color: '#4A6055' }}>Avg {psh} kWh/m²/day</span>
               </div>
 
-              <div className="heatmap-grid">
-                <div />
-                {MONTHS.map(m => <div key={m} className="heatmap-label justify-center" style={{ fontSize: '0.625rem' }}>{m[0]}</div>)}
-                {HOURLY_IRRADIANCE_GRID.map((hourData, hour) => (
-                  <React.Fragment key={hour}>
-                    <div className="heatmap-label" style={{ fontSize: '0.625rem' }}>{hour}:00</div>
-                    {hourData.map((intensity, month) => (
-                      <div
-                        key={`${hour}-${month}`}
-                        className="heatmap-cell"
-                        style={{
-                          background: intensity > 0
-                            ? `rgba(168, 255, 62, ${intensity * 0.85})`
-                            : 'rgba(255,255,255,0.02)'
-                        }}
-                        title={`${MONTHS[month]} ${hour}:00 - ${(intensity * psh * 1.1).toFixed(1)} kWh/m²`}
-                      />
-                    ))}
-                  </React.Fragment>
-                ))}
-              </div>
+              <HeatmapChart
+                data={HOURLY_IRRADIANCE_GRID}
+                maxVal={psh * 1.1}
+                unit="kWh/m²"
+              />
             </div>
           </>
         ) : (
