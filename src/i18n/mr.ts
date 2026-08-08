@@ -1,66 +1,247 @@
 export default {
   // Navigation
-  welcome: 'SuryaSetu मध्ये आपले स्वागत आहे',
+  welcome: 'सूर्यसेतू मध्ये आपले स्वागत आहे',
   dashboard: 'डॅशबोर्ड',
-  solarAI: 'सौर एआई इंटेलिजन्स',
-  propertyAssessment: 'मालमत्ता मूल्यांकन',
-  aiReport: 'एआई सौर अहवाल',
-  marketplace: 'सौर बाजार',
-
-  // Dashboard KPIs
-  monthlySavings: 'मासिक बचत',
-  paybackPeriod: 'परतफेड कालावधी',
-  solarScore: 'सौर स्कोअर',
-  systemSize: 'सिस्टम आकार',
-  subsidyEligible: 'अनुदान पात्र',
-
-  // Solar AI
-  scanBill: 'बिल स्कॅन करा',
-  uploadBill: 'बिल अपलोड करा',
-  askAdvisor: 'एआई सल्लागार',
-  applianceCalculator: 'उपकरण कॅल्क्युलेटर',
-  billScanner: 'बिल स्कॅनर',
-
-  // Property Assessment
-  roofAnalysis: 'छत विश्लेषण',
-  landSolar: 'सौरसाठी जमीन',
-
-  // AI Report
-  generateReport: 'अहवाल तयार करा',
-  getQuote: 'किंमत मिळवा',
-  exportPdf: 'पीडीएफ निर्यात',
-
-  // Onboarding
-  yourState: 'तुमचा राज्य',
-  yourBill: 'तुमचे बिल',
-  existingSolar: 'सध्याचा सौर',
-  propertyType: 'मालमत्तेचा प्रकार',
-  propertySize: 'मालमत्तेचा आकार',
-  firstName: 'पहिले नाव',
-  continue_: 'सुरू ठेवा',
-  next: 'पुढचा',
-  back: 'मागे',
-  identity: 'ओळख आणि भूमिका',
-  property: 'मालमत्ता आणि छत',
-  energy: 'ऊर्जा वापर',
-  solar: 'सध्याचा सौर',
-  location: 'स्थान आणि डिस्कॉम',
-
-  // Marketplace
-  findInstallers: 'स्थापक शोधा',
-  businessPortal: 'व्यवसाय पोर्टल',
-  vendorRegistration: 'विक्रेता नोंदणी',
-
-  // Common
-  poweredBy: 'Solar Pro AI ✦',
-  switchedTo: 'Switched to Solar Basic AI ✦',
-  loading: 'लोड होत आहे...',
-  error: 'एक त्रुटी झाली.',
-  noData: 'डेटा उपलब्ध नाही',
-  cancel: 'रद्द करा',
-  apply: 'अर्ज करा',
-  details: 'तपशील',
+  solarAI: 'सौर एआय इंटेलिजन्स',
+  propertyAssessment: 'मालमत्ता मूल्यमापन',
+  aiReport: 'एआय सौर अहवाल',
+  marketplace: 'सौर बाजारपेठ',
   search: 'शोधा',
   filter: 'फिल्टर',
+  logout: 'प्रोफाइल रिसेट करा',
+  login: 'साइन इन करा',
+  signup: 'साइन अप करा',
+
+  // Auth Form
+  fullName: 'पूर्ण नाव',
+  fullNamePlaceholder: 'तुमचे पूर्ण नाव प्रविष्ट करा',
+  mobileNumber: 'मोबाईल क्रमांक',
+  mobilePlaceholder: '१०-अंकी मोबाईल क्रमांक (उदा: ९८७६५४३२१०)',
+  emailAddress: 'ईमेल पत्ता',
+  emailPlaceholder: 'your.name@example.com',
+  continueToOnboarding: 'ऑनबोर्डिंग सुरू ठेवा',
+  signInContinue: 'साइन इन करा व पुढे जा',
+  privacyEncrypted: 'तुमची माहिती सुरक्षित आहे व केवळ सबसिडी आणि बचतीचा अंदाज लावण्यासाठी वापरली जाते.',
+
+  // Landing Page
+  landingHeroTitle: 'सूर्यसेतू',
+  landingHeroSubtitle: 'भारताचे एआय-संचालित सौर ऊर्जा इंटेलिजन्स प्लॅटफॉर्म',
+  landingHeroTagline: 'झटपट वीज बिल विश्लेषण · २५-वर्षीय आर्थिक बचत · नोंदणीकृत सोलर विक्रेते · महावितरण / डिस्कॉम योजना',
+
+  roleConsumerTitle: 'मला सोलर बसवायचे आहे',
+  roleConsumerDesc: '२५ वर्षांच्या बचतीचा अंदाज घ्या, एआय द्वारे वीज बिल स्कॅन करा आणि अधिकृत इंस्टॉलर्सशी जोडा.',
+  roleConsumerCta: 'माझी सौर बचत तपासा →',
+
+  roleLandownerTitle: 'माझ्याकडे मोकळी जमीन आहे',
+  roleLandownerDesc: 'जमिनीची सौर ऊर्जा निर्मिती क्षमता, वार्षिक भाडे उत्पन्न आणि पीएम-कुसुम योजनेची पात्रता तपासा.',
+  roleLandownerCta: 'जमिनीचे मूल्यमापन करा →',
+
+  roleBusinessTitle: 'मी सोलर व्यावसायिक आहे',
+  roleBusinessDesc: 'आपल्या राज्यातील पडताळणी केलेल्या निवासी आणि व्यावसायिक सोलर ग्राहकांशी जोडण्यासाठी आमच्या बाजारपेठेत सामील व्हा.',
+  roleBusinessCta: 'मार्केटप्लेसमध्ये सामील व्हा →',
+
+  statsStates: '२८ राज्ये व केंद्रशासित प्रदेश',
+  statsGovt: 'पीएम सूर्य घर योजना २०२४ सुसंगत',
+  statsAI: 'एआय मॉडेल साखळी संचालित',
+  footerTagline: 'भारतीय गृहशास्त्र आणि व्यावसायिकांना स्वच्छ सौर ऊर्जेकडे नेण्यासाठी सक्षम करणे',
+
+  // Onboarding Wizard All Steps & Cards
+  iAmA: 'आपली भूमिका...',
+  homeowner: 'घरमालक',
+  landowner: 'जमीनमालक',
+  solarVendor: 'सोलर व्हेंडर',
+
+  onboardingTitle1: 'तुमचे नाव आणि भूमिका काय आहे?',
+  onboardingSubtitle1: 'तुमचा सोलर इंटेलिजन्स डॅशबोर्ड सानुकूलित करा.',
+  onboardingTitle2: 'तुमच्या मालमत्तेबद्दल सांगा',
+  onboardingSubtitle2: 'आम्ही कमाल kW क्षमता मोजण्यासाठी छताचे क्षेत्रफळ वापरतो.',
+  onboardingTitle3: 'सरासरी मासिक वीज बिल',
+  onboardingSubtitle3: 'आम्हाला २०-वर्षीय वीज दर विरुद्ध सोलर बचतीचा अंदाज लाऊ देतो.',
+  onboardingTitle4: 'तुमच्याकडे सध्या सोलर आहे का?',
+  onboardingSubtitle4: 'आम्हाला स्टोरेज किंवा विस्तारासाठी शिफारसी करण्यास मदत करतो.',
+  onboardingTitle5: 'स्थान आणि डिस्कॉम निश्चित करा',
+  onboardingSubtitle5: 'अचूक डिस्कॉम नेट-मीटरिंग आणि राज्य सबसिडीची गणना करतो.',
+
+  companyLegalName: 'कंपनीचे कायदेशीर नाव',
+  companyLegalNamePlaceholder: 'उदा. सोलेरिक्स पॉवर इंडिया प्रायव्हेट लिमिटेड',
+  contactPersonName: 'संपर्क व्यक्तीचे नाव',
+
+  solarPossibilitiesTitle: 'भारतातील सौर ऊर्जेच्या शक्यता',
+  solarPossibilitiesDesc: '२५-वर्षीय आर्थिक बचत, सोलर क्षमता आणि पीएम सूर्य घर सबसिडीचा अंदाज घेण्यासाठी तपशील भरा.',
+  billOffset100: '१००% पर्यंत वीज बिल बचत',
+  billOffset100Desc: 'दरमहा ३०० युनिटपर्यंत मोफत वीज तयार करा.',
+  govtSubsidy78k: '₹७८,००० पर्यंत सरकारी सबसिडी',
+  govtSubsidy78kDesc: 'पीएम सूर्य घर अंतर्गत थेट बँक खात्यात सबसिडी.',
+  payback3to4yr: '३ ते ४ वर्षांत खर्च वसुली',
+  payback3to4yrDesc: '४८ महिन्यांच्या आत तुमची संपूर्ण गुंतवणूक वसूल करा.',
+
+  viewMyDashboard: 'माझा सोलर डॅशबोर्ड पहा',
+  openInstallerPortal: 'इन्स्टॉलर मार्केटप्लेस पोर्टल उघडा',
+
+  // Property Assessment Section
+  propertyAssessmentDesc: 'तुमच्या मालमत्तेसाठी एमएनआरई आणि पीएम सूर्य घर समर्थित सौर क्षमता मूल्यमापन.',
+  netMeteringTitle: 'सीईए नेट मीटरिंग मानक',
+  netMeteringDesc: 'महावितरण/डिस्कॉमद्वारे बसवलेले द्वि-दिशात्मक नेट मीटर. ग्रीडला पाठवलेली अतिरिक्त सौर वीज मासिक बिलात जमा केली जाते.',
+  pmKusumSchemeTitle: 'पीएम-कुसुम योजना (घटक A/B/C)',
+  pmKusumSchemeDesc: 'पडीक जमिनीवर ग्रीड-कनेक्टेड सौर ऊर्जा प्रकल्प (०.५ मेगावॅट-२ मेगावॅट) किंवा सौर कृषी पंप (२-१० एचपी).',
+  roofTypeLabel: 'छताचा प्रकार',
+  buildingAgeLabel: 'इमारतीचे वय',
+  shadingLabel: 'सावलीची स्थिती',
+  orientationLabel: 'दिशा',
+
+  // AI Solar Report Section
+  aiReportTitle: 'तुमचा एआय सोलर इंटेलिजन्स रिपोर्ट',
+  aiReportDesc: 'वैयक्तिकृत सौर आर्थिक उपयुक्तता आणि २५-वर्षीय बचतीचा अहवाल.',
+
+  // Dashboard KPIs & Sections
+  monthlySavings: 'अंदाजित मासिक बचत',
+  paybackPeriod: 'पेबॅक कालावधी (लागत भरपाई)',
+  solarScore: 'सोलर स्कोअर',
+  systemSize: 'सोलर सिस्टीम क्षमता',
+  subsidyEligible: 'सरकारी सबसिडी',
+  annualSavings: 'वार्षिक बचत',
+  lifetimeSavings: '२५-वर्षीय एकूण बचत',
+  recommendedCapacity: 'शिफारस केलेली सोलर क्षमता',
+  co2Offset: 'कार्बन उत्सर्जन कमी (वार्षिक)',
+  treesEquivalent: 'ला लावलेल्या झाडांच्या समतुल्य',
+
+  dashWelcome: 'स्वागत आहे',
+  dashOverview: 'सौर ऊर्जेवर लक्ष ठेवा. वीज खर्च कमी करा. भविष्य उजळवा.',
+  billComparisonTitle: 'सध्याचे वीज बिल विरुद्ध सोलर बसवल्यानंतरचे बिल',
+  currentBillLabel: 'सध्याचे मासिक बिल',
+  solarBillLabel: 'सोलरनंतरचे बिल',
+  savingsLabel: 'मासिक निव्वळ बचत',
+
+  stateTariffTitle: 'राज्य वीज दर आणि सबसिडी माहिती',
+  discomLabel: 'वीज वितरण कंपनी (उदा. महावितरण)',
+  stateTariffRate: 'सरासरी वीज दर',
+  pmSuryaGharSubsidy: 'पीएम सूर्य घर सबसिडी',
+
+  financialBreakdownTitle: '२५-वर्षीय आर्थिक विश्लेषण',
+  initialInvestment: 'एकूण सुरुवातीचा खर्च',
+  netInvestment: 'सबसिडीनंतरचा निव्वळ खर्च',
+  roiPercentage: 'अंदाजित परतावा दर (ROI)',
+  breakEvenYear: 'खर्च वसुली कालावधी',
+
+  // Solar AI & Bill Scanner
+  scanBill: 'वीज बिल स्कॅनर एआय',
+  uploadBill: 'वीज बिल अपलोड करा',
+  dropBillHere: 'तुमच्या वीज बिलाचा फोटो किंवा पीडीएफ येथे ड्रॉप करा किंवा निवडा.',
+  supportedFormats: 'JPG, PNG, WEBP फोटो 10MB पर्यंत स्वीकारले जातात',
+  scanningBill: 'एआय व्हिजन मॉडेलद्वारे बिलाची तपासणी सुरू आहे...',
+  extractedInfoTitle: 'वीज बिलातून काढलेली माहिती',
+
+  consumerNumber: 'ग्राहक क्रमांक',
+  discomName: 'वीज कंपनी (DISCOM)',
+  unitsConsumed: 'वापरलेले युनिट',
+  billAmount: 'देय रक्कम',
+  billingPeriod: 'बिल कालावधी',
+  consumerCategory: 'वर्ग',
+  sanctionedLoad: 'मंजूर भार (kW)',
+  extractedSuccess: 'सेंट्रलाइज्ड एआय इंजिनमध्ये नोंदवले गेले',
+
+  askAdvisor: 'एआय सल्लागार चॅट',
+  advisorSubtitle: 'सोलर पॅनेल, महावितरण नियम, सबसिडी किंवा तांत्रिक माहितीबाबत काहीही विचारा',
+  askPlaceholder: 'पीएम सूर्य घर, सबसिडी, महावितरण नेट-मीटरिंगबद्दल काहीही विचारा...',
+  send: 'पाठवा',
+  suggestedQuestionsTitle: 'सुचवलेले प्रश्न',
+
+  q1: 'पीएम सूर्य घर मोफत वीज योजनेअंतर्गत किती अनुदान मिळते?',
+  q2: 'माझ्या राज्यात नेट मीटरिंग आणि ग्रॉस मीटरिंगमध्ये काय फरक आहे?',
+  q3: 'सोलर पॅनेलचे आयुष्य किती वर्षे असते आणि देखभाल खर्च किती येतो?',
+  q4: '३ kW सोलर सिस्टीमवर १.५ टन एसी चालू शकतो का?',
+
+  // Appliance Calculator
+  applianceCalculator: 'उपकरण लोड एआय',
+  selectAppliance: 'उपकरण निवडा',
+  quantity: 'संख्या',
+  hoursPerDay: 'दैनिक वापर (तास)',
+  totalDailyKwh: 'एकूण दैनिक आवश्यक ऊर्जा',
+  recommendedKw: 'आवश्यक सोलर क्षमता',
+
+  // Property Assessment Tabs & Inputs
+  propertyAssessmentTitle: 'मालमत्ता व छत मूल्यांकन',
+  roofAnalysis: 'छताचे मूल्यांकन',
+  landSolar: 'सौर भूमी मूल्यमापन (पीएम-कुसुम)',
+
+  roofAreaSqFt: 'उपलब्ध छताचे क्षेत्रफळ (चौ. फूट)',
+  shadingObstruction: 'सूर्यप्रकाशातील अडथळा (सावली)',
+  shadingNone: 'काहीही सावली नाही (पूर्ण ऊन)',
+  shadingPartial: 'अंशतः सावली (झाडे/इमारती)',
+  shadingHeavy: 'जास्त सावली',
+
+  solarPotentialScore: 'सौर क्षमता स्कोअर',
+  annualGenerationEst: 'अंदाजित वार्षिक वीज निर्मिती',
+  maxSolarCapacity: 'कमाल शक्य सोलर क्षमता',
+  suitableSystemType: 'शिफारस केलेला सिस्टीम प्रकार',
+
+  landAreaAcres: 'जमिनीचे क्षेत्रफळ (एकरामध्ये)',
+  substationDistance: 'जवळच्या वीज सबस्टेशनपासून अंतर (किमी)',
+  annualLeaseIncomeEst: 'अंदाजित वार्षिक भाडे उत्पन्न',
+  pmKusumEligibility: 'पीएम-कुसुम योजना पात्रता',
+
+  // AI Solar Report
+  generateReport: 'संपूर्ण एआय सोलर रिपोर्ट तयार करा',
+  getQuote: 'कोटेशन मिळवा',
+  exportPdf: 'पीडीएफ अहवाल डाऊनलोड करा',
+  reportTitle: 'सूर्यसेतू एआय सोलर उपयुक्तता आणि आर्थिक अहवाल',
+  executiveSummary: 'मुख्य सारांश',
+  financialProjections25Yr: '२५-वर्षीय एकत्रित बचतीचा अंदाज',
+  environmentalImpactTitle: 'पर्यावरण व कार्बन परिणाम',
+
+  // Marketplace
+  findInstallers: 'पडताळणी केलेले सोलर इंस्टॉलर्स',
+  marketplaceSubtitle: 'तुमच्या परिसरातील सर्वोत्तम आणि अधिकृत सोलर इंस्टॉलर्सशी संपर्क साधा',
+  rating: 'रेटिंग',
+  experience: 'अनुभव (वर्षे)',
+  installationsDone: 'पूर्ण केलेले प्रकल्प',
+  warrantiesOffered: 'वारंटी कालावधी',
+  requestQuote: 'कोटेशनसाठी विनंती करा',
+  verifiedBadge: 'प्रमाणित व्हेंडर',
+  businessPortal: 'व्यवसाय व व्हेंडर पोर्टल',
+  vendorRegistration: 'सोलर व्हेंडर म्हणून नोंदणी करा',
+
+  // Onboarding Steps
+  identity: 'आपली ओळख व भूमिका',
+  property: 'मालमत्ता व छत माहिती',
+  energy: 'वीज वापर',
+  solar: 'सध्याची सौर स्थिती',
+  location: 'स्थान व डिस्कॉम',
+
+  yourState: 'राज्य निवडा',
+  yourCity: 'शहर / जिल्हा',
+  yourPincode: 'पिन कोड',
+  yourBill: 'मासिक वीज बिल (₹)',
+  existingSolar: 'तुमच्याकडे आधीपासून सोलर बसवले आहे का?',
+  propertyType: 'मालमत्तेचा प्रकार',
+  propertySize: 'छताचे क्षेत्रफळ (चौ. फूट)',
+  firstName: 'तुमचे नाव',
+  companyName: 'कंपनी / व्यवसायाचे नाव',
+  gstinNo: 'जीएसटी (GSTIN) क्रमांक',
+  phoneNo: 'मोबाईल क्रमांक',
+  emailAddr: 'ईमेल पत्ता',
+
+  continue_: 'पुढे जा',
+  next: 'पुढील टप्पा',
+  back: 'मागे जा',
+  skip: 'आत्ताच वगळा',
+  submit: 'सबमिट करा आणि डॅशबोर्ड पहा',
+
+  // Common & System States
+  poweredBy: 'एआय व्हिजन मॉडेलद्वारे संचालित',
+  switchedTo: 'सोलर बेसिक एआय ✦',
+  loading: 'लोड होत आहे...',
+  processing: 'प्रक्रिया सुरू आहे…',
+  error: 'त्रुटी आढळली. कृपया पुन्हा प्रयत्न करा.',
+  noData: 'कोणतीही माहिती उपलब्ध नाही',
+  cancel: 'रद्द करा',
+  apply: 'लागू करा',
+  details: 'तपशील पहा',
   all: 'सर्व',
+  yes: 'होय',
+  no: 'नाही',
+  residential: 'निवासी',
+  commercial: 'व्यावसायिक',
+  industrial: 'औद्योगिक',
+  agricultural: 'शेती',
 };

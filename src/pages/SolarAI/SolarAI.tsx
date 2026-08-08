@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu, Layers, Trash2, Receipt, Clock, Check } from 'lucide-react';
 import {
-  UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu, Layers,
-  Trash2, Receipt, Clock, FileText
-} from 'lucide-react';
-import {
-  Chart as ChartJS, CategoryScale, LinearScale, BarElement,
-  ArcElement, Tooltip, Legend
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useApp } from '../../context/AppContext';
@@ -23,7 +23,6 @@ import {
   getCentralizedContext
 } from '../../services/centralizedContext';
 import { localDB, DBScannedBill } from '../../services/localDatabase';
-import './SolarAI.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -32,66 +31,79 @@ export const SolarAI: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bill' | 'calculator' | 'advisor'>('bill');
 
   return (
-    <div className="solar-ai-page" style={{ paddingTop: '24px' }}>
-      <main className="container pb-12">
-        {/* Tab Navigation */}
-        <div className="vai-tabs">
-          <button
-            className={`vai-tab-btn ${activeTab === 'bill' ? 'vai-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('bill')}
-          >
-            Bill Scanner AI
-          </button>
-          <button
-            className={`vai-tab-btn ${activeTab === 'calculator' ? 'vai-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('calculator')}
-          >
-            Appliance Load AI
-          </button>
-          <button
-            className={`vai-tab-btn ${activeTab === 'advisor' ? 'vai-tab-btn--active' : ''}`}
-            onClick={() => setActiveTab('advisor')}
-          >
-            AI Advisor Chat
-          </button>
-        </div>
+    <main className="container pb-12">
+      <header className="page-header mt-8">
+        <h1>{t('solarAI') || 'Solar AI Intelligence'}</h1>
+        <p className="text-secondary">
+          Centralized AI Context Engine parsing your bill scans, load calculations, and role pathways for hyper-personalized solar insights.
+        </p>
+      </header>
 
-        {activeTab === 'bill' && <BillScanner onNavigateToAdvisor={() => setActiveTab('advisor')} />}
-        {activeTab === 'calculator' && <ApplianceCalculator />}
-        {activeTab === 'advisor' && <AIAdvisor />}
-      </main>
-    </div>
+      <div className="tabs mb-6">
+        <button
+          className={`tab-btn ${activeTab === 'bill' ? 'tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('bill')}
+        >
+          {t('scanBill') || 'Bill Scanner AI'}
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'calculator' ? 'tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('calculator')}
+        >
+          Appliance Load AI
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'advisor' ? 'tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('advisor')}
+        >
+          {t('askAdvisor') || 'AI Advisor Chat'}
+        </button>
+      </div>
+
+      {activeTab === 'bill' && <BillScanner onNavigateToAdvisor={() => setActiveTab('advisor')} />}
+      {activeTab === 'calculator' && <ApplianceCalculator />}
+      {activeTab === 'advisor' && <AIAdvisor />}
+    </main>
   );
 };
 
-/* ═══════════════════════════════════════════════════
-   BILL SCANNER
-═══════════════════════════════════════════════════ */
 const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigateToAdvisor }) => {
   const { userProfile, setProfile } = useApp();
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<BillData | null>(null);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // IndexedDB relational bill history state
   const [savedBills, setSavedBills] = useState<DBScannedBill[]>([]);
   const [appliedSuccess, setAppliedSuccess] = useState(false);
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userId = userProfile.email || userProfile.phone || 'default_user';
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
 
+  // Load all historical bills from client IndexedDB database on mount
   const loadSavedBills = useCallback(async () => {
     try {
       const bills = await localDB.getAllScannedBills(userId);
       setSavedBills(bills);
-    } catch (e) { console.error('Error loading bills:', e); }
+    } catch (e) {
+      console.error('Error loading saved bills from local database:', e);
+    }
   }, [userId]);
 
-  useEffect(() => { loadSavedBills(); }, [loadSavedBills]);
+  useEffect(() => {
+    loadSavedBills();
+  }, [loadSavedBills]);
 
   const processFile = async (file: File) => {
-    setScanning(true); setError(''); setResult(null); setAppliedSuccess(false);
+    setScanning(true);
+    setError('');
+    setResult(null);
+    setAppliedSuccess(false);
+
     try {
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -100,174 +112,244 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
         try {
           const data = await scanBill(base64, mimeType);
           setResult(data);
-          const saved = await localDB.saveScannedBill({
-            userId, filename: file.name,
-            discom: data.discom, consumerNumber: data.consumerNumber,
-            unitsConsumed: data.unitsConsumed, billAmount: data.billAmount,
-            billingPeriod: data.billingPeriod, consumerCategory: data.consumerCategory,
-            sanctionedLoad: data.sanctionedLoad, modelUsed: data.modelUsed, base64Image: base64,
+
+          // Save bill transactionally into local relational database (IndexedDB)
+          const savedRecord = await localDB.saveScannedBill({
+            userId,
+            filename: file.name,
+            discom: data.discom,
+            consumerNumber: data.consumerNumber,
+            unitsConsumed: data.unitsConsumed,
+            billAmount: data.billAmount,
+            billingPeriod: data.billingPeriod,
+            consumerCategory: data.consumerCategory,
+            sanctionedLoad: data.sanctionedLoad,
+            modelUsed: data.modelUsed,
+            base64Image: base64,
           });
-          setSelectedBillId(saved.id);
+
+          setSelectedBillId(savedRecord.id);
           recordBillScanAction(data, userProfile);
           await loadSavedBills();
-        } catch {
-          setError('AI OCR scan failed. Please try a clearer image.');
-        } finally { setScanning(false); }
+        } catch (err) {
+          setError('Failed to scan bill. Please try again.');
+        } finally {
+          setScanning(false);
+        }
       };
       reader.readAsDataURL(file);
     } catch {
-      setError('Failed to read file.'); setScanning(false);
+      setError('Failed to read file.');
+      setScanning(false);
     }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
   };
 
   const handleApplyData = (billToApply?: BillData | DBScannedBill) => {
     const target = billToApply || result;
     if (!target) return;
+
     const dataToApply: BillData = {
-      discom: target.discom, consumerNumber: target.consumerNumber,
-      unitsConsumed: target.unitsConsumed, billAmount: target.billAmount,
-      billingPeriod: target.billingPeriod, consumerCategory: target.consumerCategory || 'Residential',
+      discom: target.discom,
+      consumerNumber: target.consumerNumber,
+      unitsConsumed: target.unitsConsumed,
+      billAmount: target.billAmount,
+      billingPeriod: target.billingPeriod,
+      consumerCategory: target.consumerCategory || 'Residential',
       sanctionedLoad: (target as any).sanctionedLoad || 3.5,
-      extractedSuccessfully: true, modelUsed: (target as any).modelUsed || 'IndexedDB Store'
+      extractedSuccessfully: true,
+      modelUsed: (target as any).modelUsed || 'Solar Vision AI (IndexedDB Store)'
     };
+
     setResult(dataToApply);
-    setProfile({ billAmount: dataToApply.billAmount, avgBill: dataToApply.billAmount, discom: dataToApply.discom });
+    setProfile({
+      billAmount: dataToApply.billAmount,
+      avgBill: dataToApply.billAmount,
+      discom: dataToApply.discom,
+    });
+
     recordBillScanAction(dataToApply, userProfile);
     setAppliedSuccess(true);
   };
 
   const handleDeleteBill = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await localDB.deleteScannedBill(id);
-    if (selectedBillId === id) setSelectedBillId(null);
-    await loadSavedBills();
+    try {
+      await localDB.deleteScannedBill(id);
+      if (selectedBillId === id) setSelectedBillId(null);
+      await loadSavedBills();
+    } catch (err) {
+      console.error('Failed to delete bill:', err);
+    }
   };
 
   return (
-    <div className="vai-grid-2">
-      <div className="vai-stack">
+    <div className="grid-2">
+      <div className="flex-col gap-6">
         {/* Upload Zone */}
         <div
-          className={`vai-upload-zone ${isDragging ? 'vai-upload-zone--dragover' : ''}`}
+          className={`upload-zone ${isDragging ? 'upload-zone--drag-over' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
-          onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
+          onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
         >
-          <input ref={fileInputRef} type="file" accept="image/*,.pdf" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
-          <UploadCloud size={40} className="vai-upload-icon" />
-          <h3 className="vai-upload-title">Upload Electricity Bill</h3>
-          <p className="vai-upload-sub">Drag & drop your bill image or PDF, or click to browse</p>
-          <span className="vai-tag vai-tag--ember">AI OCR Vision Powered</span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) processFile(file);
+            }}
+          />
+          <UploadCloud size={48} className="text-accent mb-4" />
+          <h3 className="mb-2" style={{ fontSize: '1.125rem' }}>{t('uploadBill')}</h3>
+          <p className="text-secondary text-sm mb-4">
+            {t('dropBillHere')}
+          </p>
+          <span className="badge badge--green">{t('poweredBy')}</span>
         </div>
 
         {scanning && (
-          <div className="vai-card" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '20px' }}>
-            <span className="vai-spinner" />
-            <span style={{ fontSize: '14px', color: 'var(--vai-steel)' }}>Scanning with AI OCR Vision Model…</span>
+          <div className="glass-card flex items-center justify-center gap-3 py-8">
+            <div className="spinner" />
+            <span>{t('scanningBill')}</span>
           </div>
         )}
 
-        {error && <div className="vai-error">{error}</div>}
+        {error && (
+          <div className="glass-card bg-red-900/20 border-red-500/30 text-red-400 p-4">
+            {error}
+          </div>
+        )}
 
+        {/* Current Scan Result Card */}
         {result && (
-          <div className="vai-card--white" style={{ border: appliedSuccess ? '1px solid #bbf7d0' : '1px solid var(--vai-mist)' }}>
-            <div className="vai-section-label" style={{ marginBottom: '16px' }}>
-              <span className="vai-section-title" style={{ color: '#16a34a' }}>
-                <CheckCircle size={16} /> Extracted Bill Data
+          <div className="glass-card" style={{ border: appliedSuccess ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="flex items-center gap-2 text-accent" style={{ fontSize: '1rem', margin: 0 }}>
+                <CheckCircle size={18} /> {t('extractedInfoTitle')}
+              </h4>
+              <span className="badge badge--accent" style={{ fontSize: '0.6875rem' }}>
+                {t('extractedSuccess')}
               </span>
-              <span className="vai-tag vai-tag--success">Recorded in AI Context Engine</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '18px' }}>
-              {[
-                ['DISCOM', result.discom],
-                ['Consumer No.', result.consumerNumber],
-                ['Units Consumed', `${result.unitsConsumed} kWh`],
-                ['Bill Amount', `₹${result.billAmount.toLocaleString('en-IN')}`],
-                ['Category', result.consumerCategory],
-                ['Billing Period', result.billingPeriod],
-              ].map(([label, val]) => (
-                <div key={label}>
-                  <div style={{ fontSize: '11px', color: 'var(--vai-slate)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '2px' }}>{label}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: label === 'Bill Amount' ? 'var(--vai-ember)' : 'var(--vai-graphite)' }}>{val}</div>
-                </div>
-              ))}
+            <div className="grid-2 gap-4 mb-6 text-sm">
+              <div><span className="text-muted">{t('discomName')}:</span> <strong>{result.discom}</strong></div>
+              <div><span className="text-muted">{t('consumerNumber')}:</span> <strong>{result.consumerNumber}</strong></div>
+              <div><span className="text-muted">{t('unitsConsumed')}:</span> <strong>{result.unitsConsumed} kWh</strong></div>
+              <div><span className="text-muted">{t('billAmount')}:</span> <strong className="text-accent">₹{result.billAmount.toLocaleString('en-IN')}</strong></div>
+              <div><span className="text-muted">{t('billingPeriod')}:</span> <strong>{result.billingPeriod}</strong></div>
+              <div><span className="text-muted">{t('consumerCategory')}:</span> <strong>{result.consumerCategory}</strong></div>
             </div>
 
             <button
-              className={`vai-btn-primary ${appliedSuccess ? 'vai-btn-primary--success' : ''}`}
-              style={{ width: '100%', justifyContent: 'center', marginBottom: '12px' }}
+              className={`btn ${appliedSuccess ? 'btn-secondary' : 'btn-primary'} w-full justify-center gap-2 mb-3`}
               onClick={() => handleApplyData()}
+              style={{
+                fontSize: '0.9375rem',
+                background: appliedSuccess ? 'rgba(34,197,94,0.18)' : undefined,
+                borderColor: appliedSuccess ? 'rgba(34,197,94,0.35)' : undefined,
+                color: appliedSuccess ? '#22C55E' : undefined
+              }}
             >
-              <CheckCircle size={16} />
-              {appliedSuccess ? 'Applied to AI Context Engine ✓' : 'Apply Data to Centralized AI Context'}
+              <CheckCircle size={18} />
+              {appliedSuccess ? 'Applied to Centralized AI Context Engine ✓' : 'Apply Data to Centralized AI Context'}
             </button>
 
             {appliedSuccess && (
-              <div className="vai-card--success">
-                <div style={{ fontWeight: 600, color: '#16a34a', fontSize: '13px', marginBottom: '4px' }}>✓ Context Engine Updated</div>
-                <div style={{ fontSize: '13px', color: 'var(--vai-steel)', marginBottom: '8px' }}>
-                  {result.discom} bill (₹{result.billAmount.toLocaleString('en-IN')}) synced across all 3 AI tools, ROI models, and AI Advisor.
-                </div>
-                <button className="vai-link" onClick={onNavigateToAdvisor}>Open AI Advisor Chat →</button>
+              <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', padding: '0.75rem 1rem', borderRadius: '10px', fontSize: '0.8125rem', color: '#ECF2EE' }}>
+                <div style={{ fontWeight: 700, color: '#22C55E', marginBottom: '2px' }}>✓ Context Engine Updated!</div>
+                <div>DISCOM ({result.discom}) &amp; Monthly Bill (₹{result.billAmount.toLocaleString('en-IN')}) are now synced across all 3 AI tools, ROI models, and AI Advisor prompts.</div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm mt-2 text-accent p-0"
+                  onClick={onNavigateToAdvisor}
+                  style={{ textDecoration: 'underline', fontSize: '0.8125rem' }}
+                >
+                  Open AI Advisor Chat →
+                </button>
               </div>
             )}
           </div>
         )}
 
-        {/* Saved Bills Library */}
-        <div className="vai-card--white">
-          <div className="vai-section-label">
-            <span className="vai-section-title">
-              <Receipt size={16} style={{ color: 'var(--vai-ember)' }} />
-              Bill Library ({savedBills.length})
-            </span>
-            <span className="vai-section-meta">IndexedDB Store</span>
+        {/* ══ SAVED BILLS LIBRARY (INDEXEDDB RELATIONAL STORE) ══ */}
+        <div className="glass-card">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="flex items-center gap-2" style={{ fontSize: '1rem', margin: 0, color: '#ECF2EE', fontFamily: 'Outfit, sans-serif' }}>
+              <Receipt size={18} className="text-accent" />
+              Saved Electricity Bills ({savedBills.length})
+            </h4>
+            <span style={{ fontSize: '0.6875rem', color: '#7A9484' }}>Client IndexedDB Store</span>
           </div>
 
           {savedBills.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '24px 0', fontSize: '13px', color: 'var(--vai-slate)' }}>
-              No bills saved yet. Upload a bill to build your relational history.
+            <div className="text-center py-6 text-muted text-sm">
+              No bills saved yet. Upload a bill above to build your relational bill history library.
             </div>
           ) : (
-            <div className="vai-stack" style={{ gap: '8px', maxHeight: '280px', overflowY: 'auto' }}>
+            <div className="flex-col gap-3" style={{ maxHeight: '280px', overflowY: 'auto' }}>
               {savedBills.map((b) => (
                 <div
                   key={b.id}
-                  className={`vai-bill-item ${selectedBillId === b.id ? 'vai-bill-item--active' : ''}`}
+                  style={{
+                    background: selectedBillId === b.id ? 'rgba(168,255,62,0.08)' : 'rgba(255,255,255,0.03)',
+                    border: selectedBillId === b.id ? '1px solid rgba(168,255,62,0.25)' : '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '12px',
+                    padding: '0.875rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    transition: 'all 150ms ease',
+                  }}
                 >
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '3px' }}>
-                      <span className="vai-bill-label">{b.discom}</span>
-                      <span className="vai-bill-amount">₹{b.billAmount.toLocaleString('en-IN')}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                      <strong style={{ fontSize: '0.875rem', color: '#ECF2EE' }}>{b.discom}</strong>
+                      <span style={{ fontSize: '0.6875rem', color: '#A8FF3E', fontWeight: 700 }}>
+                        ₹{b.billAmount.toLocaleString('en-IN')}
+                      </span>
                     </div>
-                    <div className="vai-bill-meta">
+                    <div style={{ fontSize: '0.75rem', color: '#7A9484', display: 'flex', gap: '8px', alignItems: 'center' }}>
                       <span>{b.unitsConsumed} kWh</span>
-                      <span>·</span>
+                      <span>•</span>
                       <span>{b.billingPeriod}</span>
-                      <span>·</span>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        <Clock size={11} />
-                        {new Date(b.scannedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                      <span>•</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <Clock size={11} /> {new Date(b.scannedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                       </span>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <button
-                      className="vai-btn-ghost"
-                      style={{ fontSize: '12px', padding: '5px 12px' }}
-                      onClick={() => { setSelectedBillId(b.id); handleApplyData(b); }}
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        setSelectedBillId(b.id);
+                        handleApplyData(b);
+                      }}
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(168,255,62,0.12)', color: '#A8FF3E', border: 'none' }}
                     >
-                      Apply
+                      Apply Context
                     </button>
                     <button
-                      className="vai-btn-ghost"
-                      style={{ padding: '5px 8px', borderColor: '#fecaca', color: '#dc2626' }}
+                      className="btn btn-ghost btn-sm text-red-400"
                       onClick={(e) => handleDeleteBill(b.id, e)}
+                      title="Delete bill"
+                      style={{ padding: '6px' }}
                     >
-                      <Trash2 size={13} />
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
@@ -277,59 +359,79 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
         </div>
       </div>
 
-      {/* Right: Role Insight */}
-      <div className="vai-stack">
-        <div className="vai-card--ivory">
-          <div className="vai-insight-label">Personalized Role Insight</div>
-          <p className="vai-insight-text">
+      {/* Right Column: Role AI Insight */}
+      <div className="flex-col gap-6">
+        <div className="glass-card">
+          <h4 className="mb-3" style={{ fontSize: '1rem' }}>Personalized Role AI Insight</h4>
+          <p className="text-secondary text-sm leading-relaxed mb-4">
             {role === 'Landowner'
-              ? 'Bill scans establish baseline power tariffs for agricultural solar feeder projects under PM-KUSUM Component A/C.'
+              ? 'As a Landowner, electricity bill scans help establish baseline power tariffs for agricultural solar feeder projects under PM-KUSUM Component A/C.'
               : role === 'Solar Vendor'
-              ? 'Client bill OCR scans automatically structure customer quotes, tariff slab offsets, and DISCOM net-metering application forms.'
-              : 'Your monthly bill determines exact kW solar PV sizing, PM Surya Ghar subsidy tiers (up to ₹78,000), and 25-year cumulative savings.'}
+              ? 'As a Solar Vendor, client bill OCR scans automatically structure customer quotes, tariff slab offsets, and DISCOM net-metering application forms.'
+              : 'As a Homeowner, your monthly bill is parsed to determine exact kW solar PV sizing, PM Surya Ghar subsidy tiers, and 25-year cumulative savings.'}
           </p>
-        </div>
 
-        <div className="vai-card--white">
-          <div className="vai-insight-label">Supported DISCOMs</div>
-          <p className="vai-insight-text" style={{ fontSize: '13px' }}>
-            MSEDCL · TANGEDCO · BESCOM · UGVCL · JVVNL · BSES · PSPCL · KSEB · WBSEDCL · DHBVN · UHBVN · CSPDCL and all state utilities across India.
-          </p>
+          <div className="p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-secondary flex items-start gap-2">
+            <Info size={16} className="text-accent shrink-0 mt-0.5" />
+            <span>Supported DISCOMs: MSEDCL, TANGEDCO, BESCOM, UGVCL, JVVNL, BSES, PSPCL, KSEB, WBSEDCL &amp; all state utilities across India.</span>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════════
-   APPLIANCE CALCULATOR
-═══════════════════════════════════════════════════ */
 const ApplianceCalculator: React.FC = () => {
   const { userProfile } = useApp();
   const [quantities, setQuantities] = useState<Record<string, number>>({
-    'ac-1.5': 2, 'fan-75': 4, 'fridge-150': 1, 'tv-100': 1, 'led-10': 8,
+    'ac-1.5': 2,
+    'fan-75': 4,
+    'fridge-150': 1,
+    'tv-100': 1,
+    'led-10': 8,
   });
-  const [hours, setHours] = useState({ summer: 8, monsoon: 5, winter: 3 });
 
-  const updateQty = (id: string, delta: number) =>
-    setQuantities(prev => ({ ...prev, [id]: Math.max(0, (prev[id] || 0) + delta) }));
+  const [hours, setHours] = useState({
+    summer: 8,
+    monsoon: 5,
+    winter: 3,
+  });
 
-  const calcKWh = (hrs: number) =>
-    APPLIANCES.reduce((t, a) => t + (a.wattage * (quantities[a.id] || 0) * hrs * 30), 0);
+  const updateQty = (id: string, delta: number) => {
+    setQuantities(prev => {
+      const current = prev[id] || 0;
+      const next = Math.max(0, current + delta);
+      return { ...prev, [id]: next };
+    });
+  };
 
-  const summerKWh = Math.round(calcKWh(hours.summer));
-  const monsoonKWh = Math.round(calcKWh(hours.monsoon));
-  const winterKWh = Math.round(calcKWh(hours.winter));
+  const calculateKWh = (hrs: number) => {
+    return APPLIANCES.reduce((total, app) => {
+      const qty = quantities[app.id] || 0;
+      return total + (app.wattage * qty * hrs * 30);
+    }, 0);
+  };
 
+  const summerKWh = Math.round(calculateKWh(hours.summer));
+  const monsoonKWh = Math.round(calculateKWh(hours.monsoon));
+  const winterKWh = Math.round(calculateKWh(hours.winter));
+
+  // Sync with Centralized Context Engine & IndexedDB on load changes
   useEffect(() => {
-    const list = APPLIANCES.map(a => ({ ...a, quantity: quantities[a.id] || 0 }));
-    recordApplianceCalculatorAction(list, hours, summerKWh, userProfile);
-    const activeDevs = list.filter(a => a.quantity > 0);
-    const top = activeDevs.sort((a, b) => (b.wattage * b.quantity) - (a.wattage * a.quantity))[0];
+    const activeList = APPLIANCES.map(a => ({ ...a, quantity: quantities[a.id] || 0 }));
+    recordApplianceCalculatorAction(activeList, hours, summerKWh, userProfile);
+    
+    // Save to local relational DB
+    const activeDevs = activeList.filter(a => a.quantity > 0);
+    const topDev = activeDevs.sort((a, b) => (b.wattage * b.quantity) - (a.wattage * a.quantity))[0];
     localDB.saveApplianceLoad({
-      userId: userProfile.email || 'default_user', totalMonthlyKWh: summerKWh,
-      summerHours: hours.summer, monsoonHours: hours.monsoon, winterHours: hours.winter,
-      activeAppliancesCount: activeDevs.length, topAppliance: top?.name || 'General',
+      userId: userProfile.email || 'default_user',
+      totalMonthlyKWh: summerKWh,
+      summerHours: hours.summer,
+      monsoonHours: hours.monsoon,
+      winterHours: hours.winter,
+      activeAppliancesCount: activeDevs.length,
+      topAppliance: topDev?.name || 'General Appliances',
     }).catch(console.error);
   }, [quantities, hours, summerKWh, userProfile]);
 
@@ -337,96 +439,85 @@ const ApplianceCalculator: React.FC = () => {
 
   const barData = {
     labels: ['Summer', 'Monsoon', 'Winter'],
-    datasets: [{
-      label: 'kWh/month',
-      data: [summerKWh, monsoonKWh, winterKWh],
-      backgroundColor: ['#ff682c', '#ff8c5a', '#ffb38a'],
-      borderRadius: 4,
-    }]
+    datasets: [
+      {
+        label: 'Energy Consumption (kWh/mo)',
+        data: [summerKWh, monsoonKWh, winterKWh],
+        backgroundColor: 'rgba(168, 255, 62, 0.8)',
+        borderRadius: 4,
+      }
+    ]
   };
 
   const activeAppliances = APPLIANCES.filter(a => quantities[a.id]);
   const pieData = {
     labels: activeAppliances.map(a => a.name),
     datasets: [{
-      data: activeAppliances.map(a => +(a.wattage * hours.summer * 30 * (quantities[a.id] || 0)).toFixed(0)),
-      backgroundColor: ['#ff682c', '#816729', '#202020', '#4d4d4d', '#828282', '#ebe6dd', '#efefef', '#e8e8e8'],
+      data: activeAppliances.map(a => (a.wattage * hours.summer * 30 * (quantities[a.id] || 0))),
+      backgroundColor: ['#A8FF3E', '#22C55E', '#F59E0B', '#F97316', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4'],
       borderWidth: 0,
     }]
   };
 
   return (
-    <div className="vai-grid-2">
-      <div className="vai-stack">
-        <div className="vai-card">
-          <div className="vai-section-label">
-            <span className="vai-section-title">Appliance Inventory</span>
-            <span className="vai-section-meta">Adjust quantities</span>
-          </div>
-          <div className="vai-grid-4">
-            {APPLIANCES.map(a => (
-              <div key={a.id} className="vai-appliance-card">
-                <div className="vai-appliance-letter">{a.name.charAt(0)}</div>
-                <div className="vai-appliance-name">{a.name}</div>
-                <div className="vai-appliance-watts">{(a.wattage * 1000).toFixed(0)}W</div>
-                <div className="vai-qty-counter">
-                  <button className="vai-qty-btn" onClick={() => updateQty(a.id, -1)}>−</button>
-                  <span className="vai-qty-value">{quantities[a.id] || 0}</span>
-                  <button className="vai-qty-btn" onClick={() => updateQty(a.id, 1)}>+</button>
-                </div>
+    <div className="grid-2">
+      <div className="flex-col gap-6">
+        <div className="grid-4 gap-3">
+          {APPLIANCES.map(a => (
+            <div key={a.id} className="glass-card glass-card--sm flex-col items-center justify-center gap-2">
+              <div style={{ fontSize: '1.25rem', fontWeight: 700, color: '#A8FF3E' }}>{a.name.charAt(0)}</div>
+              <div className="text-xs font-semibold text-center">{a.name}</div>
+              <div className="text-xs text-muted">{(a.wattage * 1000).toFixed(0)}W</div>
+              <div className="qty-counter">
+                <button className="qty-btn" onClick={() => updateQty(a.id, -1)} aria-label={`Decrease ${a.name}`}>-</button>
+                <span className="qty-value">{quantities[a.id] || 0}</span>
+                <button className="qty-btn" onClick={() => updateQty(a.id, 1)} aria-label={`Increase ${a.name}`}>+</button>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="vai-card--white">
-          <div className="vai-section-label">
-            <span className="vai-section-title">Seasonal Hours</span>
-          </div>
-          {(['summer', 'monsoon', 'winter'] as const).map(season => (
-            <div key={season} className="vai-form-group">
-              <div className="vai-range-label">
-                <span style={{ textTransform: 'capitalize' }}>{season} usage</span>
-                <strong>{hours[season]} hrs/day</strong>
-              </div>
-              <input
-                type="range" min="0" max="24" value={hours[season]}
-                onChange={e => setHours({ ...hours, [season]: +e.target.value })}
-              />
             </div>
           ))}
+        </div>
+
+        <div className="glass-card">
+          <h4 className="mb-4">Seasonal Hours Adjuster</h4>
+
+          <div className="form-group mb-3">
+            <div className="flex justify-between"><label>Summer (hrs/day)</label><span>{hours.summer} hrs</span></div>
+            <input type="range" min="0" max="24" value={hours.summer} onChange={e => setHours({ ...hours, summer: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
+          </div>
+
+          <div className="form-group mb-3">
+            <div className="flex justify-between"><label>Monsoon (hrs/day)</label><span>{hours.monsoon} hrs</span></div>
+            <input type="range" min="0" max="24" value={hours.monsoon} onChange={e => setHours({ ...hours, monsoon: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
+          </div>
+
+          <div className="form-group">
+            <div className="flex justify-between"><label>Winter (hrs/day)</label><span>{hours.winter} hrs</span></div>
+            <input type="range" min="0" max="24" value={hours.winter} onChange={e => setHours({ ...hours, winter: parseInt(e.target.value) })} className="w-full" style={{ accentColor: 'var(--accent-primary)' }} />
+          </div>
         </div>
       </div>
 
-      <div className="vai-stack">
-        {/* Stats */}
-        <div className="vai-stat-row">
-          {[['Summer', summerKWh], ['Monsoon', monsoonKWh], ['Winter', winterKWh]].map(([s, v]) => (
-            <div key={s} className="vai-stat">
-              <div className="vai-stat-value">{v}</div>
-              <div className="vai-stat-label">{s} kWh/mo</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="vai-card--white">
-          <div className="vai-section-title" style={{ marginBottom: '16px' }}>Seasonal Consumption</div>
-          <div style={{ height: '180px' }}>
-            <Bar data={barData} options={{
-              responsive: true, maintainAspectRatio: false,
-              scales: {
-                y: { beginAtZero: true, grid: { color: '#f5f5f5' }, ticks: { color: '#828282', font: { size: 11 } } },
-                x: { grid: { display: false }, ticks: { color: '#828282', font: { size: 11 } } }
-              },
-              plugins: { legend: { display: false } }
-            }} />
+      <div className="flex-col gap-6">
+        <div className="glass-card">
+          <h4 className="mb-4">Seasonal Consumption</h4>
+          <div className="chart-container chart-container--sm">
+            <Bar
+              data={barData}
+              options={{
+                scales: {
+                  y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8BAF95' } },
+                  x: { grid: { display: false }, ticks: { color: '#8BAF95' } }
+                },
+                plugins: { legend: { display: false } }
+              }}
+            />
           </div>
         </div>
 
-        <div className="vai-card--white">
-          <div className="vai-section-title" style={{ marginBottom: '16px' }}>Summer Load Breakdown</div>
+        <div className="glass-card">
+          <h4 className="mb-4">Appliance Breakdown (Summer)</h4>
           {pieData.labels.length > 0 ? (
-            <div style={{ height: '180px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
               <PieChart
                 labels={pieData.labels}
                 data={pieData.datasets[0].data}
@@ -436,50 +527,39 @@ const ApplianceCalculator: React.FC = () => {
               />
             </div>
           ) : (
-            <p style={{ textAlign: 'center', padding: '24px 0', fontSize: '13px', color: 'var(--vai-slate)' }}>
-              Add appliances above to see breakdown.
-            </p>
+            <p className="text-muted text-center py-4">Add appliances to see breakdown.</p>
           )}
         </div>
 
-        <div className="vai-card--ivory">
-          <div className="vai-insight-label">Load AI Insight — {role}</div>
-          <p className="vai-insight-text">
-            {role === 'Landowner'
-              ? `Summer peak demand reaches ${summerKWh} kWh/mo. Solarising agricultural pumps under PM-KUSUM Component B eliminates grid reliance during daytime irrigation.`
-              : role === 'Solar Vendor'
-              ? `Client summer load model: ${summerKWh} kWh/mo. Recommend proposing a ${((summerKWh) / 120).toFixed(1)} kW system with hybrid battery storage for maximum offset.`
-              : `Your modelled summer load of ${summerKWh} kWh/mo vs. bill implies ${Math.abs(summerKWh - Math.round((+(userProfile.billAmount || 3200)) / 9.5))} kWh gap. The AI Advisor will reconcile both signals when sizing your system.`}
-          </p>
+        <div className="glass-card glass-card--no-hover flex gap-3 items-start">
+          <Sparkles className="text-accent shrink-0" />
+          <div>
+            <h5 className="mb-1" style={{ fontSize: '0.9375rem', fontWeight: 700 }}>Personalized Load AI Insight ({role})</h5>
+            <p className="text-sm text-secondary leading-relaxed">
+              {role === 'Landowner'
+                ? `Summer peak demand reaches ${summerKWh} kWh/mo. Solarizing agricultural pumps under PM-KUSUM Component B eliminates grid reliance during daytime irrigation.`
+                : role === 'Solar Vendor'
+                ? `Client summer load model indicates ${summerKWh} kWh/mo peak demand. Recommend proposing a ${((summerKWh) / 120).toFixed(1)} kW system with hybrid battery storage.`
+                : `Your cooling appliances contribute significantly to your ${summerKWh} kWh summer usage. Consider sizing your solar system to cover the summer peak for 100% bill offset.`}
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════════
-   AI ADVISOR — with full Markdown rendering
-═══════════════════════════════════════════════════ */
 const AIAdvisor: React.FC = () => {
   const { userProfile, language } = useApp();
+  const { t } = useTranslation();
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
   const centralCtx = getCentralizedContext(userProfile);
 
-  const initGreeting = language === 'hi'
-    ? `नमस्ते ${userProfile.firstName || userProfile.name || 'जी'}! 👋 मैं आपका **सूर्यसेतु AI सोलर सलाहकार** हूँ। आपका **${role}** संदर्भ लोड हो गया है। आज मैं आपकी क्या सहायता कर सकता हूँ?`
-    : language === 'mr'
-      ? `नमस्कार ${userProfile.firstName || userProfile.name || 'जी'}! 👋 मी तुमचा **सूर्यसेतु AI सोलर सल्लागार** आहे. तुमचे **${role}** प्रोफाइल लोड झाले आहे. मी तुम्हाला कशी मदत करू शकतो?`
-      : `Hello ${userProfile.firstName || userProfile.name || 'there'}! 👋 I am your **SuryaSetu Solar AI Advisor**.
-
-I have loaded your **${role}** pathway from the Centralized Context Engine:
-- 📍 **Location:** ${centralCtx.onboarding.state} — ${centralCtx.onboarding.discom}
-- 🧾 **Bill Signal:** ${centralCtx.billScanner.scannedAt ? `${centralCtx.billScanner.unitsConsumed} kWh / ₹${centralCtx.billScanner.billAmount.toLocaleString('en-IN')}` : `₹${centralCtx.onboarding.billAmount.toLocaleString('en-IN')}/mo`}
-- 🏠 **Roof Baseline:** ${centralCtx.onboarding.roofArea} sq ft
-
-Ask me anything about subsidies, sizing, DISCOM net-metering, or your solar transition.`;
-
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: initGreeting }
+    {
+      role: 'assistant',
+      content: `Hello ${userProfile.firstName || userProfile.name || 'there'}! I am your SuryaSetu Solar AI Advisor. I am powered by our Centralized Context Engine aligned with your active role pathway (${role}). How can I assist you today regarding subsidies, policy rules, payback, or DISCOM net-metering?`
+    }
   ]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -492,6 +572,7 @@ Ask me anything about subsidies, sizing, DISCOM net-metering, or your solar tran
 
   const send = useCallback(async (text: string) => {
     if (!text.trim() || isStreaming) return;
+    
     const userMsg: Message = { role: 'user', content: text };
     const assistantMsg: Message = { role: 'assistant', content: '' };
     setMessages(prev => [...prev, userMsg, assistantMsg]);
@@ -502,29 +583,32 @@ Ask me anything about subsidies, sizing, DISCOM net-metering, or your solar tran
     const apiMessages: Message[] = [...messages, userMsg];
 
     try {
-      const stream = chatStream(
-        apiMessages, systemPrompt,
-        (label) => setActiveModelLabel(label),
-        userProfile, language
-      );
+      const stream = chatStream(apiMessages, systemPrompt, (modelLabel) => {
+        setActiveModelLabel(modelLabel);
+      });
+
       let currentText = '';
       for await (const chunk of stream) {
         currentText += chunk;
         setMessages(prev => {
-          const msgs = [...prev];
-          if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
-            msgs[msgs.length - 1] = { role: 'assistant', content: currentText };
+          const newMsgs = [...prev];
+          if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+            newMsgs[newMsgs.length - 1] = { role: 'assistant', content: currentText };
           }
-          return msgs;
+          return newMsgs;
         });
       }
-    } catch {
+    } catch (err) {
+      console.error('Chat error:', err);
       setMessages(prev => {
-        const msgs = [...prev];
-        if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') {
-          msgs[msgs.length - 1] = { role: 'assistant', content: 'I encountered an issue. Please try again.' };
+        const newMsgs = [...prev];
+        if (newMsgs.length > 0 && newMsgs[newMsgs.length - 1].role === 'assistant') {
+          newMsgs[newMsgs.length - 1] = {
+            role: 'assistant',
+            content: 'I apologize, but I encountered an issue. Please try again.'
+          };
         }
-        return msgs;
+        return newMsgs;
       });
     } finally {
       setIsStreaming(false);
@@ -532,100 +616,90 @@ Ask me anything about subsidies, sizing, DISCOM net-metering, or your solar tran
   }, [isStreaming, messages, userProfile, language]);
 
   const prompts = role === 'Landowner'
-    ? ['PM-KUSUM Component A land lease revenue?', 'Substation distance requirement?', 'Component B standalone pumps?', '25-year PPA tariff rates?']
+    ? [
+        "PM-KUSUM Component A 0.5MW land lease revenue?",
+        "Substation distance requirements for solar plant?",
+        "PM-KUSUM Component B standalone solar pumps?",
+        "DISCOM 25-year Power Purchase Agreement (PPA) rates?"
+      ]
     : role === 'Solar Vendor'
-    ? ['PM Surya Ghar empanelment steps?', 'GSTIN & license compliance?', 'ALMM module procurement?', 'Customer ROI pitch generator?']
-    : ['PM Surya Ghar subsidy for 3 kW?', 'Roof area for 2 kW solar?', 'DISCOM net-metering procedure?', 'On-grid vs hybrid storage?'];
-
-  const userName = userProfile.firstName || userProfile.name || 'U';
+    ? [
+        "PM Surya Ghar installer portal empanelment steps?",
+        "GSTIN & DISCOM license compliance checklist?",
+        "ALMM certified solar module procurement?",
+        "Customer ROI closing pitch generator?"
+      ]
+    : [
+        "PM Surya Ghar subsidy for 3 kW system?",
+        "Roof area required for 2 kW solar?",
+        "DISCOM net-metering application procedure?",
+        "On-grid vs hybrid battery solar storage?"
+      ];
 
   return (
-    <div className="vai-chat-shell">
-      {/* Header */}
-      <div className="vai-chat-header">
-        <div className="vai-chat-model-badge">
-          <Cpu size={13} />
-          {activeModelLabel}
-          <div className="vai-chat-model-dot" />
+    <div className="glass-card p-0 flex-col" style={{ height: '640px', overflow: 'hidden' }}>
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between p-3 px-4" style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
+        <div className="model-badge">
+          <Cpu size={14} />
+          <span>{activeModelLabel}</span>
+          <div className="model-badge__dot"></div>
         </div>
-        <div className="vai-chat-context-label">
-          <Layers size={13} />
-          Context Engine Active · {role}
+        <div className="flex items-center gap-2" style={{ fontSize: '0.75rem', color: '#A8FF3E', fontWeight: 600 }}>
+          <Layers size={14} />
+          Centralized AI Context Engine Active ({role})
         </div>
       </div>
 
-      {/* Context Signal Banner */}
-      <div className="vai-context-banner">
-        {[
-          { label: 'Location', value: `${centralCtx.onboarding.state} · ${centralCtx.onboarding.discom}` },
-          { label: 'Bill', value: centralCtx.billScanner.scannedAt ? `${centralCtx.billScanner.unitsConsumed} kWh` : `₹${centralCtx.onboarding.billAmount}/mo` },
-          { label: 'Load', value: centralCtx.applianceCalculator.calculatedAt ? `${centralCtx.applianceCalculator.totalMonthlyKWh} kWh/mo` : 'Baseline' },
-          { label: 'Roof', value: `${centralCtx.onboarding.roofArea} sq ft` },
-        ].map(sig => (
-          <div key={sig.label} className="vai-context-signal">
-            <div className="signal-dot" />
-            <strong>{sig.label}:</strong> {sig.value}
+      {/* Centralized Context Signal Banner */}
+      <div style={{ background: 'rgba(168,255,62,0.04)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '6px 16px', display: 'flex', gap: '12px', overflowX: 'auto', fontSize: '0.6875rem', color: '#7A9484' }}>
+        <span>📍 <strong>Location:</strong> {centralCtx.onboarding.state} ({centralCtx.onboarding.discom})</span>
+        <span>🧾 <strong>Bill Signal:</strong> {centralCtx.billScanner.scannedAt ? `${centralCtx.billScanner.unitsConsumed} kWh` : `₹${centralCtx.onboarding.billAmount}/mo`}</span>
+        <span>⚡ <strong>Load Model:</strong> {centralCtx.applianceCalculator.calculatedAt ? `${centralCtx.applianceCalculator.totalMonthlyKWh} kWh` : 'Baseline'}</span>
+        <span>🏠 <strong>Property:</strong> {centralCtx.onboarding.roofArea} sq ft</span>
+      </div>
+
+      {/* Chat Messages Container */}
+      <div className="chat-messages" style={{ flex: 1, overflowY: 'auto', padding: 'var(--space-4)' }}>
+        {messages.map((msg, i) => (
+          <div key={i} className={`chat-message ${msg.role === 'user' ? 'chat-message--user' : ''}`}>
+            {msg.role === 'assistant' && (
+              <div className="chat-avatar"><Sparkles size={16} color="var(--accent-primary)" /></div>
+            )}
+            <div className={`chat-bubble chat-bubble--${msg.role === 'user' ? 'user' : 'ai'} ${(msg.role === 'assistant' && isStreaming && i === messages.length - 1) ? 'streaming-cursor' : ''}`}>
+              {msg.content}
+            </div>
           </div>
         ))}
-      </div>
-
-      {/* Messages */}
-      <div className="vai-chat-messages">
-        {messages.map((msg, i) => {
-          const isLast = i === messages.length - 1;
-          const streaming = msg.role === 'assistant' && isStreaming && isLast;
-          return (
-            <div key={i} className={`vai-msg-row ${msg.role === 'user' ? 'vai-msg-row--user' : ''}`}>
-              {msg.role === 'assistant' ? (
-                <div className="vai-avatar"><Sparkles size={15} /></div>
-              ) : (
-                <div className="vai-avatar vai-avatar--user">{userName.charAt(0).toUpperCase()}</div>
-              )}
-              <div className={`vai-bubble vai-bubble--${msg.role === 'user' ? 'user' : 'ai'} ${streaming ? 'vai-bubble--streaming' : ''}`}>
-                {msg.role === 'assistant' ? (
-                  <div className="vai-md">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  msg.content
-                )}
-              </div>
-            </div>
-          );
-        })}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Prompt Chips */}
-      <div className="vai-prompt-chips">
+      {/* Suggested Prompt Chips */}
+      <div className="prompt-chips" style={{ padding: 'var(--space-2) var(--space-4)', display: 'flex', gap: '8px', overflowX: 'auto' }}>
         {prompts.map(p => (
-          <button key={p} className="vai-chip" onClick={() => send(p)} disabled={isStreaming}>{p}</button>
+          <button key={p} className="prompt-chip" onClick={() => send(p)} disabled={isStreaming}>{p}</button>
         ))}
       </div>
 
-      {/* Input */}
-      <div className="vai-chat-input-row">
-        <input
-          className="vai-chat-input"
-          placeholder={
-            role === 'Landowner' ? 'Ask about PM-KUSUM, land lease revenue, PPA rates…'
-            : role === 'Solar Vendor' ? 'Ask about empanelment, GSTIN compliance, DISCOM rules…'
-            : 'Ask about PM Surya Ghar, subsidies, sizing, net-metering…'
-          }
+      {/* Input Row */}
+      <div className="chat-input-row" style={{ padding: 'var(--space-3) var(--space-4)', display: 'flex', gap: '8px', borderTop: '1px solid var(--border-subtle)' }}>
+        <input 
+          className="chat-input"
+          placeholder={t('askPlaceholder')}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)}
           disabled={isStreaming}
+          style={{ flex: 1 }}
         />
         <button
-          className="vai-send-btn"
+          className="btn btn-primary btn-sm"
+          style={{ padding: '0 16px', borderRadius: 'var(--radius-full)' }}
           onClick={() => send(input)}
           disabled={isStreaming || !input.trim()}
-          aria-label="Send"
+          aria-label="Send message"
         >
-          {isStreaming ? <span className="vai-spinner" style={{ width: 16, height: 16 }} /> : <Send size={15} />}
+          <Send size={16} />
         </button>
       </div>
     </div>

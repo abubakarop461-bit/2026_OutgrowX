@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { User, Phone, EnvelopeSimple, ArrowRight, ShieldCheck } from '@phosphor-icons/react';
+import { useTranslation } from '../../i18n';
+import {
+  Sun, User, Phone, EnvelopeSimple, ArrowRight, ShieldCheck, CheckCircle
+} from '@phosphor-icons/react';
 
 export const Auth: React.FC = () => {
   const navigate = useNavigate();
   const { authenticateUser } = useApp();
+  const { t } = useTranslation();
 
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
   const [formData, setFormData] = useState({
@@ -47,250 +51,294 @@ export const Auth: React.FC = () => {
     <main
       style={{
         minHeight: '100vh',
-        background: 'var(--color-canvas-white)',
+        background: '#070D09',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '40px 24px',
-        color: 'var(--color-graphite)',
-        fontFamily: 'var(--font-body)',
+        padding: '2rem 1rem',
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: 'Inter, sans-serif',
       }}
     >
-      <div style={{ maxWidth: '440px', width: '100%' }}>
+
+      {/* Ambient background glow */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '20%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(168,255,62,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div style={{ maxWidth: '440px', width: '100%', position: 'relative', zIndex: 10 }}>
         {/* Header Branding */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <img
             src="/logo.png"
             alt="SuryaSetu Logo"
             style={{
-              height: '42px',
+              height: '56px',
               width: 'auto',
               objectFit: 'contain',
-              marginBottom: '12px',
+              marginBottom: '0.875rem',
+              filter: 'drop-shadow(0 4px 16px rgba(255,183,3,0.4))'
             }}
           />
 
           <h1
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '28px',
-              fontWeight: 400,
-              letterSpacing: '-0.02em',
-              color: 'var(--color-graphite)',
+              fontFamily: 'Outfit, sans-serif',
+              fontSize: '2.25rem',
+              fontWeight: 900,
+              letterSpacing: '-0.03em',
+              color: '#ECF2EE',
               margin: 0,
             }}
           >
-            Surya<span style={{ color: 'var(--color-ember-orange)' }}>Setu</span>
+            Surya<span style={{ color: '#A8FF3E' }}>Setu</span>
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--color-steel)', margin: '6px 0 0' }}>
-            India's Solar Intelligence Observatory
+          <p style={{ fontSize: '0.875rem', color: '#7A9484', margin: '0.5rem 0 0' }}>
+            {t('landingHeroSubtitle')}
           </p>
         </div>
 
-        {/* Auth Card (Ventriloc Ash container) */}
+        {/* Auth Glass Card */}
         <div
           style={{
-            background: 'var(--color-ash)',
-            borderRadius: 'var(--radius-cards)',
-            padding: '32px 28px',
+            background: 'rgba(10, 18, 13, 0.85)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '20px',
+            padding: '2rem 1.75rem',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)',
           }}
         >
-          {/* Mode Switch (Ventriloc Pill Container) */}
+          {/* Mode Switch Tabs */}
           <div
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              background: 'var(--color-canvas-white)',
+              background: 'rgba(255, 255, 255, 0.04)',
               padding: '4px',
-              borderRadius: 'var(--radius-nav-pills)',
-              marginBottom: '28px',
-              border: '1px solid var(--color-mist)',
+              borderRadius: '12px',
+              marginBottom: '1.75rem',
             }}
           >
             <button
               type="button"
               onClick={() => setMode('signup')}
               style={{
-                padding: '8px',
+                padding: '0.625rem',
                 border: 'none',
-                borderRadius: 'var(--radius-nav-pills)',
-                fontSize: '13px',
-                fontFamily: 'var(--font-display)',
-                fontWeight: 400,
-                letterSpacing: '-0.02em',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: 700,
                 cursor: 'pointer',
-                background: mode === 'signup' ? 'var(--color-graphite)' : 'transparent',
-                color: mode === 'signup' ? '#ffffff' : 'var(--color-slate)',
-                transition: 'all 150ms ease',
+                background: mode === 'signup' ? 'rgba(168,255,62,0.15)' : 'transparent',
+                color: mode === 'signup' ? '#A8FF3E' : '#7A9484',
+                transition: 'all 200ms ease',
               }}
             >
-              Sign Up
+              {t('signup')}
             </button>
             <button
               type="button"
               onClick={() => setMode('signin')}
               style={{
-                padding: '8px',
+                padding: '0.625rem',
                 border: 'none',
-                borderRadius: 'var(--radius-nav-pills)',
-                fontSize: '13px',
-                fontFamily: 'var(--font-display)',
-                fontWeight: 400,
-                letterSpacing: '-0.02em',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: 700,
                 cursor: 'pointer',
-                background: mode === 'signin' ? 'var(--color-graphite)' : 'transparent',
-                color: mode === 'signin' ? '#ffffff' : 'var(--color-slate)',
-                transition: 'all 150ms ease',
+                background: mode === 'signin' ? 'rgba(168,255,62,0.15)' : 'transparent',
+                color: mode === 'signin' ? '#A8FF3E' : '#7A9484',
+                transition: 'all 200ms ease',
               }}
             >
-              Sign In
+              {t('login')}
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            {/* Full Name */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* Field 1: Full Name */}
             <div>
               <label
                 htmlFor="auth-name"
                 style={{
                   display: 'block',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  color: 'var(--color-slate)',
-                  marginBottom: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#7A9484',
+                  marginBottom: '0.375rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
               >
-                Full Name
+                {t('fullName')}
               </label>
               <div style={{ position: 'relative' }}>
                 <User
-                  size={16}
-                  color="var(--color-slate)"
-                  style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                  size={18}
+                  weight="duotone"
+                  color="#7A9484"
+                  style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                 />
                 <input
                   id="auth-name"
                   type="text"
-                  placeholder="Enter your name"
+                  placeholder={t('fullNamePlaceholder')}
                   value={formData.name}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                   style={{
-                    paddingLeft: '36px',
-                    borderColor: errors.name ? '#dc2626' : undefined,
+                    width: '100%',
+                    padding: '0.75rem 0.875rem 0.75rem 2.625rem',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: errors.name ? '1px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '10px',
+                    color: '#ECF2EE',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                   autoFocus
                 />
               </div>
-              {errors.name && <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0' }}>{errors.name}</p>}
+              {errors.name && <p style={{ fontSize: '0.75rem', color: '#EF4444', margin: '4px 0 0' }}>{errors.name}</p>}
             </div>
 
-            {/* Phone */}
+            {/* Field 2: Phone Number */}
             <div>
               <label
                 htmlFor="auth-phone"
                 style={{
                   display: 'block',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  color: 'var(--color-slate)',
-                  marginBottom: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#7A9484',
+                  marginBottom: '0.375rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
               >
-                Mobile Number
+                {t('mobileNumber')}
               </label>
               <div style={{ position: 'relative' }}>
                 <Phone
-                  size={16}
-                  color="var(--color-slate)"
-                  style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                  size={18}
+                  weight="duotone"
+                  color="#7A9484"
+                  style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                 />
                 <input
                   id="auth-phone"
                   type="tel"
-                  placeholder="10-digit mobile number"
+                  placeholder={t('mobilePlaceholder')}
                   value={formData.phone}
                   onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   style={{
-                    paddingLeft: '36px',
-                    borderColor: errors.phone ? '#dc2626' : undefined,
+                    width: '100%',
+                    padding: '0.75rem 0.875rem 0.75rem 2.625rem',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: errors.phone ? '1px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '10px',
+                    color: '#ECF2EE',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                   maxLength={10}
                 />
               </div>
-              {errors.phone && <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0' }}>{errors.phone}</p>}
+              {errors.phone && <p style={{ fontSize: '0.75rem', color: '#EF4444', margin: '4px 0 0' }}>{errors.phone}</p>}
             </div>
 
-            {/* Email */}
+            {/* Field 3: Email Address */}
             <div>
               <label
                 htmlFor="auth-email"
                 style={{
                   display: 'block',
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  color: 'var(--color-slate)',
-                  marginBottom: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#7A9484',
+                  marginBottom: '0.375rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em',
                 }}
               >
-                Email Address
+                {t('emailAddress')}
               </label>
               <div style={{ position: 'relative' }}>
                 <EnvelopeSimple
-                  size={16}
-                  color="var(--color-slate)"
-                  style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                  size={18}
+                  weight="duotone"
+                  color="#7A9484"
+                  style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                 />
                 <input
                   id="auth-email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder={t('emailPlaceholder')}
                   value={formData.email}
                   onChange={e => setFormData({ ...formData, email: e.target.value })}
                   style={{
-                    paddingLeft: '36px',
-                    borderColor: errors.email ? '#dc2626' : undefined,
+                    width: '100%',
+                    padding: '0.75rem 0.875rem 0.75rem 2.625rem',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: errors.email ? '1px solid #EF4444' : '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '10px',
+                    color: '#ECF2EE',
+                    fontSize: '0.875rem',
+                    outline: 'none',
+                    boxSizing: 'border-box',
                   }}
                 />
               </div>
-              {errors.email && <p style={{ fontSize: '12px', color: '#dc2626', margin: '4px 0 0' }}>{errors.email}</p>}
+              {errors.email && <p style={{ fontSize: '0.75rem', color: '#EF4444', margin: '4px 0 0' }}>{errors.email}</p>}
             </div>
 
-            {/* Submit Button (Ventriloc 0px primary CTA) */}
+            {/* Submit Button */}
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-primary btn-lg"
               style={{
                 width: '100%',
-                padding: '12px',
-                marginTop: '8px',
+                justifyContent: 'center',
+                marginTop: '0.5rem',
+                padding: '0.875rem',
+                fontSize: '0.9375rem',
+                gap: '8px',
               }}
             >
-              {mode === 'signup' ? 'Continue to Onboarding' : 'Sign In'}
-              <ArrowRight size={16} />
+              {mode === 'signup' ? t('continueToOnboarding') : t('signInContinue')}
+              <ArrowRight size={18} weight="bold" />
             </button>
           </form>
 
-          {/* Footnote */}
+          {/* Privacy Footnote */}
           <div
             style={{
-              marginTop: '24px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--color-mist)',
+              marginTop: '1.5rem',
+              paddingTop: '1rem',
+              borderTop: '1px solid rgba(255, 255, 255, 0.06)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              fontSize: '12px',
-              color: 'var(--color-slate)',
+              fontSize: '0.75rem',
+              color: '#4A6055',
             }}
           >
-            <ShieldCheck size={16} color="var(--color-brass)" style={{ flexShrink: 0 }} />
-            <span>Encrypted locally on your device for accurate subsidy &amp; ROI modeling.</span>
+            <ShieldCheck size={16} weight="duotone" color="#22C55E" style={{ flexShrink: 0 }} />
+            <span>{t('privacyEncrypted')}</span>
           </div>
         </div>
       </div>
