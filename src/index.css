@@ -977,6 +977,11 @@ textarea:focus-visible {
 /* ── Page Layout ── */
 .page { min-height: 100vh; background: var(--bg-base); position: relative; }
 .page--centered { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-12) var(--space-6); }
+
+/* Static pages - fit within viewport, no scroll */
+.page--static { height: 100vh; overflow: hidden; background: var(--bg-base); position: relative; }
+.page--static-centered { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: var(--space-6) var(--space-4); }
+.page--static-flex { display: flex; flex-direction: column; height: 100%; padding: var(--space-6) var(--space-4); }
 .page-header { margin-bottom: var(--space-8); }
 .page-header__title { margin-bottom: var(--space-2); }
 .page-header__subtitle { color: var(--text-secondary); font-size: 1rem; }

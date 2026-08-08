@@ -4,6 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
 import Landing from './pages/Landing/Landing';
+import Auth from './pages/Auth/Auth';
 import Onboarding from './pages/Onboarding/Onboarding';
 import Dashboard from './pages/Dashboard/Dashboard';
 import SolarAI from './pages/SolarAI/SolarAI';
@@ -12,21 +13,36 @@ import AISolarReport from './pages/AISolarReport/AISolarReport';
 import VendorMarketplace from './pages/VendorMarketplace/VendorMarketplace';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isOnboarded } = useApp();
-  if (!isOnboarded) return <Navigate to="/" replace />;
+  const { isOnboarded, isAuthenticated } = useApp();
+  if (!isAuthenticated) return <Navigate to="/auth" replace />;
+  if (!isOnboarded) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;
 }
 
 function AppRoutes() {
-  const { isOnboarded } = useApp();
+  const { isOnboarded, isAuthenticated } = useApp();
 
   return (
     <>
       {isOnboarded && <Navbar />}
       <main style={{ paddingTop: isOnboarded ? '64px' : '0', minHeight: '100vh' }}>
         <Routes>
-          <Route path="/" element={!isOnboarded ? <Landing /> : <Navigate to="/dashboard" replace />} />
-          <Route path="/onboarding" element={<Onboarding />} />
+          {/* Landing role selection */}
+          <Route path="/" element={<Landing />} />
+
+          {/* Auth page: Sign in / Sign up with Name, Phone, Email */}
+          <Route
+            path="/auth"
+            element={!isAuthenticated ? <Auth /> : <Navigate to="/onboarding" replace />}
+          />
+
+          {/* Onboarding page */}
+          <Route
+            path="/onboarding"
+            element={isAuthenticated ? <Onboarding /> : <Navigate to="/auth" replace />}
+          />
+
+          {/* Protected tool pages after onboarding */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/solar-ai" element={<ProtectedRoute><SolarAI /></ProtectedRoute>} />
           <Route path="/property" element={<ProtectedRoute><PropertyAssessment /></ProtectedRoute>} />

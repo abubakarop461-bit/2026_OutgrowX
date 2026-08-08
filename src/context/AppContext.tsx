@@ -37,10 +37,12 @@ interface AppContextType {
   userProfile: UserProfile;
   language: Language;
   isOnboarded: boolean;
+  isAuthenticated: boolean;
   userRole: UserRole;
   setProfile: (profileUpdate: Partial<UserProfile>) => void;
   setLanguage: (lang: Language) => void;
   completeOnboarding: () => void;
+  authenticateUser: (name: string, phone: string, email: string) => void;
   resetProfile: () => void;
   setUserRole: (role: UserRole) => void;
 }
@@ -60,6 +62,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const [language, setLanguageState] = useState<Language>(() => {
     return (localStorage.getItem('suryx_lang') as Language) || 'en';
+  });
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('suryx_authenticated') === 'true' || Boolean(userProfile.name && userProfile.email);
   });
 
   const [isOnboarded, setIsOnboarded] = useState<boolean>(() => {
@@ -83,6 +89,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [isOnboarded]);
 
   useEffect(() => {
+    localStorage.setItem('suryx_authenticated', String(isAuthenticated));
+  }, [isAuthenticated]);
+
+  useEffect(() => {
     if (userRole) {
       localStorage.setItem('suryx_role', userRole);
     } else {
@@ -93,63 +103,65 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const setProfile = (profileUpdate: Partial<UserProfile>) => {
     setUserProfileState(prev => {
       const updated = { ...prev, ...profileUpdate };
-      // Sync duplicate key names for compatibility
       if (profileUpdate.firstName) updated.name = profileUpdate.firstName;
       if (profileUpdate.roofArea) updated.roofSqFt = profileUpdate.roofArea;
       if (profileUpdate.roofSqFt) updated.roofArea = profileUpdate.roofSqFt;
       if (profileUpdate.billAmount) updated.avgBill = profileUpdate.billAmount;
       if (profileUpdate.avgBill) updated.billAmount = profileUpdate.avgBill;
-      if (profileUpdate.pincode) updated.pinCode = profileUpdate.pincode;
-      if (profileUpdate.pinCode) updated.pincode = profileUpdate.pinCode;
       return updated;
     });
   };
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
+  const authenticateUser = (name: string, phone: string, email: string) => {
+    const firstName = name.split(' ')[0] || name;
+    setUserProfileState(prev => ({
+      ...prev,
+      name,
+      firstName,
+      phone,
+      email,
+    }));
+    setIsAuthenticated(true);
   };
 
-  const completeOnboarding = () => {
-    setIsOnboarded(true);
-    localStorage.setItem('suryx_onboarded', 'true');
-  };
+  const setLanguage = (lang: Language) => setLanguageState(lang);
+
+  const completeOnboarding = () => setIsOnboarded(true);
+
+  const setUserRole = (role: UserRole) => setUserRoleState(role);
 
   const resetProfile = () => {
     setUserProfileState(DEFAULT_PROFILE);
     setIsOnboarded(false);
-    setUserRoleState('consumer');
+    setIsAuthenticated(false);
     localStorage.removeItem('suryx_profile');
     localStorage.removeItem('suryx_onboarded');
-    localStorage.removeItem('suryx_role');
-  };
-
-  const setUserRole = (role: UserRole) => {
-    setUserRoleState(role);
+    localStorage.removeItem('suryx_authenticated');
   };
 
   return (
-    <AppContext.Provider
-      value={{
-        userProfile,
-        language,
-        isOnboarded,
-        userRole,
-        setProfile,
-        setLanguage,
-        completeOnboarding,
-        resetProfile,
-        setUserRole
-      }}
-    >
+    <AppContext.Provider value={{
+      userProfile,
+      language,
+      isOnboarded,
+      isAuthenticated,
+      userRole,
+      setProfile,
+      setLanguage,
+      completeOnboarding,
+      authenticateUser,
+      resetProfile,
+      setUserRole,
+    }}>
       {children}
     </AppContext.Provider>
   );
 };
 
 export const useApp = (): AppContextType => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
+  const ctx = useContext(AppContext);
+  if (!ctx) {
     throw new Error('useApp must be used within an AppProvider');
   }
-  return context;
+  return ctx;
 };

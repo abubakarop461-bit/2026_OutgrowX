@@ -7,11 +7,15 @@ import {
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserRole } = useApp();
+  const { setUserRole, isAuthenticated } = useApp();
 
   const handleRoleSelect = (role: UserRole) => {
     setUserRole(role);
-    navigate('/onboarding');
+    if (!isAuthenticated) {
+      navigate('/auth');
+    } else {
+      navigate('/onboarding');
+    }
   };
 
   const roles = [
