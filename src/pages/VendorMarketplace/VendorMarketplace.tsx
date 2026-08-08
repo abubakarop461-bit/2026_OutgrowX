@@ -43,6 +43,7 @@ export default function VendorMarketplace() {
   const [activeTab, setActiveTab] = useState<'find' | 'business'>('find');
   const [showModal, setShowModal] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState<VendorData | null>(null);
+  const [quoteSent, setQuoteSent] = useState(false);
   const [expandedVendor, setExpandedVendor] = useState<string | null>(null);
 
   // Business portal form
@@ -73,6 +74,7 @@ export default function VendorMarketplace() {
 
   const handleGetQuote = (vendor: VendorData) => {
     setSelectedVendor(vendor);
+    setQuoteSent(false);
     setShowModal(true);
   };
 
@@ -532,29 +534,55 @@ ${name}`;
         {showModal && selectedVendor && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', zIndex: 200 }}>
             <div style={{ background: 'var(--color-canvas-white)', borderRadius: 'var(--radius-cards)', padding: '32px', maxWidth: '580px', width: '100%', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--color-mist)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
-                <div>
-                  <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '4px' }}>Quote Request</div>
-                  <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0 }}>{selectedVendor.companyName}</h3>
+              {quoteSent ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px 0', textAlign: 'center', gap: '20px' }}>
+                  <div style={{
+                    width: '64px', height: '64px', borderRadius: '50%',
+                    background: 'rgba(255, 104, 44, 0.1)', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center'
+                  }}>
+                    <CheckCircle size={36} color="var(--color-ember-orange)" />
+                  </div>
+                  <div>
+                    <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', margin: '0 0 10px' }}>
+                      {isHi ? "अनुरोध सफलतापूर्वक भेजा गया!" : isMr ? "विनंती यशस्वीरित्या पाठवली!" : "Request Sent Successfully!"}
+                    </h3>
+                    <p style={{ fontSize: '14px', color: 'var(--color-steel)', lineHeight: 1.6, margin: 0 }}>
+                      {isHi 
+                        ? `आपका पूर्व-मूल्यांकित सोलर प्रोफ़ाइल सुरक्षित रूप से ${selectedVendor.companyName.split(' - ')[0]} के साथ साझा किया गया है। वे जल्द ही आपसे संपर्क करेंगे।`
+                        : isMr 
+                          ? `तुमचे पूर्व-मूल्यांकन केलेले सोलर प्रोफाइल ${selectedVendor.companyName.split(' - ')[0]} सोबत यशस्वीरित्या शेअर केले गेले आहे. ते लवकरच तुमच्याशी संपर्क साधतील.`
+                          : `Your pre-assessed solar profile has been shared with ${selectedVendor.companyName.split(' - ')[0]}. They will review your requirement specs and reach out to you within 24–48 hours.`}
+                    </p>
+                  </div>
+                  <button className="btn btn-primary" style={{ minWidth: '120px', justifyContent: 'center' }} onClick={() => setShowModal(false)}>
+                    {isHi ? "हो गया" : isMr ? "झाले" : "Done"}
+                  </button>
                 </div>
-                <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-slate)', padding: '4px' }}>
-                  <X size={20} />
-                </button>
-              </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                    <div>
+                      <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-slate)', marginBottom: '4px' }}>Quote Request</div>
+                      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0 }}>{selectedVendor.companyName}</h3>
+                    </div>
+                    <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--color-slate)', padding: '4px' }}>
+                      <X size={20} />
+                    </button>
+                  </div>
 
-              <div style={{ background: 'var(--color-fog)', border: '1px solid var(--color-mist)', borderRadius: '8px', padding: '16px', fontSize: '13px', color: 'var(--color-steel)', whiteSpace: 'pre-wrap', lineHeight: 1.7, marginBottom: '20px' }}>
-                {quoteText}
-              </div>
+                  <div style={{ background: 'var(--color-fog)', border: '1px solid var(--color-mist)', borderRadius: '8px', padding: '16px', fontSize: '13px', color: 'var(--color-steel)', whiteSpace: 'pre-wrap', lineHeight: 1.7, marginBottom: '20px' }}>
+                    {quoteText}
+                  </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button className="btn btn-primary" onClick={() => {
-                  alert(`Quote request dispatched to ${selectedVendor.companyName}! You will receive a response at your registered email within 24–48 hours.`);
-                  setShowModal(false);
-                }}>
-                  Send Quote Request →
-                </button>
-              </div>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                    <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                    <button className="btn btn-primary" onClick={() => setQuoteSent(true)}>
+                      Send Quote Request →
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
