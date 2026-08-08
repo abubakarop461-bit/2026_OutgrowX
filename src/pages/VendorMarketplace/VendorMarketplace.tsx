@@ -111,8 +111,8 @@ ${name}`;
   const maintenance = VENDORS.filter(v => v.type === 'Maintenance').length;
 
   return (
-    <main style={{ background: 'var(--color-canvas-white)', minHeight: '100vh', padding: '8px 24px 80px', color: 'var(--color-graphite)', fontFamily: 'var(--font-body)' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+    <main style={{ background: 'var(--color-canvas-white)', minHeight: '100vh', padding: '24px 24px 80px', color: 'var(--color-graphite)', fontFamily: 'var(--font-body)' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', paddingTop: '16px' }}>
 
         {/* ── Marketplace Stats Banner ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>

@@ -15,7 +15,6 @@ import solarPoliciesData from '../../knowledge/solarPoliciesAndSchemes.json';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-// Special states getting additional 10% subsidy under PM Surya Ghar
 const SPECIAL_STATES = [
   'Himachal Pradesh', 'Uttarakhand', 'Assam', 'Sikkim', 'Arunachal Pradesh',
   'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Tripura', 'Jammu & Kashmir'
@@ -30,92 +29,107 @@ export const PropertyAssessment: React.FC = () => {
   const isSpecialState = SPECIAL_STATES.includes(state);
 
   return (
-    <main className="container pb-12" style={{ maxWidth: '1240px', margin: '0 auto', padding: '8px 1rem 3rem' }}>
-      {/* Tabs */}
-      <div className="tabs mb-6">
-        <button
-          className={`tab-btn ${activeTab === 'roof' ? 'tab-btn--active' : ''}`}
-          onClick={() => setActiveTab('roof')}
-          style={{ fontSize: '0.8125rem', padding: '8px 18px' }}
-        >
-          <HouseLine size={15} weight="duotone" style={{ marginRight: '6px' }} />
-          {t('roofAnalysis') || 'Rooftop Solar Assessment'}
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'land' ? 'tab-btn--active' : ''}`}
-          onClick={() => setActiveTab('land')}
-          style={{ fontSize: '0.8125rem', padding: '8px 18px' }}
-        >
-          <Mountains size={15} weight="duotone" style={{ marginRight: '6px' }} />
-          {t('landSolar') || 'PM-KUSUM Land Solar'}
-        </button>
-      </div>
+    <main
+      style={{
+        background: 'var(--color-canvas-white)',
+        minHeight: '100vh',
+        padding: '32px 24px 80px',
+        color: 'var(--color-graphite)',
+        fontFamily: 'var(--font-body)',
+      }}
+    >
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Header */}
+        <header style={{ marginBottom: '32px', borderBottom: '1px solid var(--color-mist)', paddingBottom: '20px' }}>
+          <div style={{ fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            MNRE &amp; PM Surya Ghar Assessment
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '32px',
+              fontWeight: 400,
+              letterSpacing: '-0.64px',
+              color: 'var(--color-graphite)',
+              margin: 0,
+            }}
+          >
+            Property Assessment — {state}
+          </h1>
+          <p style={{ fontSize: '14px', color: 'var(--color-steel)', marginTop: '4px' }}>
+            Technical feasibility, shadow modeling, and generation potential for rooftop &amp; land parcels.
+          </p>
+        </header>
 
-      {activeTab === 'roof' && <RoofAnalysis state={state} isSpecialState={isSpecialState} />}
-      {activeTab === 'land' && <LandSolar state={state} />}
-
-      {/* Official Government Eligibility Footer Card */}
-      <div style={{
-        background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px',
-        padding: '1.5rem 1.75rem', marginTop: '2rem'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1rem', fontWeight: 700, margin: 0, color: '#ECF2EE', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldCheck size={18} weight="duotone" color="#A8FF3E" />
-            Official Government Schemes Compliance (MNRE Verified)
-          </h3>
-          <span style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600 }}>Portal: pmsuryaghar.gov.in</span>
+        {/* Tabs (Ventriloc Capsule Pill) */}
+        <div className="tabs">
+          <button
+            className={`tab-btn ${activeTab === 'roof' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('roof')}
+          >
+            <HouseLine size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
+            Rooftop Solar Assessment
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'land' ? 'tab-btn--active' : ''}`}
+            onClick={() => setActiveTab('land')}
+          >
+            <Mountains size={15} style={{ marginRight: '6px', display: 'inline-block' }} />
+            PM-KUSUM Land Solar
+          </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
-          {/* PM Surya Ghar */}
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-            <CheckCircle size={20} weight="duotone" color="#22C55E" style={{ marginTop: '2px', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ECF2EE', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                {pmSuryaGharData.schemeOverview.name}
-                <span style={{ fontSize: '0.6875rem', color: '#A8FF3E', background: 'rgba(168,255,62,0.1)', padding: '2px 8px', borderRadius: '999px' }}>Up to ₹78,000</span>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '4px', lineHeight: 1.5 }}>
-                Direct Benefit Transfer (DBT) to consumer bank account. Up to 300 units free electricity/mo.
-              </div>
-              <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '6px' }}>
-                ALMM Indian Solar PV modules mandatory · Collateral-free loan available @ ~7% p.a.
-              </div>
-            </div>
+        {activeTab === 'roof' && <RoofAnalysis state={state} isSpecialState={isSpecialState} />}
+        {activeTab === 'land' && <LandSolar state={state} />}
+
+        {/* Official Government Eligibility Footer Card (Ventriloc Ash container) */}
+        <div
+          style={{
+            background: 'var(--color-ash)',
+            borderRadius: 'var(--radius-cards)',
+            padding: '28px 32px',
+            marginTop: '40px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldCheck size={18} color="var(--color-brass)" />
+              Official Government Schemes Compliance (MNRE Verified)
+            </h3>
+            <span style={{ fontSize: '12px', color: 'var(--color-slate)' }}>Portal: pmsuryaghar.gov.in</span>
           </div>
 
-          {/* State Net Metering */}
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-            <CheckCircle size={20} weight="duotone" color="#22C55E" style={{ marginTop: '2px', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ECF2EE', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                CEA Net Metering Standard ({state})
-                <span style={{ fontSize: '0.6875rem', color: '#60A5FA', background: 'rgba(96,165,250,0.1)', padding: '2px 8px', borderRadius: '999px' }}>Active</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+            {/* PM Surya Ghar */}
+            <div style={{ background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', borderRadius: 'var(--radius-cards)', padding: '20px' }}>
+              <div style={{ fontSize: '14px', fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--color-graphite)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {pmSuryaGharData.schemeOverview.name}
+                <span className="badge badge--ember">Up to ₹78,000</span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '4px', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px', lineHeight: 1.5 }}>
+                Direct Benefit Transfer (DBT) to consumer bank account. Up to 300 units free electricity per month.
+              </div>
+            </div>
+
+            {/* State Net Metering */}
+            <div style={{ background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', borderRadius: 'var(--radius-cards)', padding: '20px' }}>
+              <div style={{ fontSize: '14px', fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--color-graphite)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                CEA Net Metering Standard ({state})
+                <span className="badge badge--success">Active</span>
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px', lineHeight: 1.5 }}>
                 Bi-directional net meter installed by DISCOM. Surplus solar power exported to grid credited against monthly bill.
               </div>
-              <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '6px' }}>
-                Sanctioned load check required by DISCOM within 15–30 days.
-              </div>
             </div>
-          </div>
 
-          {/* PM-KUSUM */}
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', gap: '0.875rem' }}>
-            <Plant size={20} weight="duotone" color="#F59E0B" style={{ marginTop: '2px', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#ECF2EE', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                PM-KUSUM Scheme (Component A/B/C)
-                <span style={{ fontSize: '0.6875rem', color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '2px 8px', borderRadius: '999px' }}>30%–50% Subsidy</span>
+            {/* PM-KUSUM */}
+            <div style={{ background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', borderRadius: 'var(--radius-cards)', padding: '20px' }}>
+              <div style={{ fontSize: '14px', fontFamily: 'var(--font-display)', fontWeight: 400, color: 'var(--color-graphite)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                PM-KUSUM Component A/B/C
+                <span className="badge badge--brass">Agri Solar</span>
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '4px', lineHeight: 1.5 }}>
-                Grid-connected solar power plants (0.5 MW–2 MW) on barren/fallow land or solar agricultural pumps (2–10 HP).
-              </div>
-              <div style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '6px' }}>
-                Target: 30,800 MW total capacity for farmers &amp; landowners.
+              <div style={{ fontSize: '13px', color: 'var(--color-steel)', marginTop: '8px', lineHeight: 1.5 }}>
+                Subsidized standalone solar pumps (up to 60%) and 25-year developer lease contracts on agricultural land.
               </div>
             </div>
           </div>
@@ -125,617 +139,293 @@ export const PropertyAssessment: React.FC = () => {
   );
 };
 
-/* ═══════════════════════════════════════════════════════
-   ROOFTOP ANALYSIS COMPONENT
-═══════════════════════════════════════════════════════ */
+/* ── Rooftop Analysis Component ── */
 const RoofAnalysis: React.FC<{ state: string; isSpecialState: boolean }> = ({ state, isSpecialState }) => {
   const { userProfile } = useApp();
+  const [roofArea, setRoofArea] = useState<number | string>(userProfile.roofArea || 800);
+  const [roofType, setRoofType] = useState('Flat Concrete (RCC)');
+  const [shadow, setShadow] = useState('Minimal (< 10%)');
   const [analyzed, setAnalyzed] = useState(false);
-  const [roofArea, setRoofArea] = useState<number | ''>(userProfile.roofArea || userProfile.roofSqFt ? Number(userProfile.roofArea || userProfile.roofSqFt) : '');
-  const [roofType, setRoofType] = useState('RCC Flat');
-  const [buildingAge, setBuildingAge] = useState('0-5 years');
-  const [shading, setShading] = useState('None');
-  const [orientation, setOrientation] = useState('South');
 
-  const discom = (userProfile as any).discom || 'State DISCOM';
-  const monthlyBill = Number((userProfile as any).billSize || (userProfile as any).avgBill || (userProfile as any).billAmount || 3200);
+  const irradianceData = getSolarHoursPerDay(state);
+  const peakSunHours = irradianceData.average;
 
-  // Irradiance data for state
-  const irradiance = getSolarHoursPerDay(state);
-  const psh = irradiance.average;
-
-  // Current tariff
-  const tariffHistory = getStateTariffHistory(state, discom);
-  const currentTariff = tariffHistory[tariffHistory.length - 1]?.rate || 7.5;
-
-  // Calculation logic based on PM Surya Ghar requirements
   const calc = useMemo(() => {
-    const areaNum = Number(roofArea) || 800;
-    const maxViableKW = Math.max(1, Math.floor(areaNum / 107));
-    
-    // Monthly consumption units
-    const monthlyUnits = monthlyBill / currentTariff;
-    const annualUnits = monthlyUnits * 12;
+    const area = Number(roofArea) || 800;
+    const maxCapacityKW = +(area / 107).toFixed(1);
+    const dailyGenerationKWh = +(maxCapacityKW * peakSunHours).toFixed(1);
+    const monthlyGenerationKWh = Math.round(dailyGenerationKWh * 30);
+    const annualGenerationKWh = Math.round(dailyGenerationKWh * 365);
 
-    // Required capacity to meet consumption: Annual Units / (365 * PSH * 0.77)
-    const requiredKW = annualUnits / (365 * psh * 0.77);
-    const recommendedKW = Math.max(1, Math.min(maxViableKW, Math.ceil(requiredKW * 2) / 2));
+    const shadowMultiplier = shadow === 'None' ? 1.0 : shadow === 'Minimal (< 10%)' ? 0.93 : shadow === 'Moderate (10-25%)' ? 0.80 : 0.65;
+    const effectiveKW = +(maxCapacityKW * shadowMultiplier).toFixed(1);
 
-    // Usable shadow-free area (60% to 75% depending on shading)
-    const usableAreaFactor = shading === 'None' ? 0.75 : shading === 'Partial' ? 0.60 : 0.45;
-    const usableAreaSqFt = Math.round(areaNum * usableAreaFactor);
-
-    // Number of panels (using standard 400W ALMM-listed monocrystalline PV modules)
-    const panelsCount = Math.ceil((recommendedKW * 1000) / 400);
-
-    // PM Surya Ghar Subsidy calculation from pmSuryaGhar.json
-    let subsidy = 0;
-    if (recommendedKW <= 1) subsidy = 30000;
-    else if (recommendedKW <= 2) subsidy = 60000;
-    else subsidy = 78000; // Capped at 78k for residential
-
-    if (isSpecialState) {
-      subsidy = Math.round(subsidy * 1.10); // Additional 10% for special states
-    }
-
-    // Benchmark system cost: ₹45,000/kW for <=3kW, ₹40,000/kW for >3kW
-    const costPerKW = recommendedKW <= 3 ? 45000 : 40000;
-    const systemCost = Math.round(recommendedKW * costPerKW);
-    const netInvestment = Math.max(0, systemCost - subsidy);
-
-    // Generation & Financials
-    const annualGenerationKWh = Math.round(recommendedKW * psh * 365 * 0.77);
-    const monthlyGenerationKWh = Math.round(annualGenerationKWh / 12);
-    const annualSavings = Math.round(Math.min(annualGenerationKWh, annualUnits) * currentTariff);
-    const paybackYears = netInvestment > 0 ? parseFloat((netInvestment / annualSavings).toFixed(1)) : 0;
-
-    // Sub-scores (0-100)
-    const solarResourceScore = Math.round(Math.min(100, Math.max(30, ((psh - 4.0) / 1.5) * 60 + 40)));
-    
-    let roofSuitabilityScore = areaNum >= 1000 ? 95 : areaNum >= 500 ? 85 : 70;
-    if (roofType === 'RCC Flat' || roofType === 'Terrace') roofSuitabilityScore = Math.min(100, roofSuitabilityScore + 8);
-    if (roofType === 'Metal Sheet') roofSuitabilityScore = Math.max(40, roofSuitabilityScore - 5);
-
-    const shadingScore = shading === 'None' ? 95 : shading === 'Partial' ? 70 : 45;
-    const structuralScore = buildingAge === '0-5 years' ? 98 : buildingAge === '5-15 years' ? 88 : buildingAge === '15-30 years' ? 72 : 50;
-
-    const orientationBonus = orientation === 'South' ? 10 : orientation.includes('South') ? 5 : 0;
-    const overallScore = Math.round(
-      Math.min(100, (solarResourceScore * 0.3) + (roofSuitabilityScore * 0.25) + (shadingScore * 0.25) + (structuralScore * 0.2) + orientationBonus)
-    );
+    const baseSubsidy = effectiveKW <= 1 ? 30000 : effectiveKW <= 2 ? 60000 : 78000;
+    const finalSubsidy = isSpecialState ? Math.round(baseSubsidy * 1.1) : baseSubsidy;
 
     return {
-      maxViableKW,
-      recommendedKW,
-      panelsCount,
-      usableAreaSqFt,
-      subsidy,
-      systemCost,
-      netInvestment,
-      annualGenerationKWh,
+      maxCapacityKW,
+      effectiveKW,
+      dailyGenerationKWh,
       monthlyGenerationKWh,
-      annualSavings,
-      paybackYears,
-      solarResourceScore,
-      roofSuitabilityScore,
-      shadingScore,
-      structuralScore,
-      overallScore
+      annualGenerationKWh,
+      finalSubsidy,
+      overallScore: Math.min(100, Math.round(85 * shadowMultiplier + (peakSunHours / 5.5) * 15)),
     };
-  }, [roofArea, roofType, buildingAge, shading, orientation, psh, monthlyBill, currentTariff, isSpecialState]);
+  }, [roofArea, roofType, shadow, peakSunHours, isSpecialState]);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem' }}>
-      {/* Input Form Column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        <div style={{
-          background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
-        }}>
-          <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 1.25rem', color: '#ECF2EE', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Ruler size={16} weight="duotone" color="#A8FF3E" />
-            Rooftop &amp; Structural Inputs
-          </h4>
+    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '24px' }}>
+      {/* Left Column: Form & Assessment */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ background: 'var(--color-ash)', borderRadius: 'var(--radius-cards)', padding: '28px' }}>
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            Rooftop Geometry Parameters
+          </div>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '20px' }}>
+            Rooftop Input &amp; Solar Potential
+          </h3>
 
-          {/* Roof Area */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="roofArea" style={{ fontSize: '0.75rem', color: '#7A9484' }}>
-              Total Roof Area (sq. ft.)
-            </label>
+          <div className="form-group">
+            <label className="label">Usable Shadow-Free Roof Area (sq ft)</label>
             <input
               type="number"
-              id="roofArea"
-              className="input"
               value={roofArea}
-              onChange={e => setRoofArea(Math.max(50, Number(e.target.value) || 0))}
+              onChange={e => setRoofArea(e.target.value)}
               placeholder="e.g. 800"
-              min="50"
-              style={{ fontSize: '0.875rem' }}
             />
-            <span style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>
-              PM Surya Ghar standard: ~107 sq ft required per 1 kW system.
+            <span style={{ fontSize: '12px', color: 'var(--color-slate)', marginTop: '4px', display: 'block' }}>
+              Standard benchmark: 107 sq ft per 1 kW system.
             </span>
           </div>
 
-          {/* Roof Type */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="roofType" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Roof Construction</label>
-            <select id="roofType" className="input select" value={roofType} onChange={e => setRoofType(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="RCC Flat">RCC Flat Roof (Ideal for ballasted mounting)</option>
-              <option value="Terrace">Open Terrace / Open Deck</option>
-              <option value="Sloped Tile">Sloped / Tiled Roof</option>
-              <option value="Metal Sheet">Industrial Metal Sheet</option>
+          <div className="form-group">
+            <label className="label">Roof Surface Type</label>
+            <select value={roofType} onChange={e => setRoofType(e.target.value)}>
+              <option value="Flat Concrete (RCC)">Flat Concrete (RCC)</option>
+              <option value="Slanted Tile Roof">Slanted Tile Roof</option>
+              <option value="Metal Sheet Shed">Metal Sheet Industrial Shed</option>
             </select>
           </div>
 
-          {/* Orientation */}
-          <div className="form-group mb-4">
-            <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Tilt &amp; Direction</label>
-            <select className="input select" value={orientation} onChange={e => setOrientation(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="South">True South (True solar optimum 15°–20° tilt)</option>
-              <option value="South-East">South-East (Good morning generation)</option>
-              <option value="South-West">South-West (Good evening generation)</option>
-              <option value="East / West">East / West (Dual-tilt layout)</option>
-              <option value="North">North (Not recommended - 25% loss)</option>
-            </select>
-          </div>
-
-          {/* Shading */}
-          <div className="form-group mb-4">
-            <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Sunlight Obstruction (Shading)</label>
-            <div className="toggle-group">
-              {['None', 'Partial', 'Heavy'].map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`toggle-option ${shading === opt ? 'toggle-option--selected' : ''}`}
-                  onClick={() => setShading(opt)}
-                  style={{ fontSize: '0.8125rem', padding: '8px' }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Building Age */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="buildingAge" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Building Structural Age</label>
-            <select id="buildingAge" className="input select" value={buildingAge} onChange={e => setBuildingAge(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="0-5 years">0–5 years (New / Excellent load bearing)</option>
-              <option value="5-15 years">5–15 years (Good condition)</option>
-              <option value="15-30 years">15–30 years (Structural check recommended)</option>
-              <option value="30+ years">30+ years (Requires structural reinforcement)</option>
+          <div className="form-group">
+            <label className="label">Shadow / Obstruction Level</label>
+            <select value={shadow} onChange={e => setShadow(e.target.value)}>
+              <option value="None">None (100% Clear Sun)</option>
+              <option value="Minimal (< 10%)">Minimal (&lt; 10% Shadow)</option>
+              <option value="Moderate (10-25%)">Moderate (10–25% Shadow)</option>
+              <option value="Severe (> 25%)">Severe (&gt; 25% Shadow)</option>
             </select>
           </div>
 
           <button
-            className="btn btn-primary w-full justify-center mt-2"
+            className="btn btn-primary w-full justify-center"
+            style={{ marginTop: '8px' }}
             onClick={() => {
               setAnalyzed(true);
-              recordPropertyAssessmentAction({ roofArea: Number(roofArea) || 800, score: calc.overallScore }, userProfile);
+              recordPropertyAssessmentAction({ roofArea: Number(roofArea) || 800, score: calc.overallScore, maxCapacityKW: calc.maxCapacityKW }, userProfile);
             }}
-            style={{ fontSize: '0.875rem' }}
           >
-            Recalculate Rooftop Potential <CaretRight size={15} />
+            Calculate Solar Potential →
           </button>
+        </div>
+
+        {/* Irradiance Heatmap Card */}
+        <div style={{ background: 'var(--color-canvas-white)', border: '1px solid var(--color-mist)', borderRadius: 'var(--radius-cards)', padding: '28px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div>
+              <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '2px', fontFamily: 'var(--font-display)' }}>
+                Solar Irradiance Heatmap
+              </div>
+              <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0 }}>
+                {state} Monthly Peak Sun Hours (PSH)
+              </h4>
+            </div>
+            <span className="badge badge--ember">{peakSunHours} PSH Avg</span>
+          </div>
+
+          <div style={{ height: '180px' }}>
+            <HeatmapChart
+              data={HOURLY_IRRADIANCE_GRID}
+              activeColor="rgba(255, 104, 44,"
+              maxVal={1.0}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Results Column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {analyzed ? (
-          <>
-            {/* Score & Capacity Card */}
-            <div style={{
-              background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
-                <div>
-                  <div style={{ fontFamily: 'Outfit, sans-serif', fontSize: '2.25rem', fontWeight: 800, color: '#A8FF3E', lineHeight: 1 }}>
-                    {calc.overallScore}<span style={{ fontSize: '1rem', color: '#4A6055' }}>/100</span>
-                  </div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#7A9484', marginTop: '4px' }}>
-                    Rooftop Feasibility Score
-                  </div>
-                </div>
-                <span className={`badge ${calc.overallScore >= 75 ? 'badge--accent' : 'badge--amber'}`}>
-                  {calc.overallScore >= 85 ? 'OPTIMAL FEASIBILITY' : calc.overallScore >= 70 ? 'GOOD FEASIBILITY' : 'MODERATE'}
-                </span>
-              </div>
-
-              {/* Breakdown Bars */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.25rem' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7A9484', marginBottom: '3px' }}>
-                    <span>Solar Resource ({psh} PSH/day)</span>
-                    <span style={{ fontWeight: 700, color: '#ECF2EE' }}>{calc.solarResourceScore}/100</span>
-                  </div>
-                  <div style={{ height: '5px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${calc.solarResourceScore}%`, background: '#22C55E', borderRadius: '999px' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7A9484', marginBottom: '3px' }}>
-                    <span>Roof Suitability ({roofArea} sq ft)</span>
-                    <span style={{ fontWeight: 700, color: '#ECF2EE' }}>{calc.roofSuitabilityScore}/100</span>
-                  </div>
-                  <div style={{ height: '5px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${calc.roofSuitabilityScore}%`, background: '#A8FF3E', borderRadius: '999px' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7A9484', marginBottom: '3px' }}>
-                    <span>Shading Clearance ({shading})</span>
-                    <span style={{ fontWeight: 700, color: '#ECF2EE' }}>{calc.shadingScore}/100</span>
-                  </div>
-                  <div style={{ height: '5px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${calc.shadingScore}%`, background: '#60A5FA', borderRadius: '999px' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#7A9484', marginBottom: '3px' }}>
-                    <span>Structural Integrity ({buildingAge})</span>
-                    <span style={{ fontWeight: 700, color: '#ECF2EE' }}>{calc.structuralScore}/100</span>
-                  </div>
-                  <div style={{ height: '5px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${calc.structuralScore}%`, background: '#F59E0B', borderRadius: '999px' }} />
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', margin: '1rem 0' }} />
-
-              {/* System Recommendation Summary */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                <div>
-                  <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>Recommended Capacity</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#A8FF3E', fontFamily: 'Outfit, sans-serif' }}>
-                    {calc.recommendedKW} kW
-                  </div>
-                  <div style={{ fontSize: '0.6875rem', color: '#7A9484' }}>{calc.panelsCount} × 400W ALMM panels</div>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>PM Surya Ghar Subsidy</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#22C55E', fontFamily: 'Outfit, sans-serif' }}>
-                    ₹{calc.subsidy.toLocaleString('en-IN')}
-                  </div>
-                  <div style={{ fontSize: '0.6875rem', color: '#7A9484' }}>
-                    {isSpecialState ? 'Includes 10% Special State bonus' : 'Direct DBT transfer'}
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>Est. Annual Generation</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ECF2EE' }}>
-                    {calc.annualGenerationKWh.toLocaleString('en-IN')} kWh
-                  </div>
-                  <div style={{ fontSize: '0.6875rem', color: '#7A9484' }}>~{calc.monthlyGenerationKWh} units / month</div>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>Est. Payback Period</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 700, color: '#ECF2EE' }}>
-                    {calc.paybackYears} years
-                  </div>
-                  <div style={{ fontSize: '0.6875rem', color: '#7A9484' }}>25-year system lifespan</div>
-                </div>
-              </div>
+      {/* Right Column: Sizing Results (Ventriloc White Card) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          style={{
+            background: 'var(--color-canvas-white)',
+            border: '1px solid var(--color-mist)',
+            borderRadius: 'var(--radius-cards)',
+            padding: '28px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
+          <div>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
+              Engineering Synthesis
             </div>
-
-            {/* Annual Irradiance Heatmap using BKLIT UI (@bklit/heatmap-chart) */}
-            <div style={{
-              background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.875rem', fontWeight: 700, margin: 0, color: '#ECF2EE', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sun size={15} weight="duotone" color="#A8FF3E" />
-                  Hourly Irradiance Matrix ({state})
-                </h4>
-                <span style={{ fontSize: '0.6875rem', color: '#4A6055' }}>Avg {psh} kWh/m²/day</span>
-              </div>
-
-              <HeatmapChart
-                data={HOURLY_IRRADIANCE_GRID}
-                maxVal={psh * 1.1}
-                unit="kWh/m²"
-              />
-            </div>
-          </>
-        ) : (
-          <div style={{
-            background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '3rem 2rem',
-            textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <Sun size={40} weight="duotone" color="#7A9484" style={{ marginBottom: '1rem' }} />
-            <p style={{ color: '#7A9484', fontSize: '0.875rem' }}>Fill in your property details and click analyze to compute rooftop solar feasibility.</p>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0 }}>
+              Estimated Rooftop Capacity
+            </h3>
           </div>
-        )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div className="vai-stat">
+              <div className="vai-stat-value">{calc.effectiveKW}</div>
+              <div className="vai-stat-label">Usable kW Peak</div>
+            </div>
+            <div className="vai-stat">
+              <div className="vai-stat-value">{calc.overallScore}</div>
+              <div className="vai-stat-label">Solar Score /100</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', borderTop: '1px solid var(--color-mist)', paddingTop: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ color: 'var(--color-steel)' }}>Daily Generation</span>
+              <strong style={{ color: 'var(--color-graphite)' }}>~{calc.dailyGenerationKWh} kWh/day</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ color: 'var(--color-steel)' }}>Monthly Yield</span>
+              <strong style={{ color: 'var(--color-graphite)' }}>~{calc.monthlyGenerationKWh} kWh/mo</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ color: 'var(--color-steel)' }}>Annual Generation</span>
+              <strong style={{ color: 'var(--color-graphite)' }}>~{calc.annualGenerationKWh.toLocaleString('en-IN')} kWh/yr</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+              <span style={{ color: 'var(--color-steel)' }}>PM Subsidy DBT</span>
+              <strong style={{ color: 'var(--color-ember-orange)' }}>₹{calc.finalSubsidy.toLocaleString('en-IN')}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* Asymmetric Role Tip */}
+        <div style={{ background: 'var(--color-ivory)', borderRadius: '6px 0px 0px 6px', padding: '24px' }}>
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            DISCOM Sanctioned Load Guideline
+          </div>
+          <p style={{ fontSize: '13px', color: 'var(--color-steel)', lineHeight: 1.6, margin: 0 }}>
+            Under {state} net-metering regulations, solar capacity up to 100% of sanctioned load is approved seamlessly. Sizing at {calc.effectiveKW} kW requires a matching sanctioned load.
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
-/* ═══════════════════════════════════════════════════════
-   LAND SOLAR COMPONENT (PM-KUSUM ALIGNED)
-═══════════════════════════════════════════════════════ */
+/* ── Land Solar Analysis (PM-KUSUM) Component ── */
 const LandSolar: React.FC<{ state: string }> = ({ state }) => {
   const { userProfile } = useApp();
+  const [landArea, setLandArea] = useState<number | string>(5);
+  const [substationDist, setSubstationDist] = useState<number | string>(2.5);
   const [analyzed, setAnalyzed] = useState(false);
-  const [landArea, setLandArea] = useState<number | ''>(5);
-  const [terrain, setTerrain] = useState('Flat');
-  const [soilType, setSoilType] = useState('Sandy / Loamy');
-  const [gridDistance, setGridDistance] = useState('< 1 km');
-  const [waterAccess, setWaterAccess] = useState('Yes');
-  const [ownership, setOwnership] = useState('Own');
 
-  const psh = getSolarHoursPerDay(state).average;
-
-  // Calculation based on solarPoliciesAndSchemes.json (PM-KUSUM rules)
   const calc = useMemo(() => {
-    const areaNum = Number(landArea) || 5;
-    // Terrain capacity modifier
-    const terrainMod = terrain === 'Flat' ? 1.0 : terrain === 'Gently Sloped' ? 0.88 : 0.65;
-    
-    // ~200 kW capacity per acre for utility / community scale
-    const estimatedCapacityKW = Math.round(areaNum * 200 * terrainMod);
-    const capacityMW = (estimatedCapacityKW / 1000).toFixed(2);
-
-    // Annual generation: kW * PSH * 365 * 0.78 efficiency
-    const annualGenerationKWh = Math.round(estimatedCapacityKW * psh * 365 * 0.78);
-    const annualGenerationLakhs = (annualGenerationKWh / 100000).toFixed(1);
-
-    // PM-KUSUM Matching
-    let schemeMatch = 'PM-KUSUM Component A';
-    let schemeDesc = '0.5 MW to 2 MW grid-connected solar power plant on barren or fallow farmland.';
-    if (areaNum < 2) {
-      schemeMatch = 'PM-KUSUM Component B / C';
-      schemeDesc = 'Off-grid standalone solar pumps (2–10 HP) or solarization of agricultural feeder pumps.';
-    }
-
-    // Revenue Options under PM-KUSUM
-    // Option 1: Lease land to developer @ ₹35,000 to ₹50,000 per acre/year
-    const annualLeaseMin = Math.round(areaNum * 35000);
-    const annualLeaseMax = Math.round(areaNum * 52000);
-
-    // Option 2: Sale of power to DISCOM at PPA tariff ~₹3.00 / unit
-    const ppaTariff = 3.00;
-    const grossPpaIncome = Math.round((annualGenerationKWh * ppaTariff) / 100000); // in Lakhs
-
-    // Feasibility Score based on Grid Distance & Terrain
-    const gridScore = gridDistance === '< 1 km' ? 95 : gridDistance === '1 - 3 km' ? 80 : gridDistance === '3 - 5 km' ? 62 : 40;
-    const terrainScore = terrain === 'Flat' ? 95 : terrain === 'Gently Sloped' ? 78 : 50;
-    const waterScore = waterAccess === 'Yes' ? 90 : 65;
-    const overallFeasibility = Math.round((gridScore * 0.45) + (terrainScore * 0.35) + (waterScore * 0.2));
+    const acres = Number(landArea) || 5;
+    const capacityMW = +(acres * 0.2).toFixed(2);
+    const annualLeaseMin = Math.round(acres * 60000);
+    const annualLeaseMax = Math.round(acres * 100000);
+    const dist = Number(substationDist) || 2.5;
+    const feasible = dist <= 5.0;
 
     return {
-      estimatedCapacityKW,
       capacityMW,
-      annualGenerationKWh,
-      annualGenerationLakhs,
-      schemeMatch,
-      schemeDesc,
       annualLeaseMin,
       annualLeaseMax,
-      grossPpaIncome,
-      overallFeasibility
+      feasible,
     };
-  }, [landArea, terrain, gridDistance, waterAccess, psh]);
+  }, [landArea, substationDist]);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem' }}>
-      {/* Inputs Column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        <div style={{
-          background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
-        }}>
-          <h4 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '0.9375rem', fontWeight: 700, margin: '0 0 1.25rem', color: '#ECF2EE', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Mountains size={16} weight="duotone" color="#A8FF3E" />
-            Land Parcel Specifications
-          </h4>
-
-          {/* Land Area */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="landArea" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Total Land Area (Acres)</label>
-            <input
-              type="number"
-              id="landArea"
-              className="input"
-              value={landArea}
-              onChange={e => setLandArea(Math.max(0.2, Number(e.target.value) || 0))}
-              placeholder="e.g. 5"
-              min="0.2"
-              step="0.5"
-              style={{ fontSize: '0.875rem' }}
-            />
-            <span style={{ fontSize: '0.6875rem', color: '#4A6055', marginTop: '4px' }}>
-              ~2 to 5 acres required for 1 MW solar plant under PM-KUSUM Component A.
-            </span>
-          </div>
-
-          {/* Terrain */}
-          <div className="form-group mb-4">
-            <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Terrain Topology</label>
-            <div className="toggle-group">
-              {['Flat', 'Gently Sloped', 'Hilly'].map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`toggle-option ${terrain === opt ? 'toggle-option--selected' : ''}`}
-                  onClick={() => setTerrain(opt)}
-                  style={{ fontSize: '0.8125rem', padding: '8px' }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Distance to Substation */}
-          <div className="form-group mb-4">
-            <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Distance to Nearest DISCOM Substation (33/11 kV)</label>
-            <select className="input select" value={gridDistance} onChange={e => setGridDistance(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="< 1 km">&lt; 1 km (Optimal - Minimal evacuation cost)</option>
-              <option value="1 - 3 km">1 – 3 km (Feasible - Standard transmission line)</option>
-              <option value="3 - 5 km">3 – 5 km (Requires line extension)</option>
-              <option value="> 5 km">&gt; 5 km (High transmission interconnect cost)</option>
-            </select>
-          </div>
-
-          {/* Soil Type */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="soilType" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Soil &amp; Land Classification</label>
-            <select id="soilType" className="input select" value={soilType} onChange={e => setSoilType(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="Sandy / Loamy">Barren / Fallow Land (Ideal for KUSUM)</option>
-              <option value="Agricultural">Agricultural Land (Suitable for Agri-PV / Dual use)</option>
-              <option value="Clay / Marshy">Clay / Marshy (Requires reinforced piling)</option>
-              <option value="Rocky">Rocky Strata (Requires specialized drilling)</option>
-            </select>
-          </div>
-
-          {/* Water Access */}
-          <div className="form-group mb-4">
-            <label className="label" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Module Cleaning Water Access</label>
-            <div className="toggle-group">
-              {['Yes', 'No'].map(opt => (
-                <button
-                  key={opt}
-                  type="button"
-                  className={`toggle-option ${waterAccess === opt ? 'toggle-option--selected' : ''}`}
-                  onClick={() => setWaterAccess(opt)}
-                  style={{ fontSize: '0.8125rem', padding: '8px' }}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Ownership */}
-          <div className="form-group mb-4">
-            <label className="label" htmlFor="ownership" style={{ fontSize: '0.75rem', color: '#7A9484' }}>Ownership Title</label>
-            <select id="ownership" className="input select" value={ownership} onChange={e => setOwnership(e.target.value)} style={{ fontSize: '0.875rem' }}>
-              <option value="Own">Individual Owner / Freehold</option>
-              <option value="Lease">Leased / Long-term Lease agreement</option>
-              <option value="Shared">Co-operative / Joint Ownership</option>
-            </select>
-          </div>
-
-          <button
-            className="btn btn-primary w-full justify-center mt-2"
-            onClick={() => {
-              setAnalyzed(true);
-              recordPropertyAssessmentAction({ acres: Number(landArea) || 5, capacityMW: Number(calc.capacityMW) || 0.5 }, userProfile);
-            }}
-            style={{ fontSize: '0.875rem' }}
-          >
-            Recalculate Land Potential <CaretRight size={15} />
-          </button>
+    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '24px' }}>
+      <div style={{ background: 'var(--color-ash)', borderRadius: 'var(--radius-cards)', padding: '28px' }}>
+        <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+          PM-KUSUM Land Feasibility
         </div>
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '20px' }}>
+          Agricultural Land Solarization &amp; Leasing
+        </h3>
+
+        <div className="form-group">
+          <label className="label">Unused Agricultural Land Area (Acres)</label>
+          <input
+            type="number"
+            value={landArea}
+            onChange={e => setLandArea(e.target.value)}
+            placeholder="e.g. 5"
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="label">Distance to Nearest 11kV/33kV Substation (km)</label>
+          <input
+            type="number"
+            value={substationDist}
+            onChange={e => setSubstationDist(e.target.value)}
+            placeholder="e.g. 2.5"
+          />
+          <span style={{ fontSize: '12px', color: 'var(--color-slate)', marginTop: '4px', display: 'block' }}>
+            PM-KUSUM Component A mandates distance &lt; 5 km from distribution substations.
+          </span>
+        </div>
+
+        <button
+          className="btn btn-primary w-full justify-center"
+          style={{ marginTop: '8px' }}
+          onClick={() => {
+            setAnalyzed(true);
+            recordPropertyAssessmentAction({ acres: Number(landArea) || 5, capacityMW: calc.capacityMW, score: calc.feasible ? 92 : 45 }, userProfile);
+          }}
+        >
+          Calculate Land Solar Feasibility →
+        </button>
       </div>
 
-      {/* Results Column */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-        {analyzed ? (
-          <div style={{
-            background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '1.5rem 1.75rem'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <div>
-                <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1rem', fontWeight: 700, margin: 0, color: '#ECF2EE', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Mountains size={18} weight="duotone" color="#A8FF3E" />
-                  Land Solar Revenue &amp; Capacity
-                </h3>
+      {/* Right Column: Land Economics */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div
+          style={{
+            background: 'var(--color-canvas-white)',
+            border: '1px solid var(--color-mist)',
+            borderRadius: 'var(--radius-cards)',
+            padding: '28px',
+          }}
+        >
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-brass)', marginBottom: '4px', fontFamily: 'var(--font-display)' }}>
+            Commercial Feasibility
+          </div>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 400, color: 'var(--color-graphite)', marginBottom: '16px' }}>
+            Estimated Lease Returns
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>Plant Capacity</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', color: 'var(--color-graphite)' }}>~{calc.capacityMW} MW</div>
+            </div>
+
+            <div>
+              <div style={{ fontSize: '11px', color: 'var(--color-slate)', textTransform: 'uppercase' }}>Estimated Annual Lease</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '22px', color: 'var(--color-ember-orange)' }}>
+                ₹{calc.annualLeaseMin.toLocaleString('en-IN')} – ₹{calc.annualLeaseMax.toLocaleString('en-IN')}
               </div>
-              <span className={`badge ${calc.overallFeasibility >= 75 ? 'badge--accent' : 'badge--amber'}`}>
-                {calc.overallFeasibility >= 80 ? 'HIGH FEASIBILITY ✓' : 'MODERATE FEASIBILITY'}
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--color-mist)', paddingTop: '12px', fontSize: '13px' }}>
+              <span style={{ color: calc.feasible ? '#16a34a' : '#dc2626', fontWeight: 500 }}>
+                {calc.feasible ? '✓ Substation Proximity: Optimal (< 5 km)' : '⚠ Substation Distance Exceeds 5 km'}
               </span>
             </div>
-
-            {/* Key Metrics Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>Estimated Capacity</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#A8FF3E', fontFamily: 'Outfit, sans-serif' }}>
-                  {calc.estimatedCapacityKW} kW
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#7A9484' }}>({calc.capacityMW} MW plant size)</div>
-              </div>
-
-              <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ fontSize: '0.6875rem', color: '#4A6055', fontWeight: 600, textTransform: 'uppercase' }}>Est. Annual Generation</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#ECF2EE', fontFamily: 'Outfit, sans-serif' }}>
-                  {calc.annualGenerationLakhs} Lakh
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#7A9484' }}>kWh units / year</div>
-              </div>
-            </div>
-
-            {/* Scheme Match Card */}
-            <div style={{ background: 'rgba(168, 255, 62, 0.05)', border: '1px solid rgba(168, 255, 62, 0.18)', borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
-              <div style={{ fontSize: '0.6875rem', color: '#A8FF3E', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                MNRE Scheme Match
-              </div>
-              <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#ECF2EE', marginTop: '2px' }}>
-                {calc.schemeMatch}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '4px', lineHeight: 1.5 }}>
-                {calc.schemeDesc}
-              </div>
-            </div>
-
-            {/* Revenue Models */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem', marginBottom: '1.25rem' }}>
-              <h5 style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#ECF2EE', margin: 0 }}>Projected Monetization Models:</h5>
-
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '0.875rem 1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#ECF2EE' }}>Model A: Developer Land Lease</span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#22C55E' }}>
-                    ₹{(calc.annualLeaseMin / 100000).toFixed(2)} – {(calc.annualLeaseMax / 100000).toFixed(2)} L/yr
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '3px' }}>
-                  Passive annual income (@ ₹35k–₹50k/acre) with 5% escalation every 2 years. Zero investment needed.
-                </div>
-              </div>
-
-              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '0.875rem 1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#ECF2EE' }}>Model B: DISCOM Power Purchase (PPA)</span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#A8FF3E' }}>
-                    ~₹{calc.grossPpaIncome} Lakh/yr
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.75rem', color: '#7A9484', marginTop: '3px' }}>
-                  Sell power directly to {state} DISCOM at fixed PPA rate ~₹3.00/unit under 25-year contract.
-                </div>
-              </div>
-            </div>
-
-            <button className="btn btn-secondary w-full justify-center" style={{ fontSize: '0.875rem' }}>
-              Connect with Empanelled KUSUM Developers <CaretRight size={15} />
-            </button>
           </div>
-        ) : (
-          <div style={{
-            background: 'rgba(10,18,13,0.78)', backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '3rem 2rem',
-            textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <Mountains size={40} weight="duotone" color="#7A9484" style={{ marginBottom: '1rem' }} />
-            <p style={{ color: '#7A9484', fontSize: '0.875rem' }}>Fill in your land details to estimate PM-KUSUM solar power plant potential.</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
