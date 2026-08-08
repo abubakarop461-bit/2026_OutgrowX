@@ -1,183 +1,152 @@
 import { knowledgeService } from './knowledgeService';
-import pmSuryaGharData from '../knowledge/pmSuryaGhar.json';
-import solarPoliciesData from '../knowledge/solarPoliciesAndSchemes.json';
 
 export interface CentralizedContextState {
-  userRole: string;
+  userRole: 'Homeowner' | 'Landowner' | 'Solar Vendor' | string;
   onboarding: {
     name?: string;
-    firstName?: string;
     companyName?: string;
     gstin?: string;
     licenseNo?: string;
-    businessType?: string;
-    state?: string;
-    discom?: string;
+    state: string;
+    discom: string;
     city?: string;
-    pincode?: string;
-    phone?: string;
-    email?: string;
-    propertyType?: string;
-    roofArea?: number;
-    billAmount?: number;
-    hasSolar?: boolean;
-    wantsBattery?: boolean;
+    billAmount: number;
+    roofArea: number;
   };
   billScanner: {
     scannedAt?: string;
-    discom?: string;
-    consumerNumber?: string;
-    unitsConsumed?: number;
-    billAmount?: number;
-    billingPeriod?: string;
-    consumerCategory?: string;
-    modelUsed?: string;
-    aiInsight?: string;
+    unitsConsumed: number;
+    billAmount: number;
+    discom: string;
+    consumerCategory: string;
   };
   applianceCalculator: {
     calculatedAt?: string;
-    totalMonthlyKWh?: number;
-    seasonalHours?: { summer: number; monsoon: number; winter: number };
-    topAppliance?: string;
-    activeDeviceCount?: number;
-    aiInsight?: string;
+    totalMonthlyKWh: number;
+    topAppliance: string;
+    seasonalHours: { summer: number; monsoon: number; winter: number };
   };
   propertyAssessment: {
     assessedAt?: string;
-    roofAreaSqFt?: number;
-    roofSolarScore?: number;
+    roofAreaSqFt: number;
+    roofSolarScore: number;
     landAcres?: number;
-    landCapacityMW?: number;
-    kusumEligible?: boolean;
-    aiInsight?: string;
+    estimatedCapacityMW?: number;
   };
+  lastUpdated: string;
 }
 
-const CONTEXT_STORAGE_KEY = 'suryx_centralized_context_engine';
+const STORAGE_KEY = 'suryx_centralized_context_engine';
 
-/**
- * Retrieves current centralized context from localStorage, seeded with active profile
- */
-export function getCentralizedContext(profile: any = {}): CentralizedContextState {
-  const role = profile.userType || profile.userRole || 'Homeowner';
-  let stored: Partial<CentralizedContextState> = {};
-  
-  try {
-    const raw = localStorage.getItem(CONTEXT_STORAGE_KEY);
-    if (raw) stored = JSON.parse(raw);
-  } catch (e) {
-    console.error('Failed to read centralized context:', e);
-  }
-
-  return {
-    userRole: role,
+export function getCentralizedContext(profile?: any): CentralizedContextState {
+  const fallback: CentralizedContextState = {
+    userRole: profile?.userType || profile?.userRole || 'Homeowner',
     onboarding: {
-      name: profile.name || profile.firstName || stored.onboarding?.name || '',
-      firstName: profile.firstName || profile.name || stored.onboarding?.firstName || '',
-      companyName: profile.companyName || stored.onboarding?.companyName || '',
-      gstin: profile.gstin || stored.onboarding?.gstin || '',
-      licenseNo: profile.licenseNo || stored.onboarding?.licenseNo || '',
-      businessType: profile.businessType || stored.onboarding?.businessType || 'EPC Installer',
-      state: profile.state || stored.onboarding?.state || 'Maharashtra',
-      discom: profile.discom || stored.onboarding?.discom || 'MSEDCL',
-      city: profile.city || stored.onboarding?.city || '',
-      pincode: profile.pincode || profile.pinCode || stored.onboarding?.pincode || '',
-      phone: profile.phone || stored.onboarding?.phone || '',
-      email: profile.email || stored.onboarding?.email || '',
-      propertyType: profile.propertyType || stored.onboarding?.propertyType || 'Independent House',
-      roofArea: Number(profile.roofArea || profile.roofSqFt || stored.onboarding?.roofArea || 800),
-      billAmount: Number(profile.billAmount || profile.avgBill || stored.onboarding?.billAmount || 3200),
-      hasSolar: Boolean(profile.hasSolar ?? stored.onboarding?.hasSolar),
-      wantsBattery: Boolean(profile.wantsBattery ?? stored.onboarding?.wantsBattery),
+      name: profile?.name || profile?.firstName || 'User',
+      companyName: profile?.companyName || '',
+      gstin: profile?.gstin || '',
+      licenseNo: profile?.licenseNo || '',
+      state: profile?.state || 'Maharashtra',
+      discom: profile?.discom || 'MSEDCL',
+      city: profile?.city || 'Pune',
+      billAmount: Number(profile?.billAmount || profile?.avgBill || profile?.billSize || 3200),
+      roofArea: Number(profile?.roofArea || profile?.roofSqFt || 800),
     },
-    billScanner: stored.billScanner || {},
-    applianceCalculator: stored.applianceCalculator || {},
-    propertyAssessment: stored.propertyAssessment || {},
+    billScanner: {
+      unitsConsumed: 0,
+      billAmount: 0,
+      discom: profile?.discom || 'MSEDCL',
+      consumerCategory: 'Residential',
+    },
+    applianceCalculator: {
+      totalMonthlyKWh: 0,
+      topAppliance: 'Air Conditioner',
+      seasonalHours: { summer: 8, monsoon: 5, winter: 3 },
+    },
+    propertyAssessment: {
+      roofAreaSqFt: Number(profile?.roofArea || profile?.roofSqFt || 800),
+      roofSolarScore: 88,
+    },
+    lastUpdated: new Date().toISOString(),
   };
-}
 
-/**
- * Saves updated context state to localStorage
- */
-function saveCentralizedContext(state: CentralizedContextState): void {
+  if (typeof window === 'undefined') return fallback;
+
   try {
-    localStorage.setItem(CONTEXT_STORAGE_KEY, JSON.stringify(state));
-  } catch (e) {
-    console.error('Failed to save centralized context:', e);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved);
+    if (profile) {
+      parsed.userRole = profile.userType || profile.userRole || parsed.userRole || 'Homeowner';
+      parsed.onboarding.name = profile.name || profile.firstName || parsed.onboarding.name;
+      parsed.onboarding.state = profile.state || parsed.onboarding.state;
+      parsed.onboarding.discom = profile.discom || parsed.onboarding.discom;
+    }
+    return parsed;
+  } catch {
+    return fallback;
   }
 }
 
-/**
- * Records a Bill Scanner Action into the Centralized Context Engine
- */
-export function recordBillScanAction(billData: any, profile: any = {}): CentralizedContextState {
+export function saveCentralizedContext(state: CentralizedContextState) {
+  if (typeof window === 'undefined') return;
+  try {
+    state.lastUpdated = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error('Failed to save Centralized Context Engine state:', e);
+  }
+}
+
+export function recordBillScanAction(billData: any, profile?: any) {
   const current = getCentralizedContext(profile);
   const updated: CentralizedContextState = {
     ...current,
     billScanner: {
       scannedAt: new Date().toISOString(),
+      unitsConsumed: billData.unitsConsumed || Math.round(billData.billAmount / 9.5),
+      billAmount: billData.billAmount || 0,
       discom: billData.discom || current.onboarding.discom,
-      consumerNumber: billData.consumerNumber || '123456789',
-      unitsConsumed: Number(billData.unitsConsumed) || 342,
-      billAmount: Number(billData.billAmount) || current.onboarding.billAmount || 3200,
-      billingPeriod: billData.billingPeriod || 'Recent Month',
       consumerCategory: billData.consumerCategory || 'Residential',
-      modelUsed: billData.modelUsed || 'Solar Vision AI (Llama 3.1 Vision / Gemini)',
-      aiInsight: `Bill scanned: ${billData.unitsConsumed || 342} kWh (${billData.discom || current.onboarding.discom}). Est system required: ${((billData.unitsConsumed || 342) / 120).toFixed(1)} kW.`,
+    },
+    onboarding: {
+      ...current.onboarding,
+      billAmount: billData.billAmount || current.onboarding.billAmount,
+      discom: billData.discom || current.onboarding.discom,
     }
   };
   saveCentralizedContext(updated);
   return updated;
 }
 
-/**
- * Records an Appliance Calculator Action into the Centralized Context Engine
- */
-export function recordApplianceCalculatorAction(
-  appliances: any[],
-  hours: { summer: number; monsoon: number; winter: number },
-  monthlyKWh: number,
-  profile: any = {}
-): CentralizedContextState {
+export function recordApplianceCalculatorAction(appliances: any[], hours: any, totalKWh: number, profile?: any) {
   const current = getCentralizedContext(profile);
-  const activeDevs = appliances.filter(a => a.quantity > 0);
-  const topDev = activeDevs.sort((a, b) => (b.wattage * b.quantity) - (a.wattage * a.quantity))[0];
+  const activeDevs = appliances.filter(a => (a.quantity || 0) > 0);
+  const topDev = activeDevs.sort((a, b) => (b.wattage * (b.quantity || 1)) - (a.wattage * (a.quantity || 1)))[0];
 
   const updated: CentralizedContextState = {
     ...current,
     applianceCalculator: {
       calculatedAt: new Date().toISOString(),
-      totalMonthlyKWh: Math.round(monthlyKWh),
+      totalMonthlyKWh: totalKWh,
+      topAppliance: topDev ? topDev.name : 'Air Conditioner',
       seasonalHours: hours,
-      topAppliance: topDev ? `${topDev.name} (${topDev.quantity}x)` : 'General Appliances',
-      activeDeviceCount: activeDevs.length,
-      aiInsight: `Seasonal load recorded: ${Math.round(monthlyKWh)} kWh/mo (Summer: ${hours.summer}h/day). Primary load: ${topDev?.name || 'AC'}.`,
     }
   };
   saveCentralizedContext(updated);
   return updated;
 }
 
-/**
- * Records a Property/Land Assessment Action into the Centralized Context Engine
- */
-export function recordPropertyAssessmentAction(
-  assessmentData: any,
-  profile: any = {}
-): CentralizedContextState {
+export function recordPropertyAssessmentAction(assessmentData: any, profile?: any) {
   const current = getCentralizedContext(profile);
   const updated: CentralizedContextState = {
     ...current,
     propertyAssessment: {
       assessedAt: new Date().toISOString(),
-      roofAreaSqFt: Number(assessmentData.roofArea) || current.onboarding.roofArea,
-      roofSolarScore: Number(assessmentData.score) || 88,
-      landAcres: Number(assessmentData.acres) || 5,
-      landCapacityMW: Number(assessmentData.acres) ? Number(assessmentData.acres) * 0.5 : 0.5,
-      kusumEligible: Number(assessmentData.acres) >= 0.5,
-      aiInsight: assessmentData.acres
-        ? `Land assessed: ${assessmentData.acres} Acres. Est capacity: ${Number(assessmentData.acres) * 0.5} MW. PM-KUSUM Component A eligible.`
-        : `Roof assessed: ${assessmentData.roofArea || current.onboarding.roofArea} sq ft. Solar score: ${assessmentData.score || 88}/100.`,
+      roofAreaSqFt: assessmentData.roofArea || current.onboarding.roofArea,
+      roofSolarScore: assessmentData.score || current.propertyAssessment.roofSolarScore || 88,
+      landAcres: assessmentData.acres,
+      estimatedCapacityMW: assessmentData.capacityMW,
     }
   };
   saveCentralizedContext(updated);
@@ -185,8 +154,9 @@ export function recordPropertyAssessmentAction(
 }
 
 /**
- * Builds the hyper-personalized System Prompt for the AI Advisor Chatbot,
- * injecting the COMPLETE Centralized Context Engine state & Role-specific pathways.
+ * Builds the Master System Prompt for the SuryaSetu Solar Advisor AI Chatbot.
+ * Dynamically injects live Centralized Context Engine signals (Bill Scans, Appliance Load, Property, Onboarding)
+ * alongside RAG Knowledge Base context and strict Master Prompt Standards.
  */
 export function buildCentralizedSystemPrompt(
   profile: any,
@@ -194,48 +164,22 @@ export function buildCentralizedSystemPrompt(
   lang: string = 'en'
 ): string {
   const ctx = getCentralizedContext(profile);
-  const role = ctx.userRole;
+  const role = ctx.userRole || 'Homeowner';
+  const name = ctx.onboarding.name || profile?.firstName || profile?.name || 'User';
 
-  const langInstruction = lang === 'hi' 
-    ? 'You MUST respond in Hindi using Devanagari script.' 
-    : lang === 'mr' 
-      ? 'You MUST respond in Marathi using Devanagari script.' 
-      : 'You MUST respond in clear, professional English.';
+  const langInstruction = lang === 'hi'
+    ? 'You MUST respond entirely in Hindi using Devanagari script (including all headers and terms).'
+    : lang === 'mr'
+      ? 'You MUST respond entirely in Marathi using Devanagari script (including all headers and terms).'
+      : 'You MUST respond in clear, professional English by default.';
 
-  // Structured Knowledge Base RAG retrieval
+  // RAG Knowledge Base context retrieval
   const ragContext = knowledgeService.getPromptContext(userQuery);
-
-  // Role-Specific Pathway Guidance
-  let rolePathwayText = '';
-  if (role === 'Landowner' || role === 'landowner') {
-    rolePathwayText = `
-=== ROLE PATHWAY: LANDOWNER ===
-- Focus on PM-KUSUM Component A (0.5 MW to 2 MW feeder solar plants), Component B (standalone solar pumps 2-10 HP), and Component C (agricultural feeder solarization).
-- Highlight annual land lease revenue: ~₹2.2 Lakh to ₹4.0 Lakh per MW/year with 25-year DISCOM Power Purchase Agreements (PPA).
-- Evaluate land requirements: ~4 to 5 acres per 1 MW solar PV plant.
-- Provide guidance on DISCOM 11kV/33kV substation distance (< 5 km recommended).`;
-  } else if (role === 'Solar Vendor' || role === 'Business Owner' || role === 'business') {
-    rolePathwayText = `
-=== ROLE PATHWAY: SOLAR VENDOR / INSTALLER ===
-- Focus on installer empanelment under PM Surya Ghar & state DISCOM portals.
-- Provide compliance assistance for GSTIN (${ctx.onboarding.gstin || '27AAAAA0000A1Z5'}) & License (${ctx.onboarding.licenseNo || 'DISCOM-EMP-2024-884'}).
-- Advise on ALMM (Approved List of Models and Manufacturers) module procurement & BIS inverted standards.
-- Assist in drafting technical proposals, DISCOM net-metering application checklists, and customer ROI closing pitches.`;
-  } else {
-    rolePathwayText = `
-=== ROLE PATHWAY: HOMEOWNER / RESIDENTIAL CONSUMER ===
-- Focus on PM Surya Ghar: Muft Bijli Yojana Central DBT Subsidies:
-  * 1 kW system: ₹30,000 subsidy
-  * 2 kW system: ₹60,000 subsidy
-  * 3 kW+ system: ₹78,000 maximum subsidy
-- Provide exact roof area calculation (107 sq ft per 1 kW system).
-- Explain DISCOM net-metering banking credits and annual zero-bill potential.`;
-  }
 
   // Active Scanned / Calculated Context Signals
   const scannerSignals = ctx.billScanner.scannedAt
-    ? `Scanned Bill: ${ctx.billScanner.unitsConsumed} kWh | ₹${ctx.billScanner.billAmount} | DISCOM: ${ctx.billScanner.discom}`
-    : `Onboarding Monthly Bill: ₹${ctx.onboarding.billAmount} | DISCOM: ${ctx.onboarding.discom}`;
+    ? `Scanned Bill: ${ctx.billScanner.unitsConsumed} kWh | ₹${ctx.billScanner.billAmount.toLocaleString('en-IN')} | DISCOM: ${ctx.billScanner.discom}`
+    : `Onboarding Monthly Bill: ₹${(ctx.onboarding.billAmount || 3200).toLocaleString('en-IN')} | DISCOM: ${ctx.onboarding.discom}`;
 
   const loadSignals = ctx.applianceCalculator.calculatedAt
     ? `Appliance Load Model: ${ctx.applianceCalculator.totalMonthlyKWh} kWh/mo | Top Load: ${ctx.applianceCalculator.topAppliance}`
@@ -243,29 +187,69 @@ export function buildCentralizedSystemPrompt(
 
   const propertySignals = ctx.propertyAssessment.assessedAt
     ? `Property Assessment: ${ctx.propertyAssessment.roofAreaSqFt} sq ft roof | Score: ${ctx.propertyAssessment.roofSolarScore}/100`
-    : `Onboarding Roof Baseline: ${ctx.onboarding.roofArea} sq ft`;
+    : `Onboarding Roof Baseline: ${ctx.onboarding.roofArea || 800} sq ft`;
 
-  return `You are SuryaSetu Solar Advisor — India's premier AI-powered regional solar intelligence expert.
-You are powered by a Centralized Context Engine that unifies Onboarding data, Bill Scans, Appliance Load Models, and Property Assessments.
+  return `# SuryaSetu Solar Advisor — Master System Prompt
+
+## 1. IDENTITY & MISSION
+You are **SuryaSetu Solar Advisor**, India's premier AI-powered regional solar intelligence expert, built on a Centralized Context Engine that unifies Onboarding data, Bill Scans, Appliance Load Models, and Property Assessments.
+
+Your job is not to answer questions — it is to produce a **decision-ready personal solar brief** every time a user asks something. Every response should leave the user able to act (apply, calculate, negotiate, or decide) without needing to ask a follow-up just to get basic numbers.
 
 ${langInstruction}
 
-=== UNIFIED CENTRALISED CONTEXT ENGINE STATE ===
-- User Role: ${role}
-- Name / Contact: ${ctx.onboarding.name || 'User'} ${ctx.onboarding.companyName ? `(${ctx.onboarding.companyName})` : ''}
-- Location: ${ctx.onboarding.state} | DISCOM: ${ctx.onboarding.discom} | City: ${ctx.onboarding.city || 'State Capital'}
-- Recorded Bill Signals: ${scannerSignals}
-- Recorded Load Signals: ${loadSignals}
-- Recorded Property Signals: ${propertySignals}
-${ctx.onboarding.gstin ? `- Business GSTIN: ${ctx.onboarding.gstin} | License: ${ctx.onboarding.licenseNo}` : ''}
+---
 
-${rolePathwayText}
+## 2. NON-NEGOTIABLE RESPONSE STANDARDS
+1. **Never give a one-line or single-paragraph answer to a substantive question.** Include: the number, the formula/reasoning behind it, how it was personalized to this user's recorded signals, and a next step.
+2. **Always show the math.** Never state a final ₹ figure without showing the calculation that produced it (rate × quantity = result).
+3. **Always personalize.** Pull the user's actual recorded signals (bill kWh, ₹ amount, DISCOM, roof sq ft, property score, load model, top appliances) into the answer by name.
+4. **Default to structured Markdown** — headers (##/###), bold key figures, and tables for any comparison or multi-line calculation.
+5. **Anticipate the next three questions.** If a user asks "how much subsidy do I get," proactively also cover system sizing, roof fit, and the immediate next action.
+6. **End every substantive answer with a clear "Next Step" or a single, focused clarifying question.**
+7. **Minimum depth bar:** Substantive queries should read as a mini-briefing (150–350 words or equivalent structured block).
 
-=== KNOWLEDGE BASE CONTEXT ===
+---
+
+## 3. UNIFIED CENTRALISED CONTEXT ENGINE STATE (GROUND TRUTH)
+- **Active User Name:** ${name} ${ctx.onboarding.companyName ? `(${ctx.onboarding.companyName})` : ''}
+- **User Role Pathway:** ${role}
+- **Location & Utility:** ${ctx.onboarding.state} | DISCOM: ${ctx.onboarding.discom} | City: ${ctx.onboarding.city || 'State Capital'}
+- **Recorded Bill Signals:** ${scannerSignals}
+- **Recorded Load Signals:** ${loadSignals}
+- **Recorded Property Signals:** ${propertySignals}
+${ctx.onboarding.gstin ? `- **Business GSTIN:** ${ctx.onboarding.gstin} | **License:** ${ctx.onboarding.licenseNo}` : ''}
+
+### 3.1 Signal Reconciliation Protocol
+If Bill Scan (e.g., ${ctx.billScanner.unitsConsumed || 235} kWh) and Appliance Load Model (e.g., ${ctx.applianceCalculator.totalMonthlyKWh || 420} kWh) differ:
+- Explicitly flag the gap to ${name}.
+- Explain the cause (e.g., newly added ACs or seasonal summer surge).
+- Size around the higher forward-looking figure by default while offering the conservative bill-based size as an alternative.
+
+---
+
+## 4. UNIVERSAL CALCULATION TOOLKIT
+- **Roof space:** ~107 sq ft per 1 kW installed.
+- **Roof capacity max:** Roof area (${ctx.propertyAssessment.roofAreaSqFt || ctx.onboarding.roofArea || 800} sq ft) ÷ 107.
+- **Load-driven size:** Monthly kWh ÷ (4.2 units/kWp/day × 30).
+- **PM Surya Ghar Subsidy:** ₹30,000 for 1 kW | ₹60,000 for 2 kW | ₹78,000 max for 3 kW+. Disbursed via DBT after commissioning. Requires ALMM & BIS compliance.
+- **PM-KUSUM (Landowners):** Component A (0.5–2 MW feeder plant, ~4-5 acres/MW, <5 km from 11/33kV substation, 25-yr PPA), Component B (off-grid solar pumps 2-10 HP, 60% subsidy), Component C (feeder solarization). Lease income: ₹60,000–₹1,00,000/acre/year or ₹2.2–4.0 Lakh/MW/year.
+
+---
+
+## 5. INJECTED KNOWLEDGE BASE & POLICY CURRENCY
 ${ragContext}
 
-=== REASONING PROTOCOL ===
-1. Personalize every recommendation to the user's explicit role (${role}) and their recorded context signals above.
-2. Ground costs, savings, and subsidies in exact ₹ Indian Rupee math according to PM Surya Ghar / PM-KUSUM rules.
-3. Keep answers clear, professional, structured with Markdown headers and bullet points. Never expose vendor model names.`;
+---
+
+## 6. RESPONSE TEMPLATES BY QUERY INTENT
+When user asks about cost/subsidy/savings, structure as:
+## [Direct headline number, e.g., "${name}, Your 3.5 kW Solar Math for ${ctx.onboarding.state}"]
+### Your Numbers & Math
+(Show sizing formula, gross cost, subsidy deduction, net investment, monthly bill offset math, payback years)
+### Why This Fits You
+(Tie directly to ${ctx.onboarding.discom}, ${ctx.onboarding.roofArea || 800} sq ft roof, and recorded load signals)
+### Next Step
+(Single actionable next step)
+`;
 }
