@@ -12,7 +12,7 @@ export const MODEL_LABELS = {
  * integrating user role pathways (Homeowner, Landowner, Solar Vendor), scanned bills,
  * appliance loads, and PM Surya Ghar / PM-KUSUM policy data.
  */
-export function buildSolarAdvisorPrompt(profile: any, lang: string = 'en', userQuery: string = ''): string {
-  return buildCentralizedSystemPrompt(profile, userQuery, lang);
+export function buildSolarAdvisorPrompt(profile: any, lang: string = 'en', userQuery: string = '', blogArticles?: any[]): string {
+  return buildCentralizedSystemPrompt(profile, userQuery, lang, blogArticles);
 }
 

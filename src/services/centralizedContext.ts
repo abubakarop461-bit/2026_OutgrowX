@@ -161,7 +161,8 @@ export function recordPropertyAssessmentAction(assessmentData: any, profile?: an
 export function buildCentralizedSystemPrompt(
   profile: any,
   userQuery: string = '',
-  lang: string = 'en'
+  lang: string = 'en',
+  blogArticles?: any[]
 ): string {
   const ctx = getCentralizedContext(profile);
   const role = ctx.userRole || 'Homeowner';
@@ -173,8 +174,8 @@ export function buildCentralizedSystemPrompt(
       ? 'You MUST respond entirely in Marathi using Devanagari script (including all headers and terms).'
       : 'You MUST respond in clear, professional English by default.';
 
-  // RAG Knowledge Base context retrieval
-  const ragContext = knowledgeService.getPromptContext(userQuery);
+  // RAG Knowledge Base context retrieval (including RSS blog feeds)
+  const ragContext = knowledgeService.getPromptContext(userQuery, blogArticles);
 
   // Active Scanned / Calculated Context Signals
   const scannerSignals = ctx.billScanner.scannedAt

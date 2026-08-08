@@ -470,7 +470,7 @@ const ApplianceCalculator: React.FC = () => {
    AI ADVISOR — with full Markdown rendering
 ═══════════════════════════════════════════════════ */
 const AIAdvisor: React.FC = () => {
-  const { userProfile, language } = useApp();
+  const { userProfile, language, blogArticles } = useApp();
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
   const centralCtx = getCentralizedContext(userProfile);
 
@@ -507,7 +507,7 @@ Ask me anything about subsidies, sizing, DISCOM net-metering, or your solar tran
     setInput('');
     setIsStreaming(true);
 
-    const systemPrompt = buildSolarAdvisorPrompt(userProfile, language, text);
+    const systemPrompt = buildSolarAdvisorPrompt(userProfile, language, text, blogArticles);
     const apiMessages: Message[] = [...messages, userMsg];
 
     try {

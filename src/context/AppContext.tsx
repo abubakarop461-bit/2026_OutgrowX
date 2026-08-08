@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { BlogArticle, STATIC_FALLBACK_BLOGS, fetchFeedBlogs } from '../services/blogFeeds';
 
 export type UserRole = 'consumer' | 'landowner' | 'business' | null;
 export type Language = 'en' | 'hi' | 'mr';
@@ -39,6 +40,7 @@ interface AppContextType {
   isOnboarded: boolean;
   isAuthenticated: boolean;
   userRole: UserRole;
+  blogArticles: BlogArticle[];
   setProfile: (profileUpdate: Partial<UserProfile>) => void;
   setLanguage: (lang: Language) => void;
   completeOnboarding: () => void;
@@ -75,6 +77,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [userRole, setUserRoleState] = useState<UserRole>(() => {
     return (localStorage.getItem('suryx_role') as UserRole) || 'consumer';
   });
+
+  const [blogArticles, setBlogArticles] = useState<BlogArticle[]>(STATIC_FALLBACK_BLOGS);
+
+  useEffect(() => {
+    fetchFeedBlogs().then(articles => {
+      if (articles && articles.length > 0) {
+        setBlogArticles(articles);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('suryx_profile', JSON.stringify(userProfile));
@@ -146,6 +158,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       isOnboarded,
       isAuthenticated,
       userRole,
+      blogArticles,
       setProfile,
       setLanguage,
       completeOnboarding,

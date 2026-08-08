@@ -249,7 +249,13 @@ export class KnowledgeService {
   /**
    * Generates formatted structured knowledge text for AI System Prompt injection.
    */
-  getPromptContext(query: string = ''): string {
+  getPromptContext(query: string = '', blogArticles?: any[]): string {
+    let feedContext = '';
+    if (blogArticles && blogArticles.length > 0) {
+      feedContext = `\n\n5. LATEST INDIAN SOLAR NEWS & FEED UPDATES (KNOWLEDGE BASE):\n` +
+        blogArticles.slice(0, 10).map((art, idx) => `- [${art.source}] ${art.title}: ${art.description} (${art.link})`).join('\n');
+    }
+
     return `=== OFFICIAL SURYAX KNOWLEDGE BASE (SINGLE SOURCE OF TRUTH) ===
 
 1. PM SURYA GHAR: MUFT BIJLI YOJNA
@@ -287,7 +293,7 @@ export class KnowledgeService {
 4. KEY DISCOM & ELIGIBILITY RULES
 - Net Metering: Bi-directional meter measures Import vs Export units
 - Documents Needed: Electricity bill, Aadhaar, Bank passbook for DBT, Roof photo, Tenant NOC if applicable.
-- If information is not in this knowledge base, answer: "This information is not available in the provided knowledge base."`;
+- If information is not in this knowledge base, answer: "This information is not available in the provided knowledge base."${feedContext}`;
   }
 }
 

@@ -49,7 +49,7 @@ const CountUp: React.FC<{ end: number; prefix?: string; suffix?: string; decimal
 };
 
 export default function Dashboard() {
-  const { userProfile, language } = useApp();
+  const { userProfile, language, blogArticles } = useApp();
   const [yearSpan, setYearSpan] = useState<10 | 20 | 25>(20);
 
   /* ─ Profile values ─ */
@@ -108,7 +108,8 @@ export default function Dashboard() {
     solarCumulativeSavings: isHi ? "सौर संचयी बचत" : isMr ? "सोलर एकत्रित बचत" : "Solar Cumulative Savings",
     gridEscalation: isHi ? "ग्रिड लागत वृद्धि (7.8%/वर्ष)" : isMr ? "ग्रीड दर वाढ (7.8%/वर्ष)" : "Grid Cost Escalation (7.8%/yr)",
     netSolarSavingsLabel: isHi ? "नेट सौर बचत" : isMr ? "निव्वळ सोलर बचत" : "Net Solar Savings",
-    netSavingsForecast: isHi ? `नेट ${yearSpan}-वर्षीय बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : isMr ? `निव्वळ ${yearSpan}-वर्षांची बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : `Net ${yearSpan}-Year Savings: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}`
+    netSavingsForecast: isHi ? `नेट ${yearSpan}-वर्षीय बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : isMr ? `निव्वळ ${yearSpan}-वर्षांची बचत: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}` : `Net ${yearSpan}-Year Savings: +₹${(roi.yearlyData[yearSpan]?.cumulative || 0).toLocaleString('en-IN')}`,
+    latestInsights: isHi ? "नवीनतम सौर समाचार एवं विश्लेषण" : isMr ? "नवीनतम सोलर बातम्या आणि विश्लेषण" : "Latest Solar News & Analysis"
   };
 
   return (
@@ -430,6 +431,148 @@ export default function Dashboard() {
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', color: 'var(--color-ember-orange)' }}>
                 {strings.netSavingsForecast}
+              </div>
+            </div>
+          </div>
+
+          {/* ── CARD 8: INFINITE SCROLLING SOLAR BLOGS MARQUEE (Span 12 cols) ── */}
+          <div
+            style={{
+              gridColumn: 'span 12',
+              background: 'var(--color-ash)',
+              border: '1px solid var(--color-mist)',
+              borderRadius: '20px',
+              padding: '24px 20px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              marginTop: '12px'
+            }}
+          >
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingLeft: '8px' }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-ember-orange)' }} />
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 400, color: 'var(--color-graphite)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {strings.latestInsights}
+              </h3>
+            </div>
+
+            {/* Marquee Wrapper */}
+            <div className="marquee-wrapper" style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+              {/* Fade masks */}
+              <div style={{
+                position: 'absolute', top: 0, bottom: 0, left: 0, width: '40px',
+                background: 'linear-gradient(to right, var(--color-ash), transparent)',
+                zIndex: 2, pointerEvents: 'none'
+              }} />
+              <div style={{
+                position: 'absolute', top: 0, bottom: 0, right: 0, width: '40px',
+                background: 'linear-gradient(to left, var(--color-ash), transparent)',
+                zIndex: 2, pointerEvents: 'none'
+              }} />
+
+              {/* Dynamic CSS for Marquee */}
+              <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes marquee {
+                  0% { transform: translateX(0); }
+                  100% { transform: translateX(-50%); }
+                }
+                .marquee-inner {
+                  display: flex;
+                  gap: 20px;
+                  width: max-content;
+                  animation: marquee 50s linear infinite;
+                }
+                .marquee-inner:hover {
+                  animation-play-state: paused;
+                }
+                .blog-marquee-card {
+                  width: 320px;
+                  background: var(--color-canvas-white);
+                  border: 1px solid var(--color-mist);
+                  border-radius: 6px 0px 0px 6px;
+                  padding: 18px;
+                  display: flex;
+                  flex-direction: column;
+                  justify-content: space-between;
+                  transition: all 0.2s ease;
+                  cursor: pointer;
+                  text-decoration: none;
+                }
+                .blog-marquee-card:hover {
+                  border-color: var(--color-ember-orange);
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+                  transform: translateY(-2px);
+                }
+              `}} />
+
+              {/* Inner Scrolling Content (Duplicated for seamless loop) */}
+              <div className="marquee-inner">
+                {/* First Copy */}
+                {blogArticles.map((blog, idx) => (
+                  <a
+                    key={`blog-1-${idx}`}
+                    href={blog.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="blog-marquee-card"
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-brass)' }}>
+                          {blog.source}
+                        </span>
+                        <span style={{ fontSize: '10px', color: 'var(--color-slate)' }}>
+                          {blog.pubDate}
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-graphite)', margin: '0 0 6px', lineHeight: 1.3, fontFamily: 'var(--font-display)' }}>
+                        {blog.title}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: 'var(--color-steel)', margin: 0, lineHeight: 1.4 }}>
+                        {blog.description}
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--color-ember-orange)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'underline' }}>
+                        Read Article <ArrowUpRight size={12} />
+                      </span>
+                    </div>
+                  </a>
+                ))}
+
+                {/* Second Copy for Seamless Loop */}
+                {blogArticles.map((blog, idx) => (
+                  <a
+                    key={`blog-2-${idx}`}
+                    href={blog.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="blog-marquee-card"
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', color: 'var(--color-brass)' }}>
+                          {blog.source}
+                        </span>
+                        <span style={{ fontSize: '10px', color: 'var(--color-slate)' }}>
+                          {blog.pubDate}
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-graphite)', margin: '0 0 6px', lineHeight: 1.3, fontFamily: 'var(--font-display)' }}>
+                        {blog.title}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: 'var(--color-steel)', margin: 0, lineHeight: 1.4 }}>
+                        {blog.description}
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--color-ember-orange)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'underline' }}>
+                        Read Article <ArrowUpRight size={12} />
+                      </span>
+                    </div>
+                  </a>
+                ))}
               </div>
             </div>
           </div>
