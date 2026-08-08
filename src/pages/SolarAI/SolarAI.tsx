@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu, Layers } from 'lucide-react';
+import { UploadCloud, CheckCircle, Info, Sparkles, Send, Cpu, Layers, Trash2, Receipt, Clock, Check } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,6 +22,7 @@ import {
   recordApplianceCalculatorAction,
   getCentralizedContext
 } from '../../services/centralizedContext';
+import { localDB, DBScannedBill } from '../../services/localDatabase';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Legend);
 
@@ -75,12 +76,33 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // IndexedDB relational bill history state
+  const [savedBills, setSavedBills] = useState<DBScannedBill[]>([]);
+  const [appliedSuccess, setAppliedSuccess] = useState(false);
+  const [selectedBillId, setSelectedBillId] = useState<string | null>(null);
+
+  const userId = userProfile.email || userProfile.phone || 'default_user';
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
+
+  // Load all historical bills from client IndexedDB database on mount
+  const loadSavedBills = useCallback(async () => {
+    try {
+      const bills = await localDB.getAllScannedBills(userId);
+      setSavedBills(bills);
+    } catch (e) {
+      console.error('Error loading saved bills from local database:', e);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    loadSavedBills();
+  }, [loadSavedBills]);
 
   const processFile = async (file: File) => {
     setScanning(true);
     setError('');
     setResult(null);
+    setAppliedSuccess(false);
 
     try {
       const reader = new FileReader();
@@ -90,8 +112,25 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
         try {
           const data = await scanBill(base64, mimeType);
           setResult(data);
-          // Record scan action directly into the Centralized Context Engine
+
+          // Save bill transactionally into local relational database (IndexedDB)
+          const savedRecord = await localDB.saveScannedBill({
+            userId,
+            filename: file.name,
+            discom: data.discom,
+            consumerNumber: data.consumerNumber,
+            unitsConsumed: data.unitsConsumed,
+            billAmount: data.billAmount,
+            billingPeriod: data.billingPeriod,
+            consumerCategory: data.consumerCategory,
+            sanctionedLoad: data.sanctionedLoad,
+            modelUsed: data.modelUsed,
+            base64Image: base64,
+          });
+
+          setSelectedBillId(savedRecord.id);
           recordBillScanAction(data, userProfile);
+          await loadSavedBills();
         } catch (err) {
           setError('Failed to scan bill. Please try again.');
         } finally {
@@ -112,22 +151,48 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
     if (file) processFile(file);
   };
 
-  const [appliedSuccess, setAppliedSuccess] = useState(false);
+  const handleApplyData = (billToApply?: BillData | DBScannedBill) => {
+    const target = billToApply || result;
+    if (!target) return;
 
-  const handleApplyData = () => {
-    if (!result) return;
+    const dataToApply: BillData = {
+      discom: target.discom,
+      consumerNumber: target.consumerNumber,
+      unitsConsumed: target.unitsConsumed,
+      billAmount: target.billAmount,
+      billingPeriod: target.billingPeriod,
+      consumerCategory: target.consumerCategory || 'Residential',
+      sanctionedLoad: (target as any).sanctionedLoad || 3.5,
+      extractedSuccessfully: true,
+      modelUsed: (target as any).modelUsed || 'Solar Vision AI (IndexedDB Store)'
+    };
+
+    setResult(dataToApply);
     setProfile({
-      billAmount: result.billAmount,
-      avgBill: result.billAmount,
-      discom: result.discom,
+      billAmount: dataToApply.billAmount,
+      avgBill: dataToApply.billAmount,
+      discom: dataToApply.discom,
     });
-    recordBillScanAction(result, userProfile);
+
+    recordBillScanAction(dataToApply, userProfile);
     setAppliedSuccess(true);
+  };
+
+  const handleDeleteBill = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await localDB.deleteScannedBill(id);
+      if (selectedBillId === id) setSelectedBillId(null);
+      await loadSavedBills();
+    } catch (err) {
+      console.error('Failed to delete bill:', err);
+    }
   };
 
   return (
     <div className="grid-2">
       <div className="flex-col gap-6">
+        {/* Upload Zone */}
         <div
           className={`upload-zone ${isDragging ? 'upload-zone--drag-over' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
@@ -166,6 +231,7 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
           </div>
         )}
 
+        {/* Current Scan Result Card */}
         {result && (
           <div className="glass-card" style={{ border: appliedSuccess ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(255,255,255,0.08)' }}>
             <div className="flex items-center justify-between mb-4">
@@ -188,7 +254,7 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
 
             <button
               className={`btn ${appliedSuccess ? 'btn-secondary' : 'btn-primary'} w-full justify-center gap-2 mb-3`}
-              onClick={handleApplyData}
+              onClick={() => handleApplyData()}
               style={{
                 fontSize: '0.9375rem',
                 background: appliedSuccess ? 'rgba(34,197,94,0.18)' : undefined,
@@ -216,8 +282,84 @@ const BillScanner: React.FC<{ onNavigateToAdvisor?: () => void }> = ({ onNavigat
             )}
           </div>
         )}
+
+        {/* ══ SAVED BILLS LIBRARY (INDEXEDDB RELATIONAL STORE) ══ */}
+        <div className="glass-card">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="flex items-center gap-2" style={{ fontSize: '1rem', margin: 0, color: '#ECF2EE', fontFamily: 'Outfit, sans-serif' }}>
+              <Receipt size={18} className="text-accent" />
+              Saved Electricity Bills ({savedBills.length})
+            </h4>
+            <span style={{ fontSize: '0.6875rem', color: '#7A9484' }}>Client IndexedDB Store</span>
+          </div>
+
+          {savedBills.length === 0 ? (
+            <div className="text-center py-6 text-muted text-sm">
+              No bills saved yet. Upload a bill above to build your relational bill history library.
+            </div>
+          ) : (
+            <div className="flex-col gap-3" style={{ maxHeight: '280px', overflowY: 'auto' }}>
+              {savedBills.map((b) => (
+                <div
+                  key={b.id}
+                  style={{
+                    background: selectedBillId === b.id ? 'rgba(168,255,62,0.08)' : 'rgba(255,255,255,0.03)',
+                    border: selectedBillId === b.id ? '1px solid rgba(168,255,62,0.25)' : '1px solid rgba(255,255,255,0.06)',
+                    borderRadius: '12px',
+                    padding: '0.875rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    transition: 'all 150ms ease',
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                      <strong style={{ fontSize: '0.875rem', color: '#ECF2EE' }}>{b.discom}</strong>
+                      <span style={{ fontSize: '0.6875rem', color: '#A8FF3E', fontWeight: 700 }}>
+                        ₹{b.billAmount.toLocaleString('en-IN')}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#7A9484', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span>{b.unitsConsumed} kWh</span>
+                      <span>•</span>
+                      <span>{b.billingPeriod}</span>
+                      <span>•</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <Clock size={11} /> {new Date(b.scannedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        setSelectedBillId(b.id);
+                        handleApplyData(b);
+                      }}
+                      style={{ fontSize: '0.75rem', padding: '4px 10px', background: 'rgba(168,255,62,0.12)', color: '#A8FF3E', border: 'none' }}
+                    >
+                      Apply Context
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm text-red-400"
+                      onClick={(e) => handleDeleteBill(b.id, e)}
+                      title="Delete bill"
+                      style={{ padding: '6px' }}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Right Column: Role AI Insight */}
       <div className="flex-col gap-6">
         <div className="glass-card">
           <h4 className="mb-3" style={{ fontSize: '1rem' }}>Personalized Role AI Insight</h4>
@@ -274,10 +416,23 @@ const ApplianceCalculator: React.FC = () => {
   const monsoonKWh = Math.round(calculateKWh(hours.monsoon));
   const winterKWh = Math.round(calculateKWh(hours.winter));
 
-  // Sync with Centralized Context Engine on load changes
+  // Sync with Centralized Context Engine & IndexedDB on load changes
   useEffect(() => {
     const activeList = APPLIANCES.map(a => ({ ...a, quantity: quantities[a.id] || 0 }));
     recordApplianceCalculatorAction(activeList, hours, summerKWh, userProfile);
+    
+    // Save to local relational DB
+    const activeDevs = activeList.filter(a => a.quantity > 0);
+    const topDev = activeDevs.sort((a, b) => (b.wattage * b.quantity) - (a.wattage * a.quantity))[0];
+    localDB.saveApplianceLoad({
+      userId: userProfile.email || 'default_user',
+      totalMonthlyKWh: summerKWh,
+      summerHours: hours.summer,
+      monsoonHours: hours.monsoon,
+      winterHours: hours.winter,
+      activeAppliancesCount: activeDevs.length,
+      topAppliance: topDev?.name || 'General Appliances',
+    }).catch(console.error);
   }, [quantities, hours, summerKWh, userProfile]);
 
   const role = userProfile.userType || userProfile.userRole || 'Homeowner';
